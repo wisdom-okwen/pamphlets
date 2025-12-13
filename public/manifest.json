@@ -1,0 +1,21 @@
+{
+  "name": "Pamphlets",
+  "short_name": "Pamphlets",
+  "description": "Discover insightful articles on Career, Academic, Religious topics and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/pamphlets.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pamphlets.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
