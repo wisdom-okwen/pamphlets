@@ -8,6 +8,7 @@ import {
     pgEnum,
     json,
     uniqueIndex,
+    uuid,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -16,6 +17,7 @@ export const userRoleEnum = pgEnum("user_role", ["admin", "author", "visitor"]);
 export const articleStatusEnum = pgEnum("article_status", [
     "draft",
     "published",
+    "archived",
 ]);
 export const reactionTypeEnum = pgEnum("reaction_type", [
     "like",
@@ -40,13 +42,12 @@ export type ContentBlock =
 export const users = pgTable(
     "users",
     {
-        id: serial("id").primaryKey(),
+        id: uuid("id").primaryKey(),
         username: varchar("username", { length: 50 }).notNull(),
         email: varchar("email", { length: 255 }).notNull().unique(),
-        passwordHash: varchar("password_hash", { length: 255 }).notNull(),
         bio: text("bio"),
         avatarUrl: varchar("avatar_url", { length: 500 }),
-        role: userRoleEnum("role").default("author").notNull(),
+        role: userRoleEnum("role").default("visitor").notNull(),
         createdAt: timestamp("created_at").defaultNow().notNull(),
         updatedAt: timestamp("updated_at").defaultNow().notNull(),
     },
@@ -76,7 +77,7 @@ export const articles = pgTable(
         content: json("content").$type<ContentBlock[]>().notNull(), // Rich content blocks
         coverImageUrl: varchar("cover_image_url", { length: 500 }),
         status: articleStatusEnum("status").default("draft").notNull(),
-        authorId: integer("author_id")
+        authorId: uuid("author_id")
             .notNull()
             .references(() => users.id, { onDelete: "cascade" }),
         genreId: integer("genre_id")
@@ -100,7 +101,7 @@ export const comments = pgTable("comments", {
     articleId: integer("article_id")
         .notNull()
         .references(() => articles.id, { onDelete: "cascade" }),
-    userId: integer("user_id")
+    userId: uuid("user_id")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     parentId: integer("parent_id"), // For nested/reply comments
@@ -111,7 +112,7 @@ export const comments = pgTable("comments", {
 // ============ BOOKMARKS (Users saving articles) ============
 export const bookmarks = pgTable("bookmarks", {
     id: serial("id").primaryKey(),
-    userId: integer("user_id")
+    userId: uuid("user_id")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     articleId: integer("article_id")
@@ -124,7 +125,7 @@ export const bookmarks = pgTable("bookmarks", {
 export const reactions = pgTable("reactions", {
     id: serial("id").primaryKey(),
     type: reactionTypeEnum("type").notNull(),
-    userId: integer("user_id")
+    userId: uuid("user_id")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     articleId: integer("article_id").references(() => articles.id, {

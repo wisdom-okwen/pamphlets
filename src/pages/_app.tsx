@@ -2,8 +2,9 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { DefaultSeo } from "next-seo";
 import SEO_CONFIG from "@/config/seo.config";
+import { trpc } from "@/lib/trpc";
 
-export default function App({ Component, pageProps }: AppProps) {
+function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <DefaultSeo {...SEO_CONFIG} />
@@ -11,3 +12,5 @@ export default function App({ Component, pageProps }: AppProps) {
     </>
   );
 }
+
+export default trpc.withTRPC(App);

@@ -14,7 +14,11 @@
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/server": ["./server"],
+      "@/server/*": ["./server/*"],
+      "@/db": ["./server/db"],
+      "@/db/*": ["./server/db/*"]
     }
   },
   "include": [
