@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { articles } from "@/db/schema";
+import { articles, articleGenres } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
 
@@ -125,7 +125,7 @@ export const articlesRouter = createTRPCRouter({
                 excerpt: z.string().optional(),
                 content: z.array(z.any()),
                 coverImageUrl: z.string().url().optional(),
-                genreId: z.number(),
+                genreIds: z.array(z.number()).min(1),
                 status: z
                     .enum(["draft", "published", "archived"])
                     .default("draft"),
@@ -142,16 +142,36 @@ export const articlesRouter = createTRPCRouter({
                 slug = generateUniqueSlug(slug);
             }
 
+            // Use first genre as legacy single-genre field
+            const primaryGenreId = input.genreIds[0];
+
             const [article] = await ctx.db
                 .insert(articles)
                 .values({
-                    ...input,
+                    title: input.title,
                     slug,
+                    excerpt: input.excerpt,
+                    content: input.content,
+                    coverImageUrl: input.coverImageUrl,
+                    status: input.status,
                     authorId: ctx.subject.id,
+                    genreId: primaryGenreId,
                     publishedAt:
                         input.status === "published" ? new Date() : null,
                 })
                 .returning();
+
+            // Insert join rows
+            const rows = input.genreIds.map((gId) => ({
+                articleId: article.id,
+                genreId: gId,
+            }));
+
+            await ctx.db
+                .insert(articleGenres)
+                .values(rows)
+                .onConflictDoNothing()
+                .execute();
 
             return article;
         }),
@@ -166,12 +186,49 @@ export const articlesRouter = createTRPCRouter({
                 excerpt: z.string().optional(),
                 content: z.array(z.any()).optional(),
                 coverImageUrl: z.string().url().optional(),
-                genreId: z.number().optional(),
+                genreIds: z.array(z.number()).optional(),
                 status: z.enum(["draft", "published", "archived"]).optional(),
             })
         )
         .mutation(async ({ ctx, input }) => {
             const { id, ...data } = input;
+
+            // If genreIds provided, update join table and set primary genre
+            if (data.genreIds) {
+                // set primary genre to first
+                const primary = data.genreIds[0];
+                // remove genreIds from data before updating articles table
+                delete (data as any).genreIds;
+
+                await ctx.db
+                    .update(articles)
+                    .set({
+                        ...data,
+                        genreId: primary,
+                        updatedAt: new Date(),
+                        publishedAt:
+                            data.status === "published"
+                                ? new Date()
+                                : undefined,
+                    })
+                    .where(eq(articles.id, id));
+
+                // replace join rows
+                await ctx.db
+                    .delete(articleGenres)
+                    .where(eq(articleGenres.articleId, id));
+                const newRows = (input.genreIds || []).map((gId) => ({
+                    articleId: id,
+                    genreId: gId,
+                }));
+                if (newRows.length > 0) {
+                    await ctx.db
+                        .insert(articleGenres)
+                        .values(newRows)
+                        .onConflictDoNothing()
+                        .execute();
+                }
+            }
 
             const [article] = await ctx.db
                 .update(articles)

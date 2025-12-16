@@ -94,6 +94,27 @@ export const articles = pgTable(
     })
 );
 
+// ============ ARTICLE_GENRES JOIN TABLE ============
+export const articleGenres = pgTable(
+    "article_genres",
+    {
+        id: serial("id").primaryKey(),
+        articleId: integer("article_id")
+            .notNull()
+            .references(() => articles.id, { onDelete: "cascade" }),
+        genreId: integer("genre_id")
+            .notNull()
+            .references(() => genres.id, { onDelete: "cascade" }),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        articleGenreIdx: uniqueIndex("article_genre_idx").on(
+            table.articleId,
+            table.genreId
+        ),
+    })
+);
+
 // ============ COMMENTS TABLE ============
 export const comments = pgTable("comments", {
     id: serial("id").primaryKey(),
