@@ -98,15 +98,14 @@ export const bookmarksRouter = createTRPCRouter({
         }),
 
     // Get all bookmarked article IDs for the current user
-    getMyBookmarkedIds: protectedProcedure
-        .query(async ({ ctx }) => {
-            const items = await ctx.db.query.bookmarks.findMany({
-                where: eq(bookmarks.userId, ctx.subject.id),
-                columns: {
-                    articleId: true,
-                },
-            });
+    getMyBookmarkedIds: protectedProcedure.query(async ({ ctx }) => {
+        const items = await ctx.db.query.bookmarks.findMany({
+            where: eq(bookmarks.userId, ctx.subject.id),
+            columns: {
+                articleId: true,
+            },
+        });
 
-            return items.map((b) => b.articleId);
-        }),
+        return items.map((b) => b.articleId);
+    }),
 });
