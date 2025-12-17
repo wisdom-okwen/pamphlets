@@ -5,6 +5,7 @@ import SEO_CONFIG from "@/config/seo.config";
 import { trpc } from "@/lib/trpc";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { NavBarProvider, useNavBarActions } from "@/contexts/NavBarContext";
 import { AuthGuard } from "@/components/AuthGuard";
 import NavBar from "@/components/NavBar";
 import { Sidebar } from "@/components/Sidebar";
@@ -45,8 +46,9 @@ const getPageTitle = (pathname: string): string => {
 function AppContent({ Component, pageProps, router }: AppProps) {
   const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/callback", "/signout"];
   const isAuthPage = authRoutes.includes(router.pathname);
+  const { actions } = useNavBarActions();
 
-  const pagesWithOwnHeader = ["/admin/articles/new"];
+  const pagesWithOwnHeader: string[] = [];
   const hasOwnHeader = pagesWithOwnHeader.includes(router.pathname);
 
   const showSidebar = !isAuthPage;
@@ -58,7 +60,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
       {showSidebar && <Sidebar />}
 
       <div className={showSidebar ? "lg:pl-64" : ""}>
-        {!hasOwnHeader && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} />}
+        {!hasOwnHeader && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} actions={actions} />}
         <Component {...pageProps} />
       </div>
     </>
@@ -70,9 +72,11 @@ function App(props: AppProps) {
     <div className={`${sourceSerif.variable} ${inter.variable}`}>
       <AuthProvider>
         <ThemeProvider>
-          <AuthGuard>
-            <AppContent {...props} />
-          </AuthGuard>
+          <NavBarProvider>
+            <AuthGuard>
+              <AppContent {...props} />
+            </AuthGuard>
+          </NavBarProvider>
         </ThemeProvider>
       </AuthProvider>
       <Analytics />

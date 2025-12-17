@@ -493,4 +493,4 @@ export default withAuth(function AdminPage() {
       </main>
     </>
   );
-});
+}, { requireAdmin: true });

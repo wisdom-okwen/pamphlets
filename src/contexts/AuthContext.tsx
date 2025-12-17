@@ -30,6 +30,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const supabase = useMemo(() => createClient(), []);
 
+  // Helper function to check if user exists and sign out if not
+  const checkUserExists = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", userId)
+      .single();
+
+    if (error && error.code === "PGRST116") {
+      console.log("User deleted, signing out...");
+      await supabase.auth.signOut({ scope: 'global' });
+      setUser(null);
+      setSession(null);
+      setRole(null);
+      return false;
+    }
+    return true;
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       setSession(initialSession);
@@ -48,6 +67,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
     };
   }, [supabase]);
+
+  // Periodic check to ensure user still exists (every 30 seconds)
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      checkUserExists(user.id);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user, supabase]);
 
   // Effect 2: Fetch role when user changes
   useEffect(() => {
@@ -69,6 +99,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (error) {
           console.error("Error fetching role:", error);
+          if (error.code === "PGRST116") {
+            console.log("User not found in database, signing out...");
+            await supabase.auth.signOut({ scope: 'global' });
+            setUser(null);
+            setSession(null);
+          }
           setRole(null);
         } else {
           setRole(data?.role as UserRole ?? null);

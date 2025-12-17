@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { useRouter } from "next/router";
 import { Sun, Moon, Archive, ArrowLeft, User, LogIn } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
@@ -11,11 +11,13 @@ export default function NavBar({
   onArchive,
   backHref,
   hideAuth,
+  actions,
 }: {
   title?: string;
   onArchive?: () => void;
   backHref?: string;
   hideAuth?: boolean;
+  actions?: ReactNode;
 }) {
   const router = useRouter();
   const { theme, toggle, mounted } = useTheme();
@@ -58,6 +60,9 @@ export default function NavBar({
 
         {/* Right: Theme toggle, auth & actions */}
         <div className="flex items-center gap-2 w-1/3 justify-end">
+          {/* Custom actions */}
+          {actions}
+
           {onArchive ? (
             <button
               onClick={onArchive}

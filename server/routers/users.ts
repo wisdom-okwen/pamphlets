@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, adminProcedure, protectedProcedure } from "../trpc";
 import { users } from "../db/schema";
 import { eq, asc } from "drizzle-orm";
+import { createAdminClient } from "@/utils/supabase/clients/api";
 
 export const usersRouter = createTRPCRouter({
     /**
@@ -103,7 +104,17 @@ export const usersRouter = createTRPCRouter({
     delete: adminProcedure
         .input(z.object({ id: z.string().uuid() }))
         .mutation(async ({ ctx, input }) => {
+            // Delete from database first
             await ctx.db.delete(users).where(eq(users.id, input.id));
+            
+            // Also delete from Supabase Auth
+            const supabaseAdmin = createAdminClient();
+            const { error } = await supabaseAdmin.auth.admin.deleteUser(input.id);
+            
+            if (error) {
+                console.error("Failed to delete user from Supabase Auth:", error);
+            }
+            
             return { success: true };
         }),
 });

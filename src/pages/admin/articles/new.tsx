@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { trpc } from "@/lib/trpc";
@@ -9,12 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Loader2, Save, Send, Sun, Moon, Upload, Link as LinkIcon, X } from "lucide-react";
-import Link from "next/link";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Loader2, Save, Send, Upload, Link as LinkIcon, X } from "lucide-react";
+import { useNavBarActions } from "@/contexts/NavBarContext";
 
 function NewArticlePage() {
   const router = useRouter();
+  const { setActions } = useNavBarActions();
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
@@ -81,7 +81,45 @@ function NewArticlePage() {
     });
   };
 
-  const { theme, toggle, mounted } = useTheme();
+  // Set navbar actions
+  useEffect(() => {
+    setActions(
+      <>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => handleSubmit("draft")}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 size-4" />
+          )}
+          <span className="hidden sm:inline">Save Draft</span>
+          <span className="sm:hidden">Draft</span>
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => handleSubmit("published")}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <Loader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 size-4" />
+          )}
+          <span className="hidden sm:inline">Publish</span>
+          <span className="sm:hidden">Post</span>
+        </Button>
+      </>
+    );
+
+    // Clear actions when leaving the page
+    return () => setActions(null);
+  }, [isSubmitting, setActions]);
 
   return (
     <>
@@ -92,67 +130,6 @@ function NewArticlePage() {
       />
 
       <div className="min-h-screen bg-background">
-        {/* Header with navigation and actions */}
-        <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center">
-            {/* Left: Back button */}
-            <div className="flex items-center gap-2 w-1/3">
-              <Link
-                href="/"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                <ArrowLeft className="size-4" />
-                <span className="hidden sm:inline">Back</span>
-              </Link>
-            </div>
-
-            {/* Center: Title */}
-            <h1 className="text-lg font-bold text-center w-1/3">New Article</h1>
-
-            {/* Right: Actions */}
-            <div className="flex items-center gap-2 w-1/3 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => handleSubmit("draft")}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 size-4" />
-                )}
-                <span className="hidden sm:inline">Save Draft</span>
-                <span className="sm:hidden">Draft</span>
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => handleSubmit("published")}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                ) : (
-                  <Send className="mr-2 size-4" />
-                )}
-                <span className="hidden sm:inline">Publish</span>
-                <span className="sm:hidden">Post</span>
-              </Button>
-              {mounted && (
-                <button
-                  onClick={toggle}
-                  aria-label="toggle-theme"
-                  className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                >
-                  {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
-
         {/* Main Content */}
         <main className="container px-4 py-6">
           <div className="mx-auto w-full max-w-3xl">
@@ -426,4 +403,4 @@ function NewArticlePage() {
   );
 }
 
-export default withAuth(NewArticlePage);
+export default withAuth(NewArticlePage, { requireAdmin: true });

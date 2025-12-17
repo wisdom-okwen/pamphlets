@@ -10,12 +10,13 @@ export function withAuth<P extends object>(
   WrappedComponent: ComponentType<P>,
   options?: {
     redirectTo?: string;
+    requireAdmin?: boolean;
   }
 ) {
-  const { redirectTo = "/login" } = options || {};
+  const { redirectTo = "/login", requireAdmin = false } = options || {};
 
   return function WithAuthComponent(props: P) {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading, isAdmin } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -24,6 +25,13 @@ export function withAuth<P extends object>(
         router.push(`${redirectTo}?redirectTo=${encodeURIComponent(router.asPath)}`);
       }
     }, [user, isLoading, router]);
+
+    // Redirect non-admins if admin is required
+    useEffect(() => {
+      if (!isLoading && user && requireAdmin && !isAdmin) {
+        router.push("/");
+      }
+    }, [user, isLoading, isAdmin, router]);
 
     // Show loading state while checking auth
     if (isLoading) {
@@ -43,7 +51,16 @@ export function withAuth<P extends object>(
       );
     }
 
-    // User is authenticated, render the wrapped component
+    // Don't render if admin required but user is not admin
+    if (requireAdmin && !isAdmin) {
+      return (
+        <main className="flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="size-8 animate-spin text-primary" />
+        </main>
+      );
+    }
+
+    // User is authenticated (and admin if required), render the wrapped component
     return <WrappedComponent {...props} />;
   };
 }
