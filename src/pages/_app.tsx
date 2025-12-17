@@ -31,7 +31,7 @@ const getPageTitle = (pathname: string): string => {
     "/forgot-password": "Forgot Password",
     "/reset-password": "Reset Password",
     "/profile": "Profile",
-    "/favorites": "My Favorites",
+    "/bookmarks": "My Bookmarks",
     "/comments": "My Comments",
     "/settings": "Settings",
     "/assistant": "AI Assistant",

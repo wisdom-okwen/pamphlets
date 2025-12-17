@@ -30,6 +30,12 @@ export default function Home() {
     limit: 20,
   });
 
+  // Fetch user's bookmarked article IDs
+  const { data: bookmarkedIds } = trpc.bookmarks.getMyBookmarkedIds.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+
   // Track optimistic like states locally
   const [optimisticLikes, setOptimisticLikes] = useState<Record<number, { liked: boolean; count: number } | undefined>>({});
 
@@ -80,6 +86,26 @@ export default function Home() {
     },
   });
 
+  // Bookmark state and mutation
+  const [optimisticBookmarks, setOptimisticBookmarks] = useState<Record<number, boolean>>({});
+  
+  const toggleBookmarkMutation = trpc.bookmarks.toggle.useMutation({
+    onSuccess: (data, { articleId }) => {
+      setOptimisticBookmarks((prev) => ({
+        ...prev,
+        [articleId]: data.bookmarked,
+      }));
+    },
+    onError: (err, { articleId }) => {
+      // Revert on error
+      setOptimisticBookmarks((prev) => {
+        const copy = { ...prev };
+        delete copy[articleId];
+        return copy;
+      });
+    },
+  });
+
   const handleLike = (e: React.MouseEvent, articleId: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -111,8 +137,13 @@ export default function Home() {
       openModal("bookmark articles");
       return;
     }
-    // TODO: Add bookmark logic
-    console.log("Bookmark article:", articleId);
+    // Optimistic update - check both optimistic state and fetched bookmarked IDs
+    const currentBookmarked = optimisticBookmarks[articleId] ?? bookmarkedIds?.includes(articleId) ?? false;
+    setOptimisticBookmarks((prev) => ({
+      ...prev,
+      [articleId]: !currentBookmarked,
+    }));
+    toggleBookmarkMutation.mutate({ articleId });
   };
 
   const handleComment = (e: React.MouseEvent, articleId: number) => {
@@ -291,10 +322,16 @@ export default function Home() {
                         </button>
                         <button
                           onClick={(e) => handleBookmark(e, article.id)}
-                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
+                          className={`p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                            (optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : ""
+                          }`}
                           title="Bookmark"
                         >
-                          <Bookmark size={16} className="text-muted-foreground hover:text-yellow-500" />
+                          <Bookmark 
+                            size={16} 
+                            className={(optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : "text-muted-foreground hover:text-yellow-500"}
+                            fill={(optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "currentColor" : "none"}
+                          />
                         </button>
                         <button
                           onClick={(e) => handleComment(e, article.id)}

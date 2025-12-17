@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   Home,
-  Heart,
+  Bookmark,
   MessageCircle,
   Settings,
   Bot,
@@ -25,7 +25,7 @@ const publicNavItems = [
 
 // These require authentication
 const protectedNavItems = [
-  { href: "/favorites", label: "My Favorites", icon: Heart, action: "view your favorites" },
+  { href: "/bookmarks", label: "My Bookmarks", icon: Bookmark, action: "view your bookmarks" },
   { href: "/comments", label: "My Comments", icon: MessageCircle, action: "view your comments" },
   { href: "/settings", label: "Settings", icon: Settings, action: "access settings" },
   { href: "/assistant", label: "AI Assistant", icon: Bot, action: "use the AI assistant" },

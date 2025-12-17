@@ -364,9 +364,35 @@ export default function ArticleModalPage() {
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState<"forward" | "backward">("forward");
   const [showComments, setShowComments] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [postingComment, setPostingComment] = useState(false);
+
+  // Bookmark state and queries
+  const { data: bookmarkData } = trpc.bookmarks.isBookmarked.useQuery(
+    { articleId: article?.id ?? 0 },
+    { enabled: !!article?.id && !!user }
+  );
+  const [optimisticBookmarked, setOptimisticBookmarked] = useState<boolean | null>(null);
+  const bookmarked = optimisticBookmarked ?? bookmarkData?.bookmarked ?? false;
+
+  const toggleBookmarkMutation = trpc.bookmarks.toggle.useMutation({
+    onSuccess: (data) => {
+      setOptimisticBookmarked(data.bookmarked);
+    },
+    onError: () => {
+      setOptimisticBookmarked(null);
+    },
+  });
+
+  const handleToggleBookmark = () => {
+    if (!user) {
+      openModal("bookmark articles");
+      return;
+    }
+    if (!article) return;
+    setOptimisticBookmarked(!bookmarked);
+    toggleBookmarkMutation.mutate({ articleId: article.id });
+  };
 
   // Fetch comments when panel is open
   const { data: commentsData, isLoading: commentsLoading, refetch: refetchComments } = trpc.comments.getByArticle.useQuery(
@@ -655,7 +681,7 @@ export default function ArticleModalPage() {
                 </span>
               </button>
               <button
-                onClick={() => setBookmarked(!bookmarked)}
+                onClick={handleToggleBookmark}
                 className={`p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 ${bookmarked ? "text-yellow-500" : ""}`}
               >
                 <Bookmark size={22} fill={bookmarked ? "currentColor" : "none"} />

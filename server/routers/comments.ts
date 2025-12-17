@@ -166,4 +166,51 @@ export const commentsRouter = createTRPCRouter({
                 return { added: true, type };
             }
         }),
+
+    getMyComments: protectedProcedure
+        .input(
+            z.object({
+                limit: z.number().min(1).max(50).default(20),
+                cursor: z.number().nullish(),
+            })
+        )
+        .query(async ({ ctx, input }) => {
+            const { limit, cursor } = input;
+
+            const items = await ctx.db.query.comments.findMany({
+                where: eq(comments.userId, ctx.subject.id),
+                orderBy: [desc(comments.createdAt)],
+                limit: limit + 1,
+                offset: cursor ?? 0,
+                with: {
+                    article: {
+                        columns: {
+                            id: true,
+                            title: true,
+                            slug: true,
+                            coverImageUrl: true,
+                        },
+                        with: {
+                            author: {
+                                columns: {
+                                    id: true,
+                                    username: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+
+            let nextCursor: typeof cursor = undefined;
+            if (items.length > limit) {
+                items.pop();
+                nextCursor = (cursor ?? 0) + limit;
+            }
+
+            return {
+                items,
+                nextCursor,
+            };
+        }),
 });
