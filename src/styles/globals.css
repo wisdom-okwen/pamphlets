@@ -95,6 +95,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.scrollbar-gutter-stable {
+  scrollbar-gutter: stable;
+}
+
 /* UI elements use sans-serif */
 button, input, select, textarea, label, nav, header, .font-sans {
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;

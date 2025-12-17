@@ -2,18 +2,24 @@ import { DefaultSeoProps } from "next-seo";
 
 const SEO_CONFIG: DefaultSeoProps = {
   titleTemplate: "%s | Pamphlets",
-  defaultTitle: "Pamphlets",
+  defaultTitle: "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
   description:
-    "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
+    "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey. Read curated content from experts and community members.",
   canonical: "https://pamphlets.vercel.app",
+  languageAlternates: [
+    {
+      hrefLang: "en-US",
+      href: "https://pamphlets.vercel.app",
+    },
+  ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://pamphlets.vercel.app",
     siteName: "Pamphlets",
-    title: "Pamphlets",
+    title: "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
     description:
-      "Discover insightful articles on Career, Academic, Religious topics and more.",
+      "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
     images: [
       {
         url: "https://pamphlets.vercel.app/pamphlets.png",
@@ -42,6 +48,27 @@ const SEO_CONFIG: DefaultSeoProps = {
       name: "author",
       content: "Pamphlets",
     },
+    {
+      name: "keywords",
+      content:
+        "articles, career advice, academic resources, religious education, expert content, pamphlets, guides, learning, knowledge",
+    },
+    {
+      httpEquiv: "x-ua-compatible",
+      content: "IE=edge",
+    },
+    {
+      name: "mobile-web-app-capable",
+      content: "yes",
+    },
+    {
+      name: "apple-mobile-web-app-capable",
+      content: "yes",
+    },
+    {
+      name: "apple-mobile-web-app-status-bar-style",
+      content: "default",
+    },
   ],
   additionalLinkTags: [
     {
@@ -56,6 +83,11 @@ const SEO_CONFIG: DefaultSeoProps = {
     {
       rel: "manifest",
       href: "/manifest.json",
+    },
+    {
+      rel: "alternate",
+      href: "https://pamphlets.vercel.app",
+      hrefLang: "en-US",
     },
   ],
 };

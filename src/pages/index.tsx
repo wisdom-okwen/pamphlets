@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
+import { NextSeo, ArticleJsonLd } from "next-seo";
 import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X, Copy, Check } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
@@ -276,12 +277,59 @@ export default function Home() {
 
   return (
     <>
+      <NextSeo
+        title="Home"
+        description="Browse curated articles on career, academic, and religious topics from expert writers."
+        openGraph={{
+          url: "https://pamphlets.vercel.app",
+          type: "website",
+          title: "Pamphlets - Expert Articles",
+          description:
+            "Browse curated articles on career, academic, and religious topics from expert writers.",
+          images: [
+            {
+              url: "https://pamphlets.vercel.app/pamphlets.png",
+              width: 1200,
+              height: 630,
+              alt: "Pamphlets",
+            },
+          ],
+        }}
+      />
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Pamphlets - Articles Collection",
+          description: "Collection of expert-written articles on career, academic, and religious topics",
+          url: "https://pamphlets.vercel.app",
+          mainEntity: {
+            "@type": "WebSite",
+            name: "Pamphlets",
+            url: "https://pamphlets.vercel.app",
+            description:
+              "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://pamphlets.vercel.app?q={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          },
+          itemListElement: articles.slice(0, 10).map((article, index) => ({
+            "@type": "Article",
+            position: index + 1,
+            headline: article.title,
+            description: article.excerpt,
+            image: article.coverImageUrl,
+            url: `https://pamphlets.vercel.app/articles/${article.slug}`,
+          })),
+        })}
+      </script>
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
-      <main className="px-4 py-6 max-w-4xl mx-auto">
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
+      <div className="sticky top-[60px] z-40 bg-background px-4 border-b">
+        <div className="max-w-4xl mx-auto py-4">
+          <div className="relative mb-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
             <input
               type="text"
@@ -300,12 +348,14 @@ export default function Home() {
             )}
           </div>
           {searchQuery && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-muted-foreground">
               {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for &ldquo;{searchQuery}&rdquo;
             </p>
           )}
         </div>
+      </div>
 
+      <main className="px-4 py-6 max-w-4xl mx-auto">
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">

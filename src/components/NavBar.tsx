@@ -27,7 +27,7 @@ export default function NavBar({
     title || (router.pathname === "/" ? "Home" : router.pathname.replace("/", " "));
 
   return (
-    <header className="w-full border-b bg-white dark:bg-black/90 dark:border-zinc-800">
+    <header className="w-full sticky top-0 z-50 border-b bg-white/95 dark:bg-black/90 dark:border-zinc-800 backdrop-blur-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] flex items-center">
         {/* Left: Logo / Back button */}
         <div className="flex items-center gap-2 w-1/3">
