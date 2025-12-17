@@ -1,11 +1,11 @@
 import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X, Copy, Check } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 
 interface ArticleWithCounts {
   id: number;
@@ -157,7 +157,37 @@ export default function Home() {
     console.log("Comment on article:", articleId);
   };
 
-  const handleShare = async (e: React.MouseEvent, article: { title: string; slug: string }) => {
+  const [shareMenuOpen, setShareMenuOpen] = useState<number | null>(null);
+  const [copiedArticleId, setCopiedArticleId] = useState<number | null>(null);
+  const shareMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
+        setShareMenuOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleShareClick = (e: React.MouseEvent, articleId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShareMenuOpen(shareMenuOpen === articleId ? null : articleId);
+  };
+
+  const handleCopyLink = async (e: React.MouseEvent, article: { id: number; slug: string }) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.origin}/articles/${article.slug}`;
+    await navigator.clipboard.writeText(url);
+    setCopiedArticleId(article.id);
+    setTimeout(() => setCopiedArticleId(null), 2000);
+    setShareMenuOpen(null);
+  };
+
+  const handleNativeShare = async (e: React.MouseEvent, article: { title: string; slug: string }) => {
     e.preventDefault();
     e.stopPropagation();
     const url = `${window.location.origin}/articles/${article.slug}`;
@@ -171,11 +201,8 @@ export default function Home() {
       } catch {
         // User cancelled or error
       }
-    } else {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(url);
-      // TODO: Show toast notification
     }
+    setShareMenuOpen(null);
   };
 
   if (isLoading) {
@@ -234,7 +261,7 @@ export default function Home() {
           </div>
           {searchQuery && (
             <p className="text-sm text-muted-foreground mt-2">
-              {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for "{searchQuery}"
+              {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for &ldquo;{searchQuery}&rdquo;
             </p>
           )}
         </div>
@@ -343,13 +370,41 @@ export default function Home() {
                             {(article as ArticleWithCounts).commentCount ?? 0}
                           </span>
                         </button>
-                        <button
-                          onClick={(e) => handleShare(e, { title: article.title, slug: article.slug })}
-                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
-                          title="Share"
-                        >
-                          <Share2 size={16} className="text-muted-foreground hover:text-green-500" />
-                        </button>
+                        <div className="relative" ref={shareMenuOpen === article.id ? shareMenuRef : null}>
+                          <button
+                            onClick={(e) => handleShareClick(e, article.id)}
+                            className={`p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                              copiedArticleId === article.id ? "text-green-500" : ""
+                            }`}
+                            title="Share"
+                          >
+                            {copiedArticleId === article.id ? (
+                              <Check size={16} className="text-green-500" />
+                            ) : (
+                              <Share2 size={16} className="text-muted-foreground hover:text-green-500" />
+                            )}
+                          </button>
+                          {shareMenuOpen === article.id && (
+                            <div className="absolute bottom-full right-0 mb-2 bg-background border rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+                              <button
+                                onClick={(e) => handleCopyLink(e, { id: article.id, slug: article.slug })}
+                                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors"
+                              >
+                                <Copy size={14} />
+                                Copy link
+                              </button>
+                              {typeof navigator !== "undefined" && "share" in navigator && (
+                                <button
+                                  onClick={(e) => handleNativeShare(e, { title: article.title, slug: article.slug })}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors"
+                                >
+                                  <Share2 size={14} />
+                                  Share...
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
