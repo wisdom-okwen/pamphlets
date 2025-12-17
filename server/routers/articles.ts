@@ -195,7 +195,7 @@ export const articlesRouter = createTRPCRouter({
                 slug: z.string().min(1).max(255).optional(),
                 excerpt: z.string().optional(),
                 content: z.array(z.any()),
-                coverImageUrl: z.string().url().optional(),
+                coverImageUrl: z.string().refine((val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), { message: 'Must be a URL or relative path' }).optional(),
                 genreIds: z.array(z.number()).min(1),
                 status: z
                     .enum(["draft", "published", "archived"])
@@ -256,7 +256,7 @@ export const articlesRouter = createTRPCRouter({
                 slug: z.string().min(1).max(255).optional(),
                 excerpt: z.string().optional(),
                 content: z.array(z.any()).optional(),
-                coverImageUrl: z.string().url().optional(),
+                coverImageUrl: z.string().refine((val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), { message: 'Must be a URL or relative path' }).optional(),
                 genreIds: z.array(z.number()).optional(),
                 status: z.enum(["draft", "published", "archived"]).optional(),
             })

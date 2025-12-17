@@ -1,11 +1,11 @@
 import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, MessageCircle, Share2, Eye, Heart } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface ArticleWithCounts {
   id: number;
@@ -24,6 +24,7 @@ interface ArticleWithCounts {
 export default function Home() {
   const { user } = useAuth();
   const { isOpen, action, openModal, closeModal } = useAuthModal();
+  const [searchQuery, setSearchQuery] = useState("");
   
   const { data, isLoading, error } = trpc.articles.getAll.useQuery({
     limit: 20,
@@ -31,6 +32,28 @@ export default function Home() {
 
   // Track optimistic like states locally
   const [optimisticLikes, setOptimisticLikes] = useState<Record<number, { liked: boolean; count: number } | undefined>>({});
+
+  // Filter articles based on search query
+  const filteredArticles = useMemo(() => {
+    const articles = data?.items || [];
+    if (!searchQuery.trim()) return articles;
+    
+    const query = searchQuery.toLowerCase().trim();
+    
+    return articles.filter((article) => {
+      // Search by title (highest priority)
+      if (article.title.toLowerCase().includes(query)) return true;
+      
+      // Search by tags/genres
+      const genres = article.genres || (article.genre ? [article.genre] : []);
+      if (genres.some((g: { name: string }) => g.name.toLowerCase().includes(query))) return true;
+      
+      // Search by excerpt/content
+      if (article.excerpt?.toLowerCase().includes(query)) return true;
+      
+      return false;
+    });
+  }, [data?.items, searchQuery]);
 
   const toggleLikeMutation = trpc.articles.toggleLike.useMutation({
     onSuccess: (data, { articleId }) => {
@@ -158,13 +181,42 @@ export default function Home() {
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
       <main className="px-4 py-6 max-w-4xl mx-auto">
-        {articles.length === 0 ? (
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+            <input
+              type="text"
+              placeholder="Search by title, tags, or content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-muted-foreground mt-2">
+              {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for "{searchQuery}"
+            </p>
+          )}
+        </div>
+
+        {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No articles yet</p>
+            <p className="text-muted-foreground">
+              {searchQuery ? "No articles match your search" : "No articles yet"}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}

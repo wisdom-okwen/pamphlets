@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { trpc } from "@/lib/trpc";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Loader2, Save, Send, Sun, Moon } from "lucide-react";
+import { ArrowLeft, Loader2, Save, Send, Sun, Moon, Upload, Link as LinkIcon, X } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -20,6 +20,10 @@ function NewArticlePage() {
   const [content, setContent] = useState("");
   const [genreIds, setGenreIds] = useState<string[]>([]);
   const [coverImageUrl, setCoverImageUrl] = useState("");
+  const [coverImageMode, setCoverImageMode] = useState<"url" | "upload">("url");
+  const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -239,19 +243,163 @@ function NewArticlePage() {
 
             {/* Cover Image */}
             <div className="space-y-2">
-              <Label htmlFor="coverImage" className="text-base font-medium">
-                Cover Image URL{" "}
+              <Label className="text-base font-medium">
+                Cover Image{" "}
                 <span className="font-normal text-muted-foreground">
                   (optional)
                 </span>
               </Label>
-              <Input
-                id="coverImage"
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                value={coverImageUrl}
-                onChange={(e) => setCoverImageUrl(e.target.value)}
-              />
+              
+              {/* Toggle between URL and Upload */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setCoverImageMode("url")}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    coverImageMode === "url"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <LinkIcon size={14} />
+                  URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoverImageMode("upload")}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                    coverImageMode === "upload"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  <Upload size={14} />
+                  Upload
+                </button>
+              </div>
+
+              {coverImageMode === "url" ? (
+                <Input
+                  id="coverImage"
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  value={coverImageUrl}
+                  onChange={(e) => setCoverImageUrl(e.target.value)}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      
+                      // Validate file size (max 5MB)
+                      if (file.size > 5 * 1024 * 1024) {
+                        setError("Image must be less than 5MB");
+                        return;
+                      }
+                      
+                      setIsUploading(true);
+                      setError(null);
+                      
+                      try {
+                        // Create a preview
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setUploadedImagePreview(event.target?.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                        
+                        // Upload to server
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        
+                        const response = await fetch("/api/upload", {
+                          method: "POST",
+                          body: formData,
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error("Upload failed");
+                        }
+                        
+                        const data = await response.json();
+                        setCoverImageUrl(data.url);
+                      } catch (err) {
+                        setError("Failed to upload image. Please try again or use a URL instead.");
+                        setUploadedImagePreview(null);
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }}
+                  />
+                  
+                  {uploadedImagePreview || coverImageUrl ? (
+                    <div className="relative inline-block">
+                      <img
+                        src={uploadedImagePreview || coverImageUrl}
+                        alt="Cover preview"
+                        className="max-h-40 rounded-lg border object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCoverImageUrl("");
+                          setUploadedImagePreview(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                        className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="w-full border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg p-8 text-center hover:border-primary hover:bg-muted/50 transition-colors disabled:opacity-50"
+                    >
+                      {isUploading ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">Uploading...</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <Upload className="size-8 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            Click to upload an image
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            PNG, JPG, GIF up to 5MB
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
+              
+              {/* Preview for URL mode */}
+              {coverImageMode === "url" && coverImageUrl && (
+                <div className="mt-2">
+                  <img
+                    src={coverImageUrl}
+                    alt="Cover preview"
+                    className="max-h-40 rounded-lg border object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Content Editor */}
