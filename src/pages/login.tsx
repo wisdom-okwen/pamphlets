@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
@@ -19,33 +19,37 @@ import { GoogleIcon } from "@/components/icons/GoogleIcon";
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabase = useMemo(() => createClient(), []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
-
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+
+      // Redirect to home or intended page
+      const redirectTo = (router.query.redirectTo as string) || "/";
+      window.location.href = redirectTo;
+    } catch {
+      setError("An error occurred during login. Please try again.");
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Redirect to home or intended page
-    const redirectTo = (router.query.redirectTo as string) || "/";
-    router.push(redirectTo);
   };
 
   const handleGoogleLogin = async () => {

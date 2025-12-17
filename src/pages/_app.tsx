@@ -5,6 +5,8 @@ import SEO_CONFIG from "@/config/seo.config";
 import { trpc } from "@/lib/trpc";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import NavBar from "@/components/NavBar";
+import { Sidebar } from "@/components/Sidebar";
 import { Source_Serif_4, Inter } from "next/font/google";
 
 const sourceSerif = Source_Serif_4({
@@ -19,13 +21,59 @@ const inter = Inter({
   display: "swap",
 });
 
-function App({ Component, pageProps }: AppProps) {
+// Map routes to page titles
+const getPageTitle = (pathname: string): string => {
+  const titles: Record<string, string> = {
+    "/": "Home",
+    "/login": "Login",
+    "/signup": "Sign Up",
+    "/forgot-password": "Forgot Password",
+    "/reset-password": "Reset Password",
+    "/profile": "Profile",
+    "/favorites": "My Favorites",
+    "/comments": "My Comments",
+    "/settings": "Settings",
+    "/assistant": "AI Assistant",
+    "/admin": "Admin",
+    "/admin/articles/new": "New Article",
+  };
+  return titles[pathname] || "";
+};
+
+function AppContent({ Component, pageProps, router }: AppProps) {
+  const hideNavbarRoutes = ["/admin/articles/new"];
+  const showNavbar = !hideNavbarRoutes.includes(router.pathname);
+  
+  const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/callback", "/signout"];
+  const isAuthPage = authRoutes.includes(router.pathname);
+
+  const showSidebar = !isAuthPage;
+
+  return (
+    <>
+      <DefaultSeo {...SEO_CONFIG} />
+      
+      {showSidebar && <Sidebar />}
+      
+      <div className={showSidebar ? "lg:pl-64" : ""}>
+        {showNavbar && !showSidebar && <NavBar title={getPageTitle(router.pathname)} />}
+        {showNavbar && showSidebar && (
+          <div className="lg:hidden">
+            <NavBar title={getPageTitle(router.pathname)} />
+          </div>
+        )}
+        <Component {...pageProps} />
+      </div>
+    </>
+  );
+}
+
+function App(props: AppProps) {
   return (
     <div className={`${sourceSerif.variable} ${inter.variable}`}>
       <AuthProvider>
         <ThemeProvider>
-          <DefaultSeo {...SEO_CONFIG} />
-          <Component {...pageProps} />
+          <AppContent {...props} />
         </ThemeProvider>
       </AuthProvider>
     </div>

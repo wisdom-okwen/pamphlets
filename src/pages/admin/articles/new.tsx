@@ -49,6 +49,10 @@ function NewArticlePage() {
       setError("Please select at least one genre");
       return;
     }
+    if (!excerpt.trim()) {
+      setError("Synopsis is required");
+      return;
+    }
     if (!content.trim()) {
       setError("Content is required");
       return;
@@ -213,23 +217,21 @@ function NewArticlePage() {
               <p className="text-xs text-muted-foreground mt-1">Select one or more genres</p>
             </div>
 
-            {/* Excerpt */}
+            {/* Synopsis */}
             <div className="space-y-2">
               <Label htmlFor="excerpt" className="text-base font-medium">
-                Excerpt{" "}
-                <span className="font-normal text-muted-foreground">
-                  (optional)
-                </span>
+                Synopsis <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="excerpt"
                 placeholder="A brief summary of your article..."
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
-                rows={2}
+                rows={3}
+                required
               />
               <p className="text-xs text-muted-foreground">
-                A short description that appears in article previews
+                A short description that appears in article previews (required)
               </p>
             </div>
 
