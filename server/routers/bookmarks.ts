@@ -4,7 +4,6 @@ import { bookmarks } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export const bookmarksRouter = createTRPCRouter({
-    // Get user's bookmarks
     getMyBookmarks: protectedProcedure
         .input(
             z.object({

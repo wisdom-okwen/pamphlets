@@ -1,10 +1,25 @@
 import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, MessageCircle, Share2, Eye } from "lucide-react";
+import { Bookmark, MessageCircle, Share2, Eye, Heart } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
+import { useState } from "react";
+
+interface ArticleWithCounts {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt?: string | null;
+  coverImageUrl?: string | null;
+  viewCount: number;
+  genre?: { id: number; name: string; slug: string } | null;
+  genres?: { id: number; name: string; slug: string }[];
+  userHasLiked?: boolean;
+  likeCount?: number;
+  commentCount?: number;
+}
 
 export default function Home() {
   const { user } = useAuth();
@@ -14,15 +29,67 @@ export default function Home() {
     limit: 20,
   });
 
-  const handleFavorite = (e: React.MouseEvent, articleId: number) => {
+  // Track optimistic like states locally
+  const [optimisticLikes, setOptimisticLikes] = useState<Record<number, { liked: boolean; count: number } | undefined>>({});
+
+  const toggleLikeMutation = trpc.articles.toggleLike.useMutation({
+    onSuccess: (data, { articleId }) => {
+      // Update with server confirmed state - keep the optimistic count direction
+      setOptimisticLikes((prev) => {
+        const current = prev[articleId];
+        if (!current) return prev;
+        return {
+          ...prev,
+          [articleId]: {
+            liked: data.liked,
+            count: current.count, // Keep the optimistic count
+          },
+        };
+      });
+    },
+    onError: (err, { articleId }) => {
+      // Revert on error - clear optimistic state
+      setOptimisticLikes((prev) => {
+        const copy = { ...prev };
+        delete copy[articleId];
+        return copy;
+      });
+    },
+  });
+
+  const handleLike = (e: React.MouseEvent, articleId: number) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      openModal("add to favorites");
+      openModal("like articles");
       return;
     }
-    // TODO: Add favorite logic
-    console.log("Favorite article:", articleId);
+    
+    const currentData = data?.items.find((a) => a.id === articleId) as ArticleWithCounts | undefined;
+    const currentOptimistic = optimisticLikes[articleId];
+    const currentLiked = currentOptimistic?.liked ?? currentData?.userHasLiked ?? false;
+    const currentCount = currentOptimistic?.count ?? currentData?.likeCount ?? 0;
+
+    setOptimisticLikes((prev) => ({
+      ...prev,
+      [articleId]: {
+        liked: !currentLiked,
+        count: currentLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+      },
+    }));
+
+    toggleLikeMutation.mutate({ articleId });
+  };
+
+  const handleBookmark = (e: React.MouseEvent, articleId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      openModal("bookmark articles");
+      return;
+    }
+    // TODO: Add bookmark logic
+    console.log("Bookmark article:", articleId);
   };
 
   const handleComment = (e: React.MouseEvent, articleId: number) => {
@@ -47,7 +114,7 @@ export default function Home() {
           title: article.title,
           url: url,
         });
-      } catch (err) {
+      } catch {
         // User cancelled or error
       }
     } else {
@@ -63,7 +130,7 @@ export default function Home() {
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="flex flex-col sm:flex-row gap-3 p-3 border rounded-lg animate-pulse">
-              <div className="w-full sm:w-28 h-40 sm:h-20 bg-zinc-200 dark:bg-zinc-800 rounded-md flex-shrink-0" />
+              <div className="w-full sm:w-28 h-40 sm:h-20 bg-zinc-200 dark:bg-zinc-800 rounded-md shrink-0" />
               <div className="flex-1 space-y-2">
                 <div className="h-5 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
                 <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-full" />
@@ -106,7 +173,7 @@ export default function Home() {
                 {/* Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row">
                   {/* Cover image */}
-                  <div className="w-full sm:w-36 md:w-44 h-48 sm:h-36 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <div className="w-full sm:w-36 md:w-44 h-48 sm:h-36 shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                     {article.coverImageUrl ? (
                       <Image
                         src={article.coverImageUrl}
@@ -138,36 +205,54 @@ export default function Home() {
 
                     {/* Bottom: Genre tag & actions */}
                     <div className="flex items-center justify-between mt-3 gap-2">
-                      <div className="relative">
-                        <div className="flex gap-2 overflow-x-auto max-w-full py-1">
-                          {(article.genres && article.genres.length > 0 ? article.genres : (article.genre ? [article.genre] : [])).map((g: any) => (
-                            <span key={g.id} className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 ${getGenreColor(g.slug)}`}>
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                          {(article.genres && article.genres.length > 0 ? article.genres : (article.genre ? [article.genre] : [])).map((g: { id: number; name: string; slug: string }) => (
+                            <span key={g.id} className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap shrink-0 ${getGenreColor(g.slug)}`}>
                               {g.name}
                             </span>
                           ))}
                         </div>
-                        {/* gradient removed per design preference */}
                       </div>
 
-                      {/* Right: Views & action buttons */}
-                      <div className="flex items-center gap-2">
+                      {/* Right: Views, Likes & action buttons */}
+                      <div className="flex items-center gap-2 shrink-0">
                         <div className="flex items-center gap-1 text-xs text-muted-foreground px-2">
                           <Eye size={12} />
                           <span>{article.viewCount}</span>
                         </div>
                         <button
-                          onClick={(e) => handleFavorite(e, article.id)}
-                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
-                          title="Add to favorites"
+                          onClick={(e) => handleLike(e, article.id)}
+                          className={`relative p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                            (optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : ""
+                          }`}
+                          title="Like"
                         >
-                          <Heart size={16} className="text-muted-foreground hover:text-red-500" />
+                          <Heart 
+                            size={16} 
+                            className={(optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : "text-muted-foreground hover:text-red-500"}
+                            fill={(optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "currentColor" : "none"}
+                          />
+                          <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-medium min-w-4 h-4 rounded-full flex items-center justify-center px-1">
+                            {optimisticLikes[article.id]?.count ?? (article as ArticleWithCounts).likeCount ?? 0}
+                          </span>
+                        </button>
+                        <button
+                          onClick={(e) => handleBookmark(e, article.id)}
+                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
+                          title="Bookmark"
+                        >
+                          <Bookmark size={16} className="text-muted-foreground hover:text-yellow-500" />
                         </button>
                         <button
                           onClick={(e) => handleComment(e, article.id)}
-                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
+                          className="relative p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
                           title="Comments"
                         >
                           <MessageCircle size={16} className="text-muted-foreground hover:text-blue-500" />
+                          <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[10px] font-medium min-w-4 h-4 rounded-full flex items-center justify-center px-1">
+                            {(article as ArticleWithCounts).commentCount ?? 0}
+                          </span>
                         </button>
                         <button
                           onClick={(e) => handleShare(e, { title: article.title, slug: article.slug })}

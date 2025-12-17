@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { trpc } from "@/lib/trpc";
 import { withAuth } from "@/components/auth/withAuth";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,12 @@ import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Loader2, Save, Send } from "lucide-react";
 import Link from "next/link";
-import { useTheme } from "@/contexts/ThemeContext";
+
+interface GenreType {
+  id: number;
+  name: string;
+  slug: string;
+}
 
 function EditArticlePage() {
   const router = useRouter();
@@ -20,13 +26,36 @@ function EditArticlePage() {
   const { data: article, isLoading: loadingArticle } = trpc.articles.getBySlug.useQuery({ slug: slug || "" }, { enabled: !!slug });
   const { data: genres, isLoading: genresLoading } = trpc.genres.getAll.useQuery();
 
-  const [title, setTitle] = useState("");
-  const [excerpt, setExcerpt] = useState("");
-  const [content, setContent] = useState("");
-  const [genreIds, setGenreIds] = useState<string[]>([]);
-  const [coverImageUrl, setCoverImageUrl] = useState("");
+  const articleGenres = (article?.genres || []) as GenreType[];
+  const initialGenreIds = articleGenres.length > 0 
+    ? articleGenres.map((g) => String(g.id)) 
+    : (article?.genre ? [String(article.genre.id)] : []);
+
+  const [title, setTitle] = useState(article?.title || "");
+  const [excerpt, setExcerpt] = useState(article?.excerpt || "");
+  const [content, setContent] = useState(() => {
+    if (article && Array.isArray(article.content) && article.content.length > 0) {
+      const first = article.content[0];
+      return (first as { content?: string })?.content || "";
+    }
+    return "";
+  });
+  const [genreIds, setGenreIds] = useState<string[]>(initialGenreIds);
+  const [coverImageUrl, setCoverImageUrl] = useState(article?.coverImageUrl || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (article && !title && article.title) {
+    setTitle(article.title);
+    setExcerpt(article.excerpt || "");
+    if (Array.isArray(article.content) && article.content.length > 0) {
+      const first = article.content[0];
+      setContent((first as { content?: string })?.content || "");
+    }
+    setCoverImageUrl(article.coverImageUrl || "");
+    const gids = articleGenres.map((g) => String(g.id));
+    setGenreIds(gids.length > 0 ? gids : (article.genre ? [String(article.genre.id)] : []));
+  }
 
   const updateArticle = trpc.articles.update.useMutation({
     onSuccess: (a) => {
@@ -37,26 +66,6 @@ function EditArticlePage() {
       setIsSubmitting(false);
     },
   });
-
-  useEffect(() => {
-    if (article) {
-      setTitle(article.title || "");
-      setExcerpt(article.excerpt || "");
-      try {
-        if (Array.isArray(article.content) && article.content.length > 0) {
-          const first = article.content[0];
-          setContent(first?.content || "");
-        } else {
-          setContent("");
-        }
-      } catch {
-        setContent("");
-      }
-      setCoverImageUrl(article.coverImageUrl || "");
-      const gids = (article.genres || []).map((g: any) => String(g.id));
-      setGenreIds(gids.length > 0 ? gids : (article.genre ? [String(article.genre.id)] : []));
-    }
-  }, [article]);
 
   const handleSubmit = async (status: "draft" | "published") => {
     setError(null);
@@ -86,6 +95,8 @@ function EditArticlePage() {
         content: content,
       },
     ];
+
+    if (!article) return;
 
     updateArticle.mutate({
       id: article.id,

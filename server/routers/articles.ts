@@ -5,9 +5,27 @@ import {
     protectedProcedure,
     adminProcedure,
 } from "../trpc";
-import { articles, articleGenres } from "@/db/schema";
+import { articles, articleGenres, reactions } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
+
+interface ReactionType {
+    id: number;
+    type: string;
+    userId: string;
+    articleId: number | null;
+    commentId: number | null;
+}
+
+interface GenreType {
+    id: number;
+    name: string;
+    slug: string;
+}
+
+interface ArticleGenreType {
+    genre: GenreType;
+}
 
 export const articlesRouter = createTRPCRouter({
     // Get all published articles
@@ -44,6 +62,8 @@ export const articlesRouter = createTRPCRouter({
                             genre: true,
                         },
                     },
+                    reactions: true,
+                    comments: true,
                 },
             });
 
@@ -53,10 +73,23 @@ export const articlesRouter = createTRPCRouter({
                 nextCursor = (cursor ?? 0) + limit;
             }
 
-            const mapped = items.map((it) => ({
-                ...it,
-                genres: (it.articleGenres || []).map((ag: any) => ag.genre),
-            }));
+            const mapped = items.map((it) => {
+                const likeReactions = (it.reactions || []).filter(
+                    (r: ReactionType) => r.type === "like"
+                );
+                const userHasLiked = ctx.subject
+                    ? likeReactions.some(
+                          (r: ReactionType) => r.userId === ctx.subject!.id
+                      )
+                    : false;
+                return {
+                    ...it,
+                    genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+                    likeCount: likeReactions.length,
+                    commentCount: (it.comments || []).length,
+                    userHasLiked,
+                };
+            });
 
             return {
                 items: mapped,
@@ -81,6 +114,7 @@ export const articlesRouter = createTRPCRouter({
                     },
                     genre: true,
                     articleGenres: { with: { genre: true } },
+                    reactions: true,
                     comments: {
                         with: {
                             user: {
@@ -108,10 +142,22 @@ export const articlesRouter = createTRPCRouter({
                 .set({ viewCount: article.viewCount + 1 })
                 .where(eq(articles.id, article.id));
 
+            const likeReactions = (article.reactions || []).filter(
+                (r: ReactionType) => r.type === "like"
+            );
+            const userHasLiked = ctx.subject
+                ? likeReactions.some((r: ReactionType) => r.userId === ctx.subject!.id)
+                : false;
+
             return {
                 ...article,
-                genres: (article.articleGenres || []).map((ag: any) => ag.genre),
-            } as any;
+                genres: (article.articleGenres || []).map(
+                    (ag: ArticleGenreType) => ag.genre
+                ),
+                likeCount: likeReactions.length,
+                commentCount: (article.comments || []).length,
+                userHasLiked,
+            };
         }),
 
     // Get featured articles (most viewed)
@@ -135,7 +181,10 @@ export const articlesRouter = createTRPCRouter({
                 },
             });
 
-            return items.map((it) => ({ ...it, genres: (it.articleGenres || []).map((ag: any) => ag.genre) }));
+            return items.map((it) => ({
+                ...it,
+                genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+            }));
         }),
 
     // Create article (protected)
@@ -213,14 +262,12 @@ export const articlesRouter = createTRPCRouter({
             })
         )
         .mutation(async ({ ctx, input }) => {
-            const { id, ...data } = input;
+            const { id, genreIds, ...data } = input;
 
             // If genreIds provided, update join table and set primary genre
-            if (data.genreIds) {
+            if (genreIds) {
                 // set primary genre to first
-                const primary = data.genreIds[0];
-                // remove genreIds from data before updating articles table
-                delete (data as any).genreIds;
+                const primary = genreIds[0];
 
                 await ctx.db
                     .update(articles)
@@ -304,13 +351,65 @@ export const articlesRouter = createTRPCRouter({
             });
 
             let nextCursor: typeof cursor = undefined;
-                if (items.length > limit) {
+            if (items.length > limit) {
                 items.pop();
                 nextCursor = (cursor ?? 0) + limit;
             }
 
-            const mapped = items.map((it) => ({ ...it, genres: (it.articleGenres || []).map((ag: any) => ag.genre) }));
+            const mapped = items.map((it) => ({
+                ...it,
+                genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+            }));
 
             return { items: mapped, nextCursor };
+        }),
+
+    // Toggle like on an article
+    toggleLike: protectedProcedure
+        .input(z.object({ articleId: z.number() }))
+        .mutation(async ({ ctx, input }) => {
+            const userId = ctx.subject.id;
+            const { articleId } = input;
+
+            // Check if user already liked this article
+            const existingLike = await ctx.db.query.reactions.findFirst({
+                where: and(
+                    eq(reactions.userId, userId),
+                    eq(reactions.articleId, articleId),
+                    eq(reactions.type, "like")
+                ),
+            });
+
+            if (existingLike) {
+                // Remove the like
+                await ctx.db
+                    .delete(reactions)
+                    .where(eq(reactions.id, existingLike.id));
+                return { liked: false };
+            } else {
+                // Add a like
+                await ctx.db.insert(reactions).values({
+                    type: "like",
+                    userId,
+                    articleId,
+                    commentId: null,
+                });
+                return { liked: true };
+            }
+        }),
+
+    // Check if user has liked an article
+    hasLiked: protectedProcedure
+        .input(z.object({ articleId: z.number() }))
+        .query(async ({ ctx, input }) => {
+            const userId = ctx.subject.id;
+            const existingLike = await ctx.db.query.reactions.findFirst({
+                where: and(
+                    eq(reactions.userId, userId),
+                    eq(reactions.articleId, input.articleId),
+                    eq(reactions.type, "like")
+                ),
+            });
+            return { liked: !!existingLike };
         }),
 });

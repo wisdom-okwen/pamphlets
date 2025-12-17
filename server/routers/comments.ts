@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { comments } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { comments, reactions } from "@/db/schema";
+import { eq, desc, and } from "drizzle-orm";
 
 export const commentsRouter = createTRPCRouter({
-    // Get comments for an article
     getByArticle: publicProcedure
         .input(
             z.object({
@@ -29,6 +28,7 @@ export const commentsRouter = createTRPCRouter({
                             avatarUrl: true,
                         },
                     },
+                    reactions: true,
                 },
             });
 
@@ -38,8 +38,35 @@ export const commentsRouter = createTRPCRouter({
                 nextCursor = (cursor ?? 0) + limit;
             }
 
+            // Add reaction counts and user's reaction status
+            const itemsWithReactions = items.map((comment) => {
+                const commentReactions = comment.reactions || [];
+                const likeCount = commentReactions.filter((r) => r.type === "like").length;
+                const loveCount = commentReactions.filter((r) => r.type === "love").length;
+                const supportCount = commentReactions.filter((r) => r.type === "support").length;
+                const userLiked = ctx.subject
+                    ? commentReactions.some((r) => r.userId === ctx.subject!.id && r.type === "like")
+                    : false;
+                const userLoved = ctx.subject
+                    ? commentReactions.some((r) => r.userId === ctx.subject!.id && r.type === "love")
+                    : false;
+                const userSupported = ctx.subject
+                    ? commentReactions.some((r) => r.userId === ctx.subject!.id && r.type === "support")
+                    : false;
+
+                return {
+                    ...comment,
+                    likeCount,
+                    loveCount,
+                    supportCount,
+                    userLiked,
+                    userLoved,
+                    userSupported,
+                };
+            });
+
             return {
-                items,
+                items: itemsWithReactions,
                 nextCursor,
             };
         }),
@@ -94,5 +121,49 @@ export const commentsRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             await ctx.db.delete(comments).where(eq(comments.id, input.id));
             return { success: true };
+        }),
+
+    // Toggle reaction on a comment (like, love, support)
+    toggleReaction: protectedProcedure
+        .input(
+            z.object({
+                commentId: z.number(),
+                type: z.enum(["like", "love", "support"]),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const { commentId, type } = input;
+            const userId = ctx.subject.id;
+
+            // Check if user already has this reaction on this comment
+            const existing = await ctx.db.query.reactions.findFirst({
+                where: and(
+                    eq(reactions.commentId, commentId),
+                    eq(reactions.userId, userId),
+                    eq(reactions.type, type)
+                ),
+            });
+
+            if (existing) {
+                // Remove the reaction
+                await ctx.db.delete(reactions).where(eq(reactions.id, existing.id));
+                return { added: false, type };
+            } else {
+                // Remove any other reaction type on this comment first (can only have one reaction)
+                await ctx.db.delete(reactions).where(
+                    and(
+                        eq(reactions.commentId, commentId),
+                        eq(reactions.userId, userId)
+                    )
+                );
+                // Add the new reaction
+                await ctx.db.insert(reactions).values({
+                    commentId,
+                    userId,
+                    type,
+                    articleId: null,
+                });
+                return { added: true, type };
+            }
         }),
 });

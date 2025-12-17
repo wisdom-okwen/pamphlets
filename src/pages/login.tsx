@@ -43,7 +43,7 @@ export default function LoginPage() {
       }
 
       // Redirect to home or intended page
-      const redirectTo = (router.query.redirectTo as string) || "/";
+      const redirectTo = (router.query.redirect as string) || (router.query.redirectTo as string) || "/";
       window.location.href = redirectTo;
     } catch {
       setError("An error occurred during login. Please try again.");

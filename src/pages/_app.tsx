@@ -5,6 +5,7 @@ import SEO_CONFIG from "@/config/seo.config";
 import { trpc } from "@/lib/trpc";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthGuard } from "@/components/AuthGuard";
 import NavBar from "@/components/NavBar";
 import { Sidebar } from "@/components/Sidebar";
 import { Source_Serif_4, Inter } from "next/font/google";
@@ -68,7 +69,9 @@ function App(props: AppProps) {
     <div className={`${sourceSerif.variable} ${inter.variable}`}>
       <AuthProvider>
         <ThemeProvider>
-          <AppContent {...props} />
+          <AuthGuard>
+            <AppContent {...props} />
+          </AuthGuard>
         </ThemeProvider>
       </AuthProvider>
     </div>
