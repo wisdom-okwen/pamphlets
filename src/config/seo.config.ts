@@ -5,24 +5,24 @@ const SEO_CONFIG: DefaultSeoProps = {
   defaultTitle: "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
   description:
     "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey. Read curated content from experts and community members.",
-  canonical: "https://pamphlets.vercel.app",
+  canonical: "https://pamflets.vercel.app",
   languageAlternates: [
     {
       hrefLang: "en-US",
-      href: "https://pamphlets.vercel.app",
+      href: "https://pamflets.vercel.app",
     },
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://pamphlets.vercel.app",
+    url: "https://pamflets.vercel.app",
     siteName: "Pamphlets",
     title: "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
     description:
       "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
     images: [
       {
-        url: "https://pamphlets.vercel.app/pamphlets.png",
+        url: "https://pamflets.vercel.app/pamphlets.png",
         width: 1200,
         height: 630,
         alt: "Pamphlets",
@@ -86,7 +86,7 @@ const SEO_CONFIG: DefaultSeoProps = {
     },
     {
       rel: "alternate",
-      href: "https://pamphlets.vercel.app",
+      href: "https://pamflets.vercel.app",
       hrefLang: "en-US",
     },
   ],

@@ -4,19 +4,19 @@ function generateSiteMap(articles: any[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
      <url>
-       <loc>https://pamphlets.vercel.app</loc>
+       <loc>https://pamflets.vercel.app</loc>
        <lastmod>${new Date().toISOString()}</lastmod>
        <changefreq>weekly</changefreq>
        <priority>1.0</priority>
      </url>
      <url>
-       <loc>https://pamphlets.vercel.app/bookmarks</loc>
+       <loc>https://pamflets.vercel.app/bookmarks</loc>
        <lastmod>${new Date().toISOString()}</lastmod>
        <changefreq>weekly</changefreq>
        <priority>0.8</priority>
      </url>
      <url>
-       <loc>https://pamphlets.vercel.app/comments</loc>
+       <loc>https://pamflets.vercel.app/comments</loc>
        <lastmod>${new Date().toISOString()}</lastmod>
        <changefreq>weekly</changefreq>
        <priority>0.8</priority>
@@ -25,7 +25,7 @@ function generateSiteMap(articles: any[]) {
        .map(({ slug, updatedAt }: any) => {
          return `
        <url>
-           <loc>${`https://pamphlets.vercel.app/articles/${slug}`}</loc>
+           <loc>${`https://pamflets.vercel.app/articles/${slug}`}</loc>
            <lastmod>${new Date(updatedAt).toISOString()}</lastmod>
            <changefreq>weekly</changefreq>
            <priority>0.9</priority>
@@ -40,7 +40,7 @@ function generateSiteMap(articles: any[]) {
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   try {
     // Fetch articles from the public API
-    const response = await fetch("https://pamphlets.vercel.app/api/trpc/articles.getAll?input=%7B%22limit%22%3A1000%7D", {
+    const response = await fetch("https://pamflets.vercel.app/api/trpc/articles.getAll?input=%7B%22limit%22%3A1000%7D", {
       headers: {
         "User-Agent": "SitemapGenerator/1.0",
       },
@@ -69,7 +69,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     const basicSitemap = `<?xml version="1.0" encoding="UTF-8"?>
    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
      <url>
-       <loc>https://pamphlets.vercel.app</loc>
+       <loc>https://pamflets.vercel.app</loc>
        <lastmod>${new Date().toISOString()}</lastmod>
        <changefreq>weekly</changefreq>
        <priority>1.0</priority>

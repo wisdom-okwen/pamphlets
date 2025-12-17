@@ -281,14 +281,14 @@ export default function Home() {
         title="Home"
         description="Browse curated articles on career, academic, and religious topics from expert writers."
         openGraph={{
-          url: "https://pamphlets.vercel.app",
+          url: "https://pamflets.vercel.app",
           type: "website",
           title: "Pamphlets - Expert Articles",
           description:
             "Browse curated articles on career, academic, and religious topics from expert writers.",
           images: [
             {
-              url: "https://pamphlets.vercel.app/pamphlets.png",
+              url: "https://pamflets.vercel.app/pamphlets.png",
               width: 1200,
               height: 630,
               alt: "Pamphlets",
@@ -302,16 +302,16 @@ export default function Home() {
           "@type": "CollectionPage",
           name: "Pamphlets - Articles Collection",
           description: "Collection of expert-written articles on career, academic, and religious topics",
-          url: "https://pamphlets.vercel.app",
+          url: "https://pamflets.vercel.app",
           mainEntity: {
             "@type": "WebSite",
             name: "Pamphlets",
-            url: "https://pamphlets.vercel.app",
+            url: "https://pamflets.vercel.app",
             description:
               "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://pamphlets.vercel.app?q={search_term_string}",
+              target: "https://pamflets.vercel.app?q={search_term_string}",
               "query-input": "required name=search_term_string",
             },
           },
@@ -321,7 +321,7 @@ export default function Home() {
             headline: article.title,
             description: article.excerpt,
             image: article.coverImageUrl,
-            url: `https://pamphlets.vercel.app/articles/${article.slug}`,
+            url: `https://pamflets.vercel.app/articles/${article.slug}`,
           })),
         })}
       </script>
