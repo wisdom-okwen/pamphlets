@@ -176,7 +176,6 @@ function SettingsPage() {
       setAvatarUrl(publicUrl);
       setAvatarPreview(null);
     } catch (err) {
-      console.error("Avatar upload failed:", err);
       setError("Failed to upload avatar. Please try again.");
       setAvatarPreview(null);
     } finally {

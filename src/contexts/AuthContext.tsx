@@ -39,7 +39,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (error && error.code === "PGRST116") {
-      console.log("User deleted, signing out...");
       await supabase.auth.signOut({ scope: 'global' });
       setUser(null);
       setSession(null);
@@ -57,7 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      console.log("Auth state changed:", _event, !!newSession);
       setSession(newSession);
       setUser(newSession?.user ?? null);
       setIsLoading(false);
@@ -87,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const fetchRole = async () => {
-      console.log("Fetching role for user:", user.id);
       try {
         const { data, error } = await supabase
           .from("users")
@@ -95,12 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq("id", user.id)
           .single();
 
-        console.log("Role query result:", { data, error });
-
         if (error) {
-          console.error("Error fetching role:", error);
           if (error.code === "PGRST116") {
-            console.log("User not found in database, signing out...");
             await supabase.auth.signOut({ scope: 'global' });
             setUser(null);
             setSession(null);
@@ -110,7 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setRole(data?.role as UserRole ?? null);
         }
       } catch (err) {
-        console.error("Exception fetching role:", err);
         setRole(null);
       }
     };
@@ -119,7 +111,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, supabase]);
 
   const signOut = async () => {
-    console.log("Signing out...");
     setUser(null);
     setSession(null);
     setRole(null);

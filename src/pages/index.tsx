@@ -195,8 +195,6 @@ export default function Home() {
       openModal("view and add comments");
       return;
     }
-    // TODO: Navigate to comments or open comment modal
-    console.log("Comment on article:", articleId);
   };
 
   const [shareMenuOpen, setShareMenuOpen] = useState<number | null>(null);

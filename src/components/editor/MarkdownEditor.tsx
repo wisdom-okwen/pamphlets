@@ -63,7 +63,6 @@ export function MarkdownEditor({
       const imageMarkdown = `![${file.name}](${publicUrl})`;
       onChange(value + '\n' + imageMarkdown + '\n');
     } catch (err) {
-      console.error('Upload failed:', err);
       alert('Failed to upload image. Check your permissions for the "content_images" bucket.');
     } finally {
       setIsUploading(false);
