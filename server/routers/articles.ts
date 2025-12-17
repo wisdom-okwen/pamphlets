@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import {
+    createTRPCRouter,
+    publicProcedure,
+    protectedProcedure,
+    adminProcedure,
+} from "../trpc";
 import { articles, articleGenres } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
@@ -34,6 +39,11 @@ export const articlesRouter = createTRPCRouter({
                         },
                     },
                     genre: true,
+                    articleGenres: {
+                        with: {
+                            genre: true,
+                        },
+                    },
                 },
             });
 
@@ -43,8 +53,13 @@ export const articlesRouter = createTRPCRouter({
                 nextCursor = (cursor ?? 0) + limit;
             }
 
+            const mapped = items.map((it) => ({
+                ...it,
+                genres: (it.articleGenres || []).map((ag: any) => ag.genre),
+            }));
+
             return {
-                items,
+                items: mapped,
                 nextCursor,
             };
         }),
@@ -65,6 +80,7 @@ export const articlesRouter = createTRPCRouter({
                         },
                     },
                     genre: true,
+                    articleGenres: { with: { genre: true } },
                     comments: {
                         with: {
                             user: {
@@ -92,14 +108,17 @@ export const articlesRouter = createTRPCRouter({
                 .set({ viewCount: article.viewCount + 1 })
                 .where(eq(articles.id, article.id));
 
-            return article;
+            return {
+                ...article,
+                genres: (article.articleGenres || []).map((ag: any) => ag.genre),
+            } as any;
         }),
 
     // Get featured articles (most viewed)
     getFeatured: publicProcedure
         .input(z.object({ limit: z.number().min(1).max(10).default(5) }))
         .query(async ({ ctx, input }) => {
-            return ctx.db.query.articles.findMany({
+            const items = await ctx.db.query.articles.findMany({
                 where: eq(articles.status, "published"),
                 orderBy: [desc(articles.viewCount)],
                 limit: input.limit,
@@ -112,8 +131,11 @@ export const articlesRouter = createTRPCRouter({
                         },
                     },
                     genre: true,
+                    articleGenres: { with: { genre: true } },
                 },
             });
+
+            return items.map((it) => ({ ...it, genres: (it.articleGenres || []).map((ag: any) => ag.genre) }));
         }),
 
     // Create article (protected)
@@ -250,5 +272,45 @@ export const articlesRouter = createTRPCRouter({
         .mutation(async ({ ctx, input }) => {
             await ctx.db.delete(articles).where(eq(articles.id, input.id));
             return { success: true };
+        }),
+
+    adminGetAll: adminProcedure
+        .input(
+            z.object({
+                limit: z.number().min(1).max(500).default(100),
+                cursor: z.number().nullish(),
+                status: z.enum(["draft", "published", "archived"]).optional(),
+            })
+        )
+        .query(async ({ ctx, input }) => {
+            const { limit, cursor, status } = input;
+
+            const items = await ctx.db.query.articles.findMany({
+                where: status ? eq(articles.status, status) : undefined,
+                orderBy: [desc(articles.publishedAt)],
+                limit: limit + 1,
+                offset: cursor ?? 0,
+                with: {
+                    author: {
+                        columns: {
+                            id: true,
+                            username: true,
+                            avatarUrl: true,
+                        },
+                    },
+                    genre: true,
+                    articleGenres: { with: { genre: true } },
+                },
+            });
+
+            let nextCursor: typeof cursor = undefined;
+                if (items.length > limit) {
+                items.pop();
+                nextCursor = (cursor ?? 0) + limit;
+            }
+
+            const mapped = items.map((it) => ({ ...it, genres: (it.articleGenres || []).map((ag: any) => ag.genre) }));
+
+            return { items: mapped, nextCursor };
         }),
 });

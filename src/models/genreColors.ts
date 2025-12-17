@@ -1,94 +1,154 @@
 // Genre color mapping - each genre gets a unique background color
 export const genreColors: Record<string, string> = {
-  // Creative & Writing
-  "fiction": "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "nonfiction": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "creative-writing": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  "short-story": "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  "poetry": "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  "memoir": "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-  "personal-essay": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  
-  // Opinion & News
-  "opinion": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "journalism": "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  "investigative": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "news": "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
-  "politics": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  
-  // Knowledge & Learning
-  "history": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "philosophy": "bg-stone-100 text-stone-800 dark:bg-stone-900/30 dark:text-stone-300",
-  "society": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  "culture": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "education": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  
-  // Arts & Entertainment
-  "art": "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",
-  "design": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  "architecture": "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300",
-  "film": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "television": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "music": "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "theater": "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-  "literature": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  "books": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "reviews": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "interviews": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  
-  // Science & Tech
-  "science": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  "astronomy": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "environment": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  "climate": "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "technology": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "programming": "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  "ai-ml": "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  "data-science": "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
-  "security": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  
-  // Business & Finance
-  "startups": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "business": "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  "finance": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  "economics": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  "marketing": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  "productivity": "bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300",
-  
-  // Health & Wellness
-  "health": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "fitness": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "wellness": "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  "psychology": "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "sociology": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  
-  // Lifestyle
-  "parenting": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  "relationships": "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
-  "travel": "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300",
-  "food": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  "cooking": "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "fashion": "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  "beauty": "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
-  "photography": "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",
-  "gaming": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "sports": "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  
-  // How-to & Guides
-  "diy-crafts": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "how-to": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  "guides": "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  
-  // Other
-  "satire": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  "religion": "bg-stone-100 text-stone-800 dark:bg-stone-900/30 dark:text-stone-300",
-  "lgbtq": "bg-gradient-to-r from-red-100 via-yellow-100 to-blue-100 text-gray-800 dark:from-red-900/30 dark:via-yellow-900/30 dark:to-blue-900/30 dark:text-gray-300",
-  "race-identity": "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
-  "law": "bg-slate-100 text-slate-800 dark:bg-slate-900/30 dark:text-slate-300",
-  "ethics": "bg-zinc-100 text-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-300",
+    // Creative & Writing
+    fiction:
+        "bg-purple-200 text-purple-900 dark:bg-purple-800/40 dark:text-purple-200",
+    nonfiction:
+        "bg-blue-200 text-blue-900 dark:bg-blue-800/40 dark:text-blue-200",
+    "creative-writing":
+        "bg-pink-200 text-pink-900 dark:bg-pink-800/40 dark:text-pink-200",
+    "short-story":
+        "bg-violet-200 text-violet-900 dark:bg-violet-800/40 dark:text-violet-200",
+    poetry: "bg-fuchsia-200 text-fuchsia-900 dark:bg-fuchsia-800/40 dark:text-fuchsia-200",
+    memoir: "bg-rose-200 text-rose-900 dark:bg-rose-800/40 dark:text-rose-200",
+    "personal-essay":
+        "bg-amber-200 text-amber-900 dark:bg-amber-800/40 dark:text-amber-200",
+
+    // Opinion & News
+    opinion:
+        "bg-orange-200 text-orange-900 dark:bg-orange-800/40 dark:text-orange-200",
+    journalism:
+        "bg-slate-200 text-slate-900 dark:bg-slate-800/40 dark:text-slate-200",
+    investigative:
+        "bg-red-200 text-red-900 dark:bg-red-800/40 dark:text-red-200",
+    news: "bg-sky-200 text-sky-900 dark:bg-sky-800/40 dark:text-sky-200",
+    politics:
+        "bg-indigo-200 text-indigo-900 dark:bg-indigo-800/40 dark:text-indigo-200",
+
+    // Knowledge & Learning
+    history:
+        "bg-yellow-200 text-yellow-900 dark:bg-yellow-800/40 dark:text-yellow-200",
+    philosophy:
+        "bg-stone-200 text-stone-900 dark:bg-stone-800/40 dark:text-stone-200",
+    society: "bg-teal-200 text-teal-900 dark:bg-teal-800/40 dark:text-teal-200",
+    culture:
+        "bg-emerald-200 text-emerald-900 dark:bg-emerald-800/40 dark:text-emerald-200",
+    education:
+        "bg-cyan-200 text-cyan-900 dark:bg-cyan-800/40 dark:text-cyan-200",
+
+    // Arts & Entertainment
+    art: "bg-lime-200 text-lime-900 dark:bg-lime-800/40 dark:text-lime-200",
+    design: "bg-green-200 text-green-900 dark:bg-green-800/40 dark:text-green-200",
+    architecture:
+        "bg-zinc-200 text-zinc-900 dark:bg-zinc-800/40 dark:text-zinc-200",
+    film: "bg-red-200 text-red-900 dark:bg-red-800/40 dark:text-red-200",
+    television:
+        "bg-blue-200 text-blue-900 dark:bg-blue-800/40 dark:text-blue-200",
+    music: "bg-purple-200 text-purple-900 dark:bg-purple-800/40 dark:text-purple-200",
+    theater: "bg-rose-200 text-rose-900 dark:bg-rose-800/40 dark:text-rose-200",
+    literature:
+        "bg-amber-200 text-amber-900 dark:bg-amber-800/40 dark:text-amber-200",
+    books: "bg-orange-200 text-orange-900 dark:bg-orange-800/40 dark:text-orange-200",
+    reviews:
+        "bg-yellow-200 text-yellow-900 dark:bg-yellow-800/40 dark:text-yellow-200",
+    interviews:
+        "bg-pink-200 text-pink-900 dark:bg-pink-800/40 dark:text-pink-200",
+
+    // Science & Tech
+    science: "bg-cyan-200 text-cyan-900 dark:bg-cyan-800/40 dark:text-cyan-200",
+    astronomy:
+        "bg-indigo-200 text-indigo-900 dark:bg-indigo-800/40 dark:text-indigo-200",
+    environment:
+        "bg-green-200 text-green-900 dark:bg-green-800/40 dark:text-green-200",
+    climate:
+        "bg-emerald-200 text-emerald-900 dark:bg-emerald-800/40 dark:text-emerald-200",
+    technology:
+        "bg-blue-200 text-blue-900 dark:bg-blue-800/40 dark:text-blue-200",
+    programming:
+        "bg-violet-200 text-violet-900 dark:bg-violet-800/40 dark:text-violet-200",
+    "ai-ml":
+        "bg-fuchsia-200 text-fuchsia-900 dark:bg-fuchsia-800/40 dark:text-fuchsia-200",
+    "data-science":
+        "bg-sky-200 text-sky-900 dark:bg-sky-800/40 dark:text-sky-200",
+    security: "bg-red-200 text-red-900 dark:bg-red-800/40 dark:text-red-200",
+
+    // Business & Finance
+    startups:
+        "bg-orange-200 text-orange-900 dark:bg-orange-800/40 dark:text-orange-200",
+    business:
+        "bg-slate-200 text-slate-900 dark:bg-slate-800/40 dark:text-slate-200",
+    finance:
+        "bg-green-200 text-green-900 dark:bg-green-800/40 dark:text-green-200",
+    economics:
+        "bg-teal-200 text-teal-900 dark:bg-teal-800/40 dark:text-teal-200",
+    marketing:
+        "bg-pink-200 text-pink-900 dark:bg-pink-800/40 dark:text-pink-200",
+    productivity:
+        "bg-lime-200 text-lime-900 dark:bg-lime-800/40 dark:text-lime-200",
+
+    // Health & Wellness
+    health: "bg-red-200 text-red-900 dark:bg-red-800/40 dark:text-red-200",
+    fitness:
+        "bg-orange-200 text-orange-900 dark:bg-orange-800/40 dark:text-orange-200",
+    wellness:
+        "bg-teal-200 text-teal-900 dark:bg-teal-800/40 dark:text-teal-200",
+    psychology:
+        "bg-purple-200 text-purple-900 dark:bg-purple-800/40 dark:text-purple-200",
+    sociology:
+        "bg-blue-200 text-blue-900 dark:bg-blue-800/40 dark:text-blue-200",
+
+    // Lifestyle
+    parenting:
+        "bg-pink-200 text-pink-900 dark:bg-pink-800/40 dark:text-pink-200",
+    relationships:
+        "bg-rose-200 text-rose-900 dark:bg-rose-800/40 dark:text-rose-200",
+    travel: "bg-sky-200 text-sky-900 dark:bg-sky-800/40 dark:text-sky-200",
+    food: "bg-amber-200 text-amber-900 dark:bg-amber-800/40 dark:text-amber-200",
+    cooking:
+        "bg-orange-200 text-orange-900 dark:bg-orange-800/40 dark:text-orange-200",
+    fashion:
+        "bg-fuchsia-200 text-fuchsia-900 dark:bg-fuchsia-800/40 dark:text-fuchsia-200",
+    beauty: "bg-pink-200 text-pink-900 dark:bg-pink-800/40 dark:text-pink-200",
+    photography:
+        "bg-violet-200 text-violet-900 dark:bg-violet-800/40 dark:text-violet-200",
+    gaming: "bg-indigo-200 text-indigo-900 dark:bg-indigo-800/40 dark:text-indigo-200",
+    sports: "bg-green-200 text-green-900 dark:bg-green-800/40 dark:text-green-200",
+
+    // How-to & Guides
+    "diy-crafts":
+        "bg-yellow-200 text-yellow-900 dark:bg-yellow-800/40 dark:text-yellow-200",
+    "how-to":
+        "bg-cyan-200 text-cyan-900 dark:bg-cyan-800/40 dark:text-cyan-200",
+    guides: "bg-blue-200 text-blue-900 dark:bg-blue-800/40 dark:text-blue-200",
+
+    // Other
+    satire: "bg-amber-200 text-amber-900 dark:bg-amber-800/40 dark:text-amber-200",
+    religion:
+        "bg-stone-200 text-stone-900 dark:bg-stone-800/40 dark:text-stone-200",
+    lgbtq: "bg-indigo-200 text-indigo-900 dark:bg-indigo-800/40 dark:text-indigo-200",
+    "race-identity":
+        "bg-amber-200 text-amber-900 dark:bg-amber-800/40 dark:text-amber-200",
+    law: "bg-slate-200 text-slate-900 dark:bg-slate-800/40 dark:text-slate-200",
+    ethics: "bg-zinc-200 text-zinc-900 dark:bg-zinc-800/40 dark:text-zinc-200",
 };
 
 // Helper function to get genre color classes
 export function getGenreColor(slug: string): string {
-  return genreColors[slug] || "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300";
+    const base =
+        genreColors[slug] ||
+        "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300";
+    // Make colors slightly more vibrant by preferring -200 backgrounds and darker text where possible.
+    // This transforms common Tailwind utility patterns without changing every mapping entry.
+    let vibrant = base
+        .replace(/-100/g, "-200")
+        .replace(/text-([a-z0-9-]+)-800/g, "text-$1-900");
+    vibrant = vibrant.replace(
+        /dark:bg-([a-z0-9-]+)-900\/30/g,
+        "dark:bg-$1-800/40"
+    );
+    vibrant = vibrant.replace(
+        /dark:text-([a-z0-9-]+)-300/g,
+        "dark:text-$1-200"
+    );
+    return vibrant;
 }

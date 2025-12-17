@@ -41,27 +41,22 @@ const getPageTitle = (pathname: string): string => {
 };
 
 function AppContent({ Component, pageProps, router }: AppProps) {
-  const hideNavbarRoutes = ["/admin/articles/new"];
-  const showNavbar = !hideNavbarRoutes.includes(router.pathname);
-  
   const authRoutes = ["/login", "/signup", "/forgot-password", "/reset-password", "/callback", "/signout"];
   const isAuthPage = authRoutes.includes(router.pathname);
+
+  const pagesWithOwnHeader = ["/admin/articles/new"];
+  const hasOwnHeader = pagesWithOwnHeader.includes(router.pathname);
 
   const showSidebar = !isAuthPage;
 
   return (
     <>
       <DefaultSeo {...SEO_CONFIG} />
-      
+
       {showSidebar && <Sidebar />}
-      
+
       <div className={showSidebar ? "lg:pl-64" : ""}>
-        {showNavbar && !showSidebar && <NavBar title={getPageTitle(router.pathname)} />}
-        {showNavbar && showSidebar && (
-          <div className="lg:hidden">
-            <NavBar title={getPageTitle(router.pathname)} />
-          </div>
-        )}
+        {!hasOwnHeader && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} />}
         <Component {...pageProps} />
       </div>
     </>

@@ -182,15 +182,16 @@ function NewArticlePage() {
                 Genres
               </Label>
 
-              <div className="flex flex-wrap gap-2">
-                {genresLoading ? (
-                  <div className="text-sm text-muted-foreground">Loading genres...</div>
-                ) : genres && genres.length > 0 ? (
-                  genres.map((genre) => {
-                    const gid = genre.id.toString();
-                    const selected = genreIds.includes(gid);
-                    return (
-                      <button
+              <div className="relative">
+                <div className="flex flex-wrap gap-2">
+                  {genresLoading ? (
+                    <div className="text-sm text-muted-foreground">Loading genres...</div>
+                  ) : genres && genres.length > 0 ? (
+                    genres.map((genre) => {
+                      const gid = genre.id.toString();
+                      const selected = genreIds.includes(gid);
+                      return (
+                        <button
                         type="button"
                         key={genre.id}
                         onClick={() =>
@@ -200,11 +201,11 @@ function NewArticlePage() {
                               : [...prev, gid]
                           )
                         }
-                        className={`rounded-full px-3 py-1 text-sm transition-colors focus:outline-none ${
-                          selected
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted/10 text-muted-foreground"
-                        }`}
+                          className={`rounded-full px-3 py-1 text-sm transition-colors focus:outline-none ${
+                            selected
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted/10 text-muted-foreground"
+                          }`}
                       >
                         {genre.name}
                       </button>
@@ -213,6 +214,7 @@ function NewArticlePage() {
                 ) : (
                   <div className="text-sm text-muted-foreground">No genres available</div>
                 )}
+                </div>
               </div>
               <p className="text-xs text-muted-foreground mt-1">Select one or more genres</p>
             </div>

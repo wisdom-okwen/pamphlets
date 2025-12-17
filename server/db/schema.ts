@@ -115,6 +115,42 @@ export const articleGenres = pgTable(
     })
 );
 
+export const articleGenresRelations = relations(articleGenres, ({ one }) => ({
+    genre: one(genres, {
+        fields: [articleGenres.genreId],
+        references: [genres.id],
+    }),
+    article: one(articles, {
+        fields: [articleGenres.articleId],
+        references: [articles.id],
+    }),
+}));
+
+// ============ TAGS TABLE ============
+export const tags = pgTable("tags", {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 100 }).notNull(),
+    slug: varchar("slug", { length: 100 }).notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+    tagNameIdx: uniqueIndex("tag_name_idx").on(table.name),
+    tagSlugIdx: uniqueIndex("tag_slug_idx").on(table.slug),
+}));
+
+// ============ ARTICLE_TAGS JOIN TABLE ============
+export const articleTags = pgTable("article_tags", {
+    id: serial("id").primaryKey(),
+    articleId: integer("article_id")
+        .notNull()
+        .references(() => articles.id, { onDelete: "cascade" }),
+    tagId: integer("tag_id")
+        .notNull()
+        .references(() => tags.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+    articleTagIdx: uniqueIndex("article_tag_idx").on(table.articleId, table.tagId),
+}));
+
 // ============ COMMENTS TABLE ============
 export const comments = pgTable("comments", {
     id: serial("id").primaryKey(),
@@ -183,6 +219,8 @@ export const articlesRelations = relations(articles, ({ one, many }) => ({
     comments: many(comments),
     bookmarks: many(bookmarks),
     reactions: many(reactions),
+    tags: many(articleTags),
+    articleGenres: many(articleGenres),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({

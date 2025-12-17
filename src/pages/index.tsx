@@ -101,19 +101,19 @@ export default function Home() {
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="block border rounded-lg overflow-hidden hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors"
+                className="group block border rounded-lg overflow-hidden bg-card shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200"
               >
                 {/* Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row">
                   {/* Cover image */}
-                  <div className="w-full sm:w-36 md:w-44 h-48 sm:h-36 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
+                  <div className="w-full sm:w-36 md:w-44 h-48 sm:h-36 flex-shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                     {article.coverImageUrl ? (
                       <Image
                         src={article.coverImageUrl}
                         alt={article.title}
                         width={160}
                         height={192}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-zinc-400">
@@ -130,7 +130,7 @@ export default function Home() {
                         {article.title}
                       </h2>
                       {article.excerpt && (
-                        <p className="text-sm text-muted-foreground line-clamp-3 mt-1.5">
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1.5">
                           {article.excerpt}
                         </p>
                       )}
@@ -138,38 +138,40 @@ export default function Home() {
 
                     {/* Bottom: Genre tag & actions */}
                     <div className="flex items-center justify-between mt-3 gap-2">
-                      {/* Left: Genre tag */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {article.genre && (
-                          <span className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap ${getGenreColor(article.genre.slug)}`}>
-                            {article.genre.name}
-                          </span>
-                        )}
+                      <div className="relative">
+                        <div className="flex gap-2 overflow-x-auto max-w-full py-1">
+                          {(article.genres && article.genres.length > 0 ? article.genres : (article.genre ? [article.genre] : [])).map((g: any) => (
+                            <span key={g.id} className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 ${getGenreColor(g.slug)}`}>
+                              {g.name}
+                            </span>
+                          ))}
+                        </div>
+                        {/* gradient removed per design preference */}
                       </div>
 
                       {/* Right: Views & action buttons */}
-                      <div className="flex items-center gap-0.5">
+                      <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 text-xs text-muted-foreground px-2">
                           <Eye size={12} />
                           <span>{article.viewCount}</span>
                         </div>
                         <button
                           onClick={(e) => handleFavorite(e, article.id)}
-                          className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
                           title="Add to favorites"
                         >
                           <Heart size={16} className="text-muted-foreground hover:text-red-500" />
                         </button>
                         <button
                           onClick={(e) => handleComment(e, article.id)}
-                          className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
                           title="Comments"
                         >
                           <MessageCircle size={16} className="text-muted-foreground hover:text-blue-500" />
                         </button>
                         <button
                           onClick={(e) => handleShare(e, { title: article.title, slug: article.slug })}
-                          className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                          className="p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
                           title="Share"
                         >
                           <Share2 size={16} className="text-muted-foreground hover:text-green-500" />

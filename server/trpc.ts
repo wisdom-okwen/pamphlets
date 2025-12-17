@@ -42,14 +42,26 @@ export const createTRPCContext = async ({
     const supabase = createApiClient(req, res);
     const { data: userData } = await supabase.auth.getUser();
 
+    let role: Subject["role"] = "visitor";
+
+    if (userData?.user) {
+        const { data: userRecord } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id", userData.user.id)
+            .single();
+
+        if (userRecord?.role) {
+            role = userRecord.role as Subject["role"];
+        }
+    }
+
     return createInnerTRPCContext({
         subject: userData?.user
             ? {
                   id: userData.user.id,
                   email: userData.user.email,
-                  role:
-                      (userData.user.user_metadata?.role as Subject["role"]) ??
-                      "visitor",
+                  role,
               }
             : null,
     });

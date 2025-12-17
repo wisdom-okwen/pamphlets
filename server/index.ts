@@ -4,6 +4,8 @@ import { genresRouter } from "./routers/genres";
 import { commentsRouter } from "./routers/comments";
 import { reactionsRouter } from "./routers/reactions";
 import { bookmarksRouter } from "./routers/bookmarks";
+import { usersRouter } from "./routers/users";
+import { adminStatsRouter } from "./routers/adminStats";
 
 /**
  * Main app router - combines all routers
@@ -14,6 +16,8 @@ export const appRouter = createTRPCRouter({
     comments: commentsRouter,
     reactions: reactionsRouter,
     bookmarks: bookmarksRouter,
+    users: usersRouter,
+    adminStats: adminStatsRouter,
 });
 
 // Export type for client

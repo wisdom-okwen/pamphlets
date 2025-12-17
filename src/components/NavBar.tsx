@@ -10,10 +10,12 @@ export default function NavBar({
   title,
   onArchive,
   backHref,
+  hideAuth,
 }: {
   title?: string;
   onArchive?: () => void;
   backHref?: string;
+  hideAuth?: boolean;
 }) {
   const router = useRouter();
   const { theme, toggle, mounted } = useTheme();
@@ -24,7 +26,7 @@ export default function NavBar({
 
   return (
     <header className="w-full border-b bg-white dark:bg-black/90 dark:border-zinc-800">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] flex items-center">
         {/* Left: Logo / Back button */}
         <div className="flex items-center gap-2 w-1/3">
           {backHref ? (
@@ -36,14 +38,18 @@ export default function NavBar({
               <ArrowLeft size={18} />
             </button>
           ) : (
-            <Image
-              src="/pamphlets.svg"
-              alt="Pamphlets"
-              width={32}
-              height={32}
-              className="cursor-pointer dark:invert dark:brightness-200"
-              onClick={() => router.push("/")}
-            />
+            hideAuth ? (
+              <div className="w-7 h-7" />
+            ) : (
+              <Image
+                src="/pamphlets.svg"
+                alt="Pamphlets"
+                width={28}
+                height={28}
+                className="cursor-pointer dark:invert dark:brightness-200"
+                onClick={() => router.push("/")}
+              />
+            )
           )}
         </div>
 
@@ -75,8 +81,8 @@ export default function NavBar({
             <div className="p-2 w-8 h-8" />
           )}
 
-          {/* Auth: Login button or Profile avatar */}
-          {mounted && (
+          {/* Auth: Login button or Profile avatar. Hidden when `hideAuth` true (sidebar shows auth controls) */}
+          {!hideAuth && mounted && (
             user ? (
               <Link
                 href="/profile"

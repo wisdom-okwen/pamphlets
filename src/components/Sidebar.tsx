@@ -59,7 +59,7 @@ export function Sidebar() {
   const navContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="p-4 border-b dark:border-zinc-800">
+      <div className="px-4 h-[61px] flex items-center border-b dark:border-zinc-800">
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
           <Image
             src="/pamphlets.svg"
@@ -68,7 +68,7 @@ export function Sidebar() {
             height={28}
             className="dark:invert dark:brightness-200"
           />
-          <span className="font-bold text-lg">Pamphlets</span>
+          <span className="font-bold text-lg leading-none">Pamphlets</span>
         </Link>
       </div>
 
