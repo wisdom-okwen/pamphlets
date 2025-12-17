@@ -9,6 +9,7 @@ import { AuthGuard } from "@/components/AuthGuard";
 import NavBar from "@/components/NavBar";
 import { Sidebar } from "@/components/Sidebar";
 import { Source_Serif_4, Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
@@ -74,6 +75,7 @@ function App(props: AppProps) {
           </AuthGuard>
         </ThemeProvider>
       </AuthProvider>
+      <Analytics />
     </div>
   );
 }
