@@ -6,6 +6,7 @@ import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
 import { useState, useMemo, useRef, useEffect } from "react";
+import { createClient } from "@/utils/supabase/clients/browser";
 
 interface ArticleWithCounts {
   id: number;
@@ -25,19 +26,60 @@ export default function Home() {
   const { user } = useAuth();
   const { isOpen, action, openModal, closeModal } = useAuthModal();
   const [searchQuery, setSearchQuery] = useState("");
+  const utils = trpc.useUtils();
+  const supabase = useMemo(() => createClient(), []);
   
   const { data, isLoading, error } = trpc.articles.getAll.useQuery({
     limit: 20,
   });
 
   // Fetch user's bookmarked article IDs
-  const { data: bookmarkedIds } = trpc.bookmarks.getMyBookmarkedIds.useQuery(
+  const { data: bookmarkedIds, refetch: refetchBookmarks } = trpc.bookmarks.getMyBookmarkedIds.useQuery(
     undefined,
     { enabled: !!user }
   );
 
   // Track optimistic like states locally
   const [optimisticLikes, setOptimisticLikes] = useState<Record<number, { liked: boolean; count: number } | undefined>>({});
+
+  // Real-time subscription for reactions (likes)
+  useEffect(() => {
+    const channel = supabase
+      .channel("realtime-reactions-home")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reactions" },
+        () => {
+          // Invalidate and refetch articles to get updated like counts
+          utils.articles.getAll.invalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, utils]);
+
+  // Real-time subscription for bookmarks
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel("realtime-bookmarks-home")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "bookmarks", filter: `user_id=eq.${user.id}` },
+        () => {
+          refetchBookmarks();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, user, refetchBookmarks]);
 
   // Filter articles based on search query
   const filteredArticles = useMemo(() => {

@@ -5,6 +5,7 @@ import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Share2, Bookmark, T
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
+import { createClient } from "@/utils/supabase/clients/browser";
 
 interface GenreType {
   id: number;
@@ -295,11 +296,54 @@ export default function ArticleModalPage() {
   const { user } = useAuth();
   const { isOpen, action, openModal, closeModal } = useAuthModal();
   const utils = trpc.useUtils();
+  const supabase = useMemo(() => createClient(), []);
 
   const { data: article, isLoading } = trpc.articles.getBySlug.useQuery(
     { slug },
     { enabled: !!slug }
   );
+
+  // Real-time subscription for reactions on this article
+  useEffect(() => {
+    if (!article?.id) return;
+
+    const channel = supabase
+      .channel(`realtime-reactions-article-${article.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reactions", filter: `article_id=eq.${article.id}` },
+        () => {
+          // Invalidate and refetch article to get updated like count
+          utils.articles.getBySlug.invalidate({ slug });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, article?.id, slug, utils]);
+
+  // Real-time subscription for comments on this article
+  useEffect(() => {
+    if (!article?.id) return;
+
+    const channel = supabase
+      .channel(`realtime-comments-article-${article.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments", filter: `article_id=eq.${article.id}` },
+        () => {
+          // Refetch comments when they change
+          utils.comments.getByArticle.invalidate({ articleId: article.id });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, article?.id, utils]);
 
   // Optimistic like state
   const [optimisticLike, setOptimisticLike] = useState<{ liked: boolean; count: number } | null>(null);
