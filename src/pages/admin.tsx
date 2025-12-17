@@ -316,10 +316,10 @@ export default withAuth(function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {statsTimeseries?.articlesPerDay?.map((row: any, idx: number) => {
+                      {statsTimeseries?.articlesPerDay?.map((row, idx) => {
                         const day = row.day ? String(row.day) : "-";
                         const articlesCount = Number(row.count ?? 0);
-                        const userRow = statsTimeseries?.usersPerDay?.find((r: any) => String(r.day) === String(row.day));
+                        const userRow = statsTimeseries?.usersPerDay?.find((r) => String(r.day) === String(row.day));
                         const usersCount = Number(userRow?.count ?? 0);
                         return (
                           <tr key={idx} className="border-t">
@@ -440,29 +440,28 @@ export default withAuth(function AdminPage() {
             ) : (
               <div className="space-y-3">
                 {articles.map((a: AdminArticle) => (
-                  <div key={a.id} className="group flex items-center justify-between border rounded px-3 py-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 bg-card">
-                    <div>
-                      <div className="font-medium">
+                  <div key={a.id} className="group flex items-center justify-between gap-4 border rounded px-3 py-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transform transition-all duration-200 bg-card">
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium line-clamp-1">
                         {a.title}
                         {a.status === "archived" && (
                           <span className="ml-2 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Archived</span>
                         )}
                       </div>
                       <div className="mt-1">
-                        <div className="relative">
-                          <div className="flex gap-2 overflow-x-auto max-w-full py-1">
-                            {(a.genres && a.genres.length > 0 ? a.genres : []).map((g: any) => (
-                              <span key={g.id} className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap flex-shrink-0 ${getGenreColor(g.slug)}`}> 
+                        <div className="flex-1 min-w-0 overflow-hidden">
+                          <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+                            {(a.genres && a.genres.length > 0 ? a.genres : []).map((g: { id: number; name: string; slug: string }) => (
+                              <span key={g.id} className={`px-2 py-0.5 rounded-full text-xs whitespace-nowrap shrink-0 ${getGenreColor(g.slug)}`}> 
                                 {g.name}
                               </span>
                             ))}
                           </div>
-                          {/* gradient removed per design preference */}
                         </div>
-                        <div className="text-xs text-muted-foreground">{a.excerpt || a.slug}</div>
+                        <div className="text-xs text-muted-foreground line-clamp-2">{a.excerpt || a.slug}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Link href={`/articles/${a.slug}`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 text-primary hover:shadow-md">View</Link>
                       <Link href={`/admin/articles/${a.slug}/edit`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 hover:shadow-md">Edit</Link>
                       {a.status === "archived" ? (

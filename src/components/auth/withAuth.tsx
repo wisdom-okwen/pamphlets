@@ -16,7 +16,7 @@ export function withAuth<P extends object>(
   const { redirectTo = "/login", requireAdmin = false } = options || {};
 
   return function WithAuthComponent(props: P) {
-    const { user, isLoading, isAdmin } = useAuth();
+    const { user, isLoading, isRoleLoading, isAdmin } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -26,15 +26,15 @@ export function withAuth<P extends object>(
       }
     }, [user, isLoading, router]);
 
-    // Redirect non-admins if admin is required
+    // Redirect non-admins if admin is required (wait for role to load first)
     useEffect(() => {
-      if (!isLoading && user && requireAdmin && !isAdmin) {
+      if (!isLoading && !isRoleLoading && user && requireAdmin && !isAdmin) {
         router.push("/");
       }
-    }, [user, isLoading, isAdmin, router]);
+    }, [user, isLoading, isRoleLoading, isAdmin, router]);
 
-    // Show loading state while checking auth
-    if (isLoading) {
+    // Show loading state while checking auth or role
+    if (isLoading || (requireAdmin && isRoleLoading)) {
       return (
         <main className="flex min-h-screen items-center justify-center bg-background">
           <Loader2 className="size-8 animate-spin text-primary" />

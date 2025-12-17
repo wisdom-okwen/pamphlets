@@ -15,6 +15,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  isRoleLoading: boolean;
   role: UserRole | null;
   isAdmin: boolean;
   signOut: () => Promise<void>;
@@ -27,8 +28,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState<UserRole | null>(null);
+  const [roleLoadedForUserId, setRoleLoadedForUserId] = useState<string | null>(null);
 
   const supabase = useMemo(() => createClient(), []);
+
+  const isRoleLoading = user !== null && roleLoadedForUserId !== user.id;
 
   // Helper function to check if user exists and sign out if not
   const checkUserExists = async (userId: string) => {
@@ -81,6 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) {
       setRole(null);
+      setRoleLoadedForUserId(null);
+      return;
+    }
+
+    if (roleLoadedForUserId === user.id) {
       return;
     }
 
@@ -104,11 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (err) {
         setRole(null);
+      } finally {
+        setRoleLoadedForUserId(user.id);
       }
     };
 
     fetchRole();
-  }, [user, supabase]);
+  }, [user, roleLoadedForUserId, supabase]);
 
   const signOut = async () => {
     setUser(null);
@@ -126,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = role === "admin";
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, role, isAdmin, signOut }}>
+    <AuthContext.Provider value={{ user, session, isLoading, isRoleLoading, role, isAdmin, signOut }}>
       {children}
     </AuthContext.Provider>
   );
