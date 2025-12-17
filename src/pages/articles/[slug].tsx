@@ -245,21 +245,48 @@ function renderInlineMarkdown(text: string): React.ReactNode {
 
 /**
  * Split text into pages, breaking at whitespace to avoid cutting words.
+ * Preserves markdown images ![alt](url) and links [text](url) by not splitting them.
  */
 function chunkText(text: string, charsPerPage = 1200): string[] {
   const pages: string[] = [];
   let remaining = text;
+  
+  // Regex to match markdown images and links: ![...](...) or [...](...) 
+  const markdownPattern = /!?\[[^\]]*\]\([^)]*\)/g;
+  
   while (remaining.length > 0) {
     if (remaining.length <= charsPerPage) {
       pages.push(remaining);
       break;
     }
-    // Find last space within limit
+    
+    // Find a good break point
     let end = charsPerPage;
+    
+    // Check if we're in the middle of a markdown image/link
+    // Find all markdown patterns in the chunk we're about to cut
+    const chunkToCheck = remaining.slice(0, end + 200);
+    let match;
+    markdownPattern.lastIndex = 0;
+    
+    while ((match = markdownPattern.exec(chunkToCheck)) !== null) {
+      const matchStart = match.index;
+      const matchEnd = match.index + match[0].length;
+      
+      // If our cut point is in the middle of a markdown pattern
+      if (matchStart < end && matchEnd > end) {
+        // Move the cut point to before the pattern starts
+        end = matchStart;
+        break;
+      }
+    }
+    
+    // Now find last space/newline within the adjusted limit
     while (end > 0 && remaining[end] !== " " && remaining[end] !== "\n") {
       end--;
     }
-    if (end === 0) end = charsPerPage; // no space found, hard cut
+    if (end === 0) end = charsPerPage;
+    
     pages.push(remaining.slice(0, end));
     remaining = remaining.slice(end).trimStart();
   }

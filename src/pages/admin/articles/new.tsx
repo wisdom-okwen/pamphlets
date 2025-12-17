@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { trpc } from "@/lib/trpc";
@@ -41,7 +41,20 @@ function NewArticlePage() {
     },
   });
 
-  const handleSubmit = async (status: "draft" | "published") => {
+  // Use refs to avoid stale closures and infinite loops
+  const formRef = useRef({ title, excerpt, content, genreIds, coverImageUrl });
+  const createArticleRef = useRef(createArticle);
+  
+  useEffect(() => {
+    formRef.current = { title, excerpt, content, genreIds, coverImageUrl };
+  }, [title, excerpt, content, genreIds, coverImageUrl]);
+  
+  useEffect(() => {
+    createArticleRef.current = createArticle;
+  }, [createArticle]);
+
+  const handleSubmit = useCallback((status: "draft" | "published") => {
+    const { title, excerpt, content, genreIds, coverImageUrl } = formRef.current;
     setError(null);
 
     // Validation
@@ -71,7 +84,7 @@ function NewArticlePage() {
       },
     ];
 
-    createArticle.mutate({
+    createArticleRef.current.mutate({
       title: title.trim(),
       excerpt: excerpt.trim() || undefined,
       content: contentBlocks,
@@ -79,7 +92,7 @@ function NewArticlePage() {
       coverImageUrl: coverImageUrl.trim() || undefined,
       status,
     });
-  };
+  }, []);
 
   // Set navbar actions
   useEffect(() => {
@@ -119,7 +132,7 @@ function NewArticlePage() {
 
     // Clear actions when leaving the page
     return () => setActions(null);
-  }, [isSubmitting, setActions]);
+  }, [isSubmitting, setActions, handleSubmit]);
 
   return (
     <>
