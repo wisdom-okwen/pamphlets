@@ -345,6 +345,31 @@ export default function ArticleModalPage() {
     };
   }, [supabase, article?.id, utils]);
 
+  // Real-time subscription for comment reactions (likes, loves, supports on comments)
+  useEffect(() => {
+    if (!article?.id) return;
+
+    const channel = supabase
+      .channel(`realtime-comment-reactions-article-${article.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "reactions" },
+        (payload) => {
+          // Check if the reaction is on a comment (comment_id is not null)
+          const data = payload.new as { comment_id?: number } | null;
+          if (data?.comment_id) {
+            // Refetch comments to get updated reaction counts
+            utils.comments.getByArticle.invalidate({ articleId: article.id });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, article?.id, utils]);
+
   // Optimistic like state
   const [optimisticLike, setOptimisticLike] = useState<{ liked: boolean; count: number } | null>(null);
 

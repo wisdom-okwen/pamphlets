@@ -4,15 +4,39 @@ import { MessageCircle, Eye, Trash2 } from "lucide-react";
 import { withAuth } from "@/components/auth/withAuth";
 import { NextSeo } from "next-seo";
 import { formatDistanceToNow } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/utils/supabase/clients/browser";
 
 function CommentsPage() {
+  const { user } = useAuth();
   const utils = trpc.useUtils();
+  const supabase = useMemo(() => createClient(), []);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   
   const { data, isLoading, error } = trpc.comments.getMyComments.useQuery({
     limit: 50,
   });
+
+  // Real-time subscription for user's comments
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel("realtime-my-comments")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments", filter: `user_id=eq.${user.id}` },
+        () => {
+          utils.comments.getMyComments.invalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [supabase, user, utils]);
 
   const deleteCommentMutation = trpc.comments.delete.useMutation({
     onSuccess: () => {
