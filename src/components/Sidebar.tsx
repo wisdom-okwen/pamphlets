@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -17,6 +17,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
 import Image from "next/image";
+import { trpc } from "@/lib/trpc";
+import { createClient } from "@/utils/supabase/clients/browser";
 
 // Home is accessible to everyone
 const publicNavItems = [
@@ -40,6 +42,39 @@ export function Sidebar() {
   const { user, signOut, isAdmin, role } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const { isOpen: isAuthModalOpen, action, openModal, closeModal } = useAuthModal();
+  const supabase = useMemo(() => createClient(), []);
+  const utils = trpc.useUtils();
+
+  // Fetch user profile from database
+  const { data: profile } = trpc.users.getMyProfile.useQuery(undefined, {
+    enabled: !!user,
+  });
+
+  // Real-time subscription for profile updates
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`sidebar-profile-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "users",
+          filter: `id=eq.${user.id}`,
+        },
+        () => {
+          // Invalidate the profile query to refetch
+          utils.users.getMyProfile.invalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, supabase, utils.users.getMyProfile]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -150,13 +185,13 @@ export function Sidebar() {
           <>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center overflow-hidden">
-                {user.user_metadata?.avatar_url ? (
-                  <Image
-                    src={user.user_metadata.avatar_url}
+                {profile?.avatarUrl || user.user_metadata?.avatar_url ? (
+                  <img
+                    src={profile?.avatarUrl || user.user_metadata?.avatar_url}
                     alt="Profile"
                     width={40}
                     height={40}
-                    className="object-cover"
+                    className="w-10 h-10 object-cover"
                   />
                 ) : (
                   <span className="text-sm font-medium">
@@ -166,7 +201,7 @@ export function Sidebar() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {user.user_metadata?.username || user.email?.split("@")[0]}
+                  {profile?.username || user.user_metadata?.username || user.email?.split("@")[0]}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
                   {user.email}
