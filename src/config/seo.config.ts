@@ -69,6 +69,10 @@ const SEO_CONFIG: DefaultSeoProps = {
       name: "apple-mobile-web-app-status-bar-style",
       content: "default",
     },
+    {
+      name: "google-site-verification",
+      content: "X5NeDfA5p10G_SOucGsO4nGnKNJYaabWuxCfBedSaVY",
+    },
   ],
   additionalLinkTags: [
     {
