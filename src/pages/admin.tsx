@@ -85,7 +85,7 @@ export default withAuth(function AdminPage() {
   });
 
   const { data: articlesData, isLoading: articlesLoading } = trpc.articles.getAll.useQuery({ limit: 100 });
-  const [viewStatus, setViewStatus] = useState<"all" | "published" | "archived">("published");
+  const [viewStatus, setViewStatus] = useState<"all" | "published" | "archived" | "draft">("published");
   const {
     data: adminArticlesData,
   } = trpc.articles.adminGetAll.useQuery(
@@ -94,13 +94,31 @@ export default withAuth(function AdminPage() {
   );
   const [articlesList, setArticlesList] = useState<AdminArticle[]>([]);
   const deleteArticle = trpc.articles.delete.useMutation({
+    onMutate: async ({ id }) => {
+      setArticlesList((prev) => prev.filter((a) => a.id !== id));
+    },
     onSuccess() {
       trpcCtx.articles.getAll.invalidate();
     },
+    onError: (err) => {
+      trpcCtx.articles.getAll.invalidate();
+      alert("Failed to delete article: " + err.message);
+    },
   });
   const updateArticle = trpc.articles.update.useMutation({
+    onMutate: async ({ id, status }) => {
+      setArticlesList((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: status || a.status } : a))
+      );
+    },
     onSuccess() {
       trpcCtx.articles.getAll.invalidate();
+      trpcCtx.articles.adminGetAll.invalidate();
+    },
+    onError: (err) => {
+      trpcCtx.articles.getAll.invalidate();
+      trpcCtx.articles.adminGetAll.invalidate();
+      alert("Failed to update article: " + err.message);
     },
   });
 
@@ -420,6 +438,12 @@ export default withAuth(function AdminPage() {
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "published" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
                   Published
+                </button>
+                <button
+                  onClick={() => setViewStatus("draft")}
+                  className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "draft" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
+                >
+                  Drafts
                 </button>
                 <button
                   onClick={() => setViewStatus("archived")}

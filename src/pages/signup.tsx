@@ -27,6 +27,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState("");
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,22 +65,12 @@ export default function SignupPage() {
         return;
       }
 
-      let user = data.user ?? null;
+      const user = data.user ?? null;
 
       if (!data.session && user) {
-        const { data: signInData, error: signInError } =
-          await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-        if (signInError) {
-          // Email confirmation might be required
-          setError("Please check your email to confirm your account.");
-          return;
-        }
-
-        user = signInData.user ?? null;
+        setConfirmationEmail(email);
+        setShowConfirmation(true);
+        return;
       }
 
       if (!user) {
@@ -140,156 +132,214 @@ export default function SignupPage() {
 
       <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
         <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-            <CardDescription>
-              Sign up to start reading and writing pamphlets
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
-              </div>
-            )}
-
-            {/* Google OAuth */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleGoogleSignup}
-              disabled={isGoogleLoading || isLoading}
-            >
-              {isGoogleLoading ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <GoogleIcon className="mr-2 size-4" />
-              )}
-              Continue with Google
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
-              </div>
-            </div>
-
-            {/* Email/Password Form */}
-            <form onSubmit={handleEmailSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="displayName">Display Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="displayName"
-                    type="text"
-                    placeholder="John Doe"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
+          {showConfirmation ? (
+            <>
+              <CardHeader className="space-y-1 text-center">
+                <div className="mb-2 flex justify-center">
+                  <Mail className="size-12 text-primary" />
                 </div>
-              </div>
+                <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+                <CardDescription>
+                  We&apos;ve sent a confirmation link to <strong>{confirmationEmail}</strong>
+                </CardDescription>
+              </CardHeader>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                    minLength={8}
-                    disabled={isLoading}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Must be at least 8 characters
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Creating account...
-                  </>
-                ) : (
-                  "Create account"
+              <CardContent className="space-y-4">
+                {error && (
+                  <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
                 )}
-              </Button>
-            </form>
+                
+                <div className="rounded-md bg-blue-50 dark:bg-blue-950 p-4 text-sm text-blue-900 dark:text-blue-100">
+                  <p className="font-medium mb-2">Didn&apos;t receive the email?</p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    <li>Check your spam folder</li>
+                    <li>Try adding us to your contacts</li>
+                    <li>The link expires in 24 hours</li>
+                  </ul>
+                </div>
 
-            <p className="text-center text-xs text-muted-foreground">
-              By signing up, you agree to our{" "}
-              <Link href="/terms" className="underline hover:text-primary">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link href="/privacy" className="underline hover:text-primary">
-                Privacy Policy
-              </Link>
-            </p>
-          </CardContent>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    setShowConfirmation(false);
+                    setError(null);
+                  }}
+                >
+                  Back to sign up
+                </Button>
+              </CardContent>
 
-          <CardFooter className="flex justify-center">
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-primary hover:underline"
-              >
-                Sign in
-              </Link>
-            </p>
-          </CardFooter>
+              <CardFooter className="flex flex-col gap-2">
+                <p className="text-center text-xs text-muted-foreground">
+                  Once you confirm your email, you&apos;ll be able to sign in to your account.
+                </p>
+                <p className="text-center text-xs text-muted-foreground">
+                  Already signed in?{" "}
+                  <Link
+                    href="/"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Go to home
+                  </Link>
+                </p>
+              </CardFooter>
+            </>
+          ) : (
+            <>
+              <CardHeader className="space-y-1 text-center">
+                <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+                <CardDescription>
+                  Sign up to start reading and writing pamphlets
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                {error && (
+                  <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleSignup}
+                  disabled={isGoogleLoading || isLoading}
+                >
+                  {isGoogleLoading ? (
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                  ) : (
+                    <GoogleIcon className="mr-2 size-4" />
+                  )}
+                  Continue with Google
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
+                </div>
+
+                <form onSubmit={handleEmailSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName">Display Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="displayName"
+                        type="text"
+                        placeholder="John Doe"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        className="pl-10"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                        minLength={8}
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Must be at least 8 characters
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="••••••••"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 size-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      "Create account"
+                    )}
+                  </Button>
+                </form>
+
+                <p className="text-center text-xs text-muted-foreground">
+                  By signing up, you agree to our{" "}
+                  <Link href="/terms" className="underline hover:text-primary">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" className="underline hover:text-primary">
+                    Privacy Policy
+                  </Link>
+                </p>
+              </CardContent>
+
+              <CardFooter className="flex justify-center">
+                <p className="text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </CardFooter>
+            </>
+          )}
         </Card>
       </main>
     </>
