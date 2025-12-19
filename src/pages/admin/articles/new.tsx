@@ -62,19 +62,19 @@ function NewArticlePage() {
 
     // Validation
     if (!title.trim()) {
-      setError("Title is required");
+      setError(t("admin.validation.titleRequired"));
       return;
     }
     if (!genreIds || genreIds.length === 0) {
-      setError("Please select at least one genre");
+      setError(t("admin.validation.genreRequired"));
       return;
     }
     if (!excerpt.trim()) {
-      setError("Synopsis is required");
+      setError(t("admin.validation.excerptRequired"));
       return;
     }
     if (!content.trim()) {
-      setError("Content is required");
+      setError(t("admin.validation.contentRequired"));
       return;
     }
 
@@ -166,7 +166,7 @@ function NewArticlePage() {
               <Input
                 id="title"
                 type="text"
-                placeholder="Enter your pamphlet title..."
+                placeholder={t("admin.pamphletTitlePlaceholder")}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="text-lg"
@@ -182,7 +182,7 @@ function NewArticlePage() {
               <div className="relative">
                 <div className="flex flex-wrap gap-2">
                   {genresLoading ? (
-                    <div className="text-sm text-muted-foreground">Loading genres...</div>
+                    <div className="text-sm text-muted-foreground">{t("admin.loadingGenres")}</div>
                   ) : genres && genres.length > 0 ? (
                     genres.map((genre) => {
                       const gid = genre.id.toString();
@@ -209,11 +209,11 @@ function NewArticlePage() {
                     );
                   })
                 ) : (
-                  <div className="text-sm text-muted-foreground">No genres available</div>
+                  <div className="text-sm text-muted-foreground">{t("admin.noGenres")}</div>
                 )}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Select one or more genres</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("admin.pamphletGenresHint")}</p>
             </div>
 
             {/* Synopsis */}
@@ -223,14 +223,14 @@ function NewArticlePage() {
               </Label>
               <Textarea
                 id="excerpt"
-                placeholder="A brief summary of your pamphlet..."
+                placeholder={t("admin.pamphletExcerptPlaceholder")}
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 rows={3}
                 required
               />
               <p className="text-xs text-muted-foreground">
-                A short description that appears in pamphlet previews (required)
+                {t("admin.pamphletExcerptHint")}
               </p>
             </div>
 
@@ -239,7 +239,7 @@ function NewArticlePage() {
               <Label className="text-base font-medium">
                 {t("admin.pamphletCover")}{" "}
                 <span className="font-normal text-muted-foreground">
-                  (optional)
+                  ({t("admin.pamphletCoverOptional")})
                 </span>
               </Label>
               
@@ -292,7 +292,7 @@ function NewArticlePage() {
                       
                       // Validate file size (max 5MB)
                       if (file.size > 5 * 1024 * 1024) {
-                        setError("Image must be less than 5MB");
+                        setError(t("admin.validation.imageTooLarge"));
                         return;
                       }
                       
@@ -323,7 +323,7 @@ function NewArticlePage() {
                         const data = await response.json();
                         setCoverImageUrl(data.url);
                       } catch (err) {
-                        setError("Failed to upload image. Please try again or use a URL instead.");
+                        setError(t("admin.validation.uploadFailed"));
                         setUploadedImagePreview(null);
                       } finally {
                         setIsUploading(false);
@@ -335,7 +335,7 @@ function NewArticlePage() {
                     <div className="relative inline-block">
                       <img
                         src={uploadedImagePreview || coverImageUrl}
-                        alt="Cover preview"
+                        alt={t("admin.coverPreview")}
                         className="max-h-40 rounded-lg border object-cover"
                       />
                       <button
@@ -362,16 +362,16 @@ function NewArticlePage() {
                       {isUploading ? (
                         <div className="flex flex-col items-center gap-2">
                           <Loader2 className="size-8 animate-spin text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">Uploading...</span>
+                          <span className="text-sm text-muted-foreground">{t("admin.uploading")}</span>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-2">
                           <Upload className="size-8 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">
-                            Click to upload an image
+                            {t("admin.clickToUpload")}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            PNG, JPG, GIF up to 5MB
+                            {t("admin.uploadHint")}
                           </span>
                         </div>
                       )}
@@ -385,7 +385,7 @@ function NewArticlePage() {
                 <div className="mt-2">
                   <img
                     src={coverImageUrl}
-                    alt="Cover preview"
+                    alt={t("admin.coverPreview")}
                     className="max-h-40 rounded-lg border object-cover"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
@@ -401,12 +401,11 @@ function NewArticlePage() {
               <MarkdownEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Write your pamphlet content in markdown..."
+                placeholder={t("admin.pamphletContentPlaceholder")}
                 minHeight="min-h-[400px]"
               />
               <p className="text-xs text-muted-foreground">
-                Supports Markdown formatting. Use the toolbar or write markdown
-                directly.
+                {t("admin.pamphletContentHint")}
               </p>
             </div>
           </div>

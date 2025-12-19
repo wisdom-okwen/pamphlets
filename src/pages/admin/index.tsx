@@ -214,12 +214,12 @@ export default withAuth(function AdminPage() {
   };
 
   const handleDeleteUser = (id: string) => {
-    if (!confirm("Delete this user? This action cannot be undone.")) return;
+    if (!confirm(t("admin.confirmDeleteUser"))) return;
     deleteUserMutation.mutate({ id });
   };
 
   const handleDeleteArticle = async (id: number) => {
-    if (!confirm("Delete this pamphlet? This action cannot be undone.")) return;
+    if (!confirm(t("admin.confirmDeletePamphlet"))) return;
     deleteArticle.mutate({ id });
   };
 
@@ -268,7 +268,7 @@ export default withAuth(function AdminPage() {
                   <Users className="text-primary" />
                   <div>
                     <span className="text-sm font-semibold">{t("admin.manageUsers")}</span>
-                    <div className="text-xs text-muted-foreground">{t("admin.manageUsersDesc", "View, change roles, and remove users")}</div>
+                    <div className="text-xs text-muted-foreground">{t("admin.manageUsersDesc")}</div>
                   </div>
                 </div>
               </button>
@@ -281,7 +281,7 @@ export default withAuth(function AdminPage() {
                   <FileText className="text-primary" />
                   <div>
                     <span className="text-sm font-semibold">{t("admin.managePamphlets")}</span>
-                    <div className="text-xs text-muted-foreground">{t("admin.managePamphletsDesc", "Edit, publish, or delete pamphlets")}</div>
+                    <div className="text-xs text-muted-foreground">{t("admin.managePamphletsDesc")}</div>
                   </div>
                 </div>
               </button>
@@ -294,7 +294,7 @@ export default withAuth(function AdminPage() {
                   <PlusSquare className="text-primary" />
                   <div>
                     <span className="text-sm font-semibold">{t("admin.newPamphlet")}</span>
-                    <div className="text-xs text-muted-foreground">{t("admin.newPamphletDesc", "Open the editor to publish a new pamphlet")}</div>
+                    <div className="text-xs text-muted-foreground">{t("admin.newPamphletDesc")}</div>
                   </div>
                 </div>
               </Link>
@@ -306,11 +306,11 @@ export default withAuth(function AdminPage() {
             <div className="mb-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">{t("admin.totalUsers", "Total Users")}</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.totalUsers")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalUsers ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">{t("admin.totalPamphlets", "Total Pamphlets")}</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.totalPamphlets")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalArticles ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
@@ -318,20 +318,20 @@ export default withAuth(function AdminPage() {
                   <div className="text-lg font-semibold">{Number(statsOverview?.published ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">{t("admin.archived", "Archived")}</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.archived")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.archived ?? 0)}</div>
                 </div>
               </div>
 
               <div className="border rounded p-3 bg-card">
-                <div className="text-sm font-medium mb-2">Recent activity (last 14 days)</div>
+                <div className="text-sm font-medium mb-2">{t("admin.recentActivity")}</div>
                 <div className="overflow-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="text-muted-foreground">
                       <tr>
-                        <th className="px-2 py-1 w-1/3">Day</th>
-                        <th className="px-2 py-1 w-1/3">Pamphlets</th>
-                        <th className="px-2 py-1 w-1/3">New Users</th>
+                        <th className="px-2 py-1 w-1/3">{t("admin.day")}</th>
+                        <th className="px-2 py-1 w-1/3">{t("admin.pamphlets")}</th>
+                        <th className="px-2 py-1 w-1/3">{t("admin.newUsers")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -368,7 +368,7 @@ export default withAuth(function AdminPage() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={activeView === "users" ? "Search users by email, username or role" : "Search pamphlets by title, slug or excerpt"}
+                  placeholder={activeView === "users" ? t("admin.searchUsersPlaceholder") : t("admin.searchPamphletsPlaceholder")}
                   className="pl-10 w-full border rounded px-3 py-2"
                 />
               </div>
@@ -379,9 +379,9 @@ export default withAuth(function AdminPage() {
         {/* Users section (only when active) */}
         {activeView === "users" && (
           <section id="users-section" className="mb-8">
-            <h2 className="text-lg font-semibold mb-3">{t("admin.users", "Users")}</h2>
+            <h2 className="text-lg font-semibold mb-3">{t("admin.users")}</h2>
             {usersLoading ? (
-              <p className="text-sm text-muted-foreground">Loading users...</p>
+              <p className="text-sm text-muted-foreground">{t("admin.loadingUsers")}</p>
             ) : usersError ? (
               <p className="text-sm text-destructive">{usersError.message}</p>
             ) : (
@@ -389,10 +389,10 @@ export default withAuth(function AdminPage() {
                 <table className="w-full text-left table-fixed">
                   <thead className="bg-muted/5">
                     <tr>
-                      <th className="px-3 py-2 w-1/3">Email</th>
-                      <th className="px-3 py-2 w-1/4">Username</th>
-                      <th className="px-3 py-2 w-1/6">Role</th>
-                      <th className="px-3 py-2 w-1/6">Actions</th>
+                      <th className="px-3 py-2 w-1/3">{t("admin.tableEmail")}</th>
+                      <th className="px-3 py-2 w-1/4">{t("admin.tableUsername")}</th>
+                      <th className="px-3 py-2 w-1/6">{t("admin.tableRole")}</th>
+                      <th className="px-3 py-2 w-1/6">{t("admin.tableActions")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -432,7 +432,7 @@ export default withAuth(function AdminPage() {
         {activeView === "articles" && (
           <section id="articles-section">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">{t("admin.pamphlets", "Pamphlets")}</h2>
+              <h2 className="text-lg font-semibold">{t("admin.pamphlets")}</h2>
               <div className="flex gap-1 bg-muted/20 rounded p-1">
                 <button
                   onClick={() => setViewStatus("published")}
@@ -444,24 +444,24 @@ export default withAuth(function AdminPage() {
                   onClick={() => setViewStatus("draft")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "draft" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  {t("admin.drafts", "Drafts")}
+                  {t("admin.drafts")}
                 </button>
                 <button
                   onClick={() => setViewStatus("archived")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "archived" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  {t("admin.archived", "Archived")}
+                  {t("admin.archived")}
                 </button>
                 <button
                   onClick={() => setViewStatus("all")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  {t("admin.all", "All")}
+                  {t("admin.all")}
                 </button>
               </div>
             </div>
             {articlesLoading ? (
-              <p className="text-sm text-muted-foreground">Loading pamphlets...</p>
+              <p className="text-sm text-muted-foreground">{t("admin.loadingPamphlets")}</p>
             ) : (
               <div className="space-y-3">
                 {articles.map((a: AdminArticle) => (
@@ -470,7 +470,7 @@ export default withAuth(function AdminPage() {
                       <div className="font-medium line-clamp-1">
                         {a.title}
                         {a.status === "archived" && (
-                          <span className="ml-2 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">Archived</span>
+                          <span className="ml-2 text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">{t("admin.archived")}</span>
                         )}
                       </div>
                       <div className="mt-1">
@@ -487,23 +487,23 @@ export default withAuth(function AdminPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Link href={`/articles/${a.slug}`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 text-primary hover:shadow-md">{t("admin.view", "View")}</Link>
+                      <Link href={`/articles/${a.slug}`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 text-primary hover:shadow-md">{t("admin.view")}</Link>
                       <Link href={`/admin/articles/${a.slug}/edit`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 hover:shadow-md">{t("common.edit")}</Link>
                       {a.status === "archived" ? (
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "published" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-green-50 text-green-700 hover:shadow-md"
-                          title={t("admin.unarchive", "Unarchive pamphlet")}
+                          title={t("admin.unarchive")}
                         >
-                          {t("admin.unarchive", "Unarchive")}
+                          {t("admin.unarchive")}
                         </button>
                       ) : (
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "archived" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-amber-50 text-amber-700 hover:shadow-md"
-                          title={t("admin.archive", "Archive pamphlet")}
+                          title={t("admin.archive")}
                         >
-                          {t("admin.archive", "Archive")}
+                          {t("admin.archive")}
                         </button>
                       )}
                       <button onClick={() => handleDeleteArticle(a.id)} className="text-sm px-2 py-1 rounded border shadow-sm bg-destructive/10 text-destructive hover:shadow-md">{t("common.delete")}</button>

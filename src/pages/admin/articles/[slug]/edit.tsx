@@ -78,19 +78,19 @@ function EditArticlePage() {
     setError(null);
 
     if (!title.trim()) {
-      setError("Title is required");
+      setError(t("admin.validation.titleRequired"));
       return;
     }
     if (!genreIds || genreIds.length === 0) {
-      setError("Please select at least one genre");
+      setError(t("admin.validation.genreRequired"));
       return;
     }
     if (!excerpt.trim()) {
-      setError("Synopsis is required");
+      setError(t("admin.validation.excerptRequired"));
       return;
     }
     if (!content.trim()) {
-      setError("Content is required");
+      setError(t("admin.validation.contentRequired"));
       return;
     }
 
@@ -118,9 +118,9 @@ function EditArticlePage() {
 
   const { theme, toggle, mounted } = useTheme();
 
-  if (loadingArticle) return <p className="p-4">Loading...</p>;
+  if (loadingArticle) return <p className="p-4">{t("admin.loading")}</p>;
 
-  if (!article) return <p className="p-4">Pamphlet not found</p>;
+  if (!article) return <p className="p-4">{t("admin.notFound")}</p>;
 
   return (
     <>
@@ -165,14 +165,14 @@ function EditArticlePage() {
                 <div className="space-y-6">
                   <div className="space-y-2">
                     <Label htmlFor="title" className="text-base font-medium">{t("admin.pamphletTitle")}</Label>
-                    <Input id="title" type="text" placeholder="Enter your article title..." value={title} onChange={(e) => setTitle(e.target.value)} className="text-lg" />
+                    <Input id="title" type="text" placeholder={t("admin.pamphletTitlePlaceholder")} value={title} onChange={(e) => setTitle(e.target.value)} className="text-lg" />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-base font-medium">{t("admin.pamphletGenres")}</Label>
                     <div className="flex gap-2 overflow-x-auto max-w-full py-1">
                       {genresLoading ? (
-                        <div className="text-sm text-muted-foreground">Loading genres...</div>
+                        <div className="text-sm text-muted-foreground">{t("admin.loadingGenres")}</div>
                       ) : genres && genres.length > 0 ? (
                         genres.map((genre) => {
                           const gid = genre.id.toString();
@@ -184,20 +184,20 @@ function EditArticlePage() {
                           );
                         })
                       ) : (
-                        <div className="text-sm text-muted-foreground">No genres available</div>
+                        <div className="text-sm text-muted-foreground">{t("admin.noGenres")}</div>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">Select one or more genres</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t("admin.pamphletGenresHint")}</p>
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="excerpt" className="text-base font-medium">{t("admin.pamphletExcerpt")} <span className="text-destructive">*</span></Label>
-                    <Textarea id="excerpt" placeholder="A brief summary of your pamphlet..." value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} required />
-                    <p className="text-xs text-muted-foreground">A short description that appears in pamphlet previews (required)</p>
+                    <Textarea id="excerpt" placeholder={t("admin.pamphletExcerptPlaceholder")} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} required />
+                    <p className="text-xs text-muted-foreground">{t("admin.pamphletExcerptHint")}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-base font-medium">{t("admin.pamphletCover")} <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                    <Label className="text-base font-medium">{t("admin.pamphletCover")} <span className="font-normal text-muted-foreground">({t("admin.pamphletCoverOptional")})</span></Label>
                     
                     {/* Toggle between URL and Upload */}
                     <div className="flex gap-2 mb-3">
@@ -234,7 +234,7 @@ function EditArticlePage() {
                           <div className="mt-2">
                             <img
                               src={coverImageUrl}
-                              alt="Cover preview"
+                              alt={t("admin.coverPreview")}
                               className="max-h-40 rounded-lg border object-cover"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = "none";
@@ -255,7 +255,7 @@ function EditArticlePage() {
                             if (!file) return;
                             
                             if (file.size > 5 * 1024 * 1024) {
-                              setError("Image must be less than 5MB");
+                              setError(t("admin.validation.imageTooLarge"));
                               return;
                             }
                             
@@ -284,7 +284,7 @@ function EditArticlePage() {
                               const data = await response.json();
                               setCoverImageUrl(data.url);
                             } catch (err) {
-                              setError("Failed to upload image. Please try again or use a URL instead.");
+                              setError(t("admin.validation.uploadFailed"));
                               setUploadedImagePreview(null);
                             } finally {
                               setIsUploading(false);
@@ -296,7 +296,7 @@ function EditArticlePage() {
                           <div className="relative inline-block">
                             <img
                               src={uploadedImagePreview || coverImageUrl}
-                              alt="Cover preview"
+                              alt={t("admin.coverPreview")}
                               className="max-h-40 rounded-lg border object-cover"
                             />
                             <button
@@ -323,13 +323,13 @@ function EditArticlePage() {
                             {isUploading ? (
                               <div className="flex flex-col items-center gap-2">
                                 <Loader2 className="size-8 animate-spin text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">Uploading...</span>
+                                <span className="text-sm text-muted-foreground">{t("admin.uploading")}</span>
                               </div>
                             ) : (
                               <div className="flex flex-col items-center gap-2">
                                 <Upload className="size-8 text-muted-foreground" />
-                                <span className="text-sm text-muted-foreground">Click to upload an image</span>
-                                <span className="text-xs text-muted-foreground">PNG, JPG, GIF up to 5MB</span>
+                                <span className="text-sm text-muted-foreground">{t("admin.clickToUpload")}</span>
+                                <span className="text-xs text-muted-foreground">{t("admin.uploadHint")}</span>
                               </div>
                             )}
                           </button>
@@ -340,8 +340,8 @@ function EditArticlePage() {
 
                   <div className="space-y-2">
                     <Label className="text-base font-medium">{t("admin.pamphletContent")}</Label>
-                    <MarkdownEditor value={content} onChange={setContent} placeholder="Write your article content in markdown..." minHeight="min-h-[400px]" />
-                    <p className="text-xs text-muted-foreground">Supports Markdown formatting. Use the toolbar or write markdown directly.</p>
+                    <MarkdownEditor value={content} onChange={setContent} placeholder={t("admin.pamphletContentPlaceholder")} minHeight="min-h-[400px]" />
+                    <p className="text-xs text-muted-foreground">{t("admin.pamphletContentHint")}</p>
                   </div>
                 </div>
               </CardContent>
