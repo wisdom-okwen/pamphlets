@@ -301,7 +301,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
             ) : messages.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
                 <Bot size={32} className="mx-auto mb-2 opacity-50" />
-                <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform dedicated to personal development, wellbeing, and positive behavioral change. I can help you find and learn about articles, and answer questions about your interactions across the platform!</p>
+                <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform dedicated to personal development, wellbeing, and positive behavioral change. I can help you find and learn about pamphlets, and answer questions about your interactions across the platform!</p>
               </div>
             ) : null}
             {messages.map((message) => (
@@ -380,7 +380,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about articles or your interactions..."
+                placeholder="Ask about pamphlets or your interactions..."
                 className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isLoading}
               />

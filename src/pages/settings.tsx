@@ -449,9 +449,9 @@ function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
-                  <p className="font-medium">Subscribe to New Articles</p>
+                  <p className="font-medium">Subscribe to New Pamphlets</p>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when new articles are published
+                    Get notified when new pamphlets are published
                   </p>
                 </div>
                 <button

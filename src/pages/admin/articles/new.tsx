@@ -137,7 +137,7 @@ function NewArticlePage() {
   return (
     <>
       <NextSeo
-        title="New Article"
+        title="New Pamphlet"
         description="Create a new pamphlet"
         noindex
       />
@@ -163,7 +163,7 @@ function NewArticlePage() {
               <Input
                 id="title"
                 type="text"
-                placeholder="Enter your article title..."
+                placeholder="Enter your pamphlet title..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="text-lg"
@@ -220,14 +220,14 @@ function NewArticlePage() {
               </Label>
               <Textarea
                 id="excerpt"
-                placeholder="A brief summary of your article..."
+                placeholder="A brief summary of your pamphlet..."
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 rows={3}
                 required
               />
               <p className="text-xs text-muted-foreground">
-                A short description that appears in article previews (required)
+                A short description that appears in pamphlet previews (required)
               </p>
             </div>
 
@@ -398,7 +398,7 @@ function NewArticlePage() {
               <MarkdownEditor
                 value={content}
                 onChange={setContent}
-                placeholder="Write your article content in markdown..."
+                placeholder="Write your pamphlet content in markdown..."
                 minHeight="min-h-[400px]"
               />
               <p className="text-xs text-muted-foreground">

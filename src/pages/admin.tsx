@@ -100,7 +100,7 @@ export default withAuth(function AdminPage() {
     onSuccess() {},
     onError: (err) => {
       trpcCtx.articles.getAll.invalidate();
-      alert("Failed to delete article: " + err.message);
+      alert("Failed to delete pamphlet: " + err.message);
     },
   });
   const updateArticle = trpc.articles.update.useMutation({
@@ -116,7 +116,7 @@ export default withAuth(function AdminPage() {
     onError: (err) => {
       trpcCtx.articles.getAll.invalidate();
       trpcCtx.articles.adminGetAll.invalidate();
-      alert("Failed to update article: " + err.message);
+      alert("Failed to update pamphlet: " + err.message);
     },
   });
 
@@ -216,7 +216,7 @@ export default withAuth(function AdminPage() {
   };
 
   const handleDeleteArticle = async (id: number) => {
-    if (!confirm("Delete this article? This action cannot be undone.")) return;
+    if (!confirm("Delete this pamphlet? This action cannot be undone.")) return;
     deleteArticle.mutate({ id });
   };
 
@@ -277,8 +277,8 @@ export default withAuth(function AdminPage() {
                 <div className="flex items-center gap-3">
                   <FileText className="text-primary" />
                   <div>
-                    <span className="text-sm font-semibold">Manage Articles</span>
-                    <div className="text-xs text-muted-foreground">Edit, publish, or delete articles</div>
+                    <span className="text-sm font-semibold">Manage Pamphlets</span>
+                    <div className="text-xs text-muted-foreground">Edit, publish, or delete pamphlets</div>
                   </div>
                 </div>
               </button>
@@ -290,7 +290,7 @@ export default withAuth(function AdminPage() {
                 <div className="flex items-center gap-3">
                   <PlusSquare className="text-primary" />
                   <div>
-                    <span className="text-sm font-semibold">Create New Article</span>
+                    <span className="text-sm font-semibold">Create New Pamphlet</span>
                     <div className="text-xs text-muted-foreground">Open the editor to publish a new pamphlet</div>
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default withAuth(function AdminPage() {
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalUsers ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">Total Articles</div>
+                  <div className="text-xs text-muted-foreground">Total Pamphlets</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalArticles ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
@@ -327,7 +327,7 @@ export default withAuth(function AdminPage() {
                     <thead className="text-muted-foreground">
                       <tr>
                         <th className="px-2 py-1 w-1/3">Day</th>
-                        <th className="px-2 py-1 w-1/3">Articles</th>
+                        <th className="px-2 py-1 w-1/3">Pamphlets</th>
                         <th className="px-2 py-1 w-1/3">New Users</th>
                       </tr>
                     </thead>
@@ -365,7 +365,7 @@ export default withAuth(function AdminPage() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder={activeView === "users" ? "Search users by email, username or role" : "Search articles by title, slug or excerpt"}
+                  placeholder={activeView === "users" ? "Search users by email, username or role" : "Search pamphlets by title, slug or excerpt"}
                   className="pl-10 w-full border rounded px-3 py-2"
                 />
               </div>
@@ -429,7 +429,7 @@ export default withAuth(function AdminPage() {
         {activeView === "articles" && (
           <section id="articles-section">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">Articles</h2>
+              <h2 className="text-lg font-semibold">Pamphlets</h2>
               <div className="flex gap-1 bg-muted/20 rounded p-1">
                 <button
                   onClick={() => setViewStatus("published")}
@@ -458,7 +458,7 @@ export default withAuth(function AdminPage() {
               </div>
             </div>
             {articlesLoading ? (
-              <p className="text-sm text-muted-foreground">Loading articles...</p>
+              <p className="text-sm text-muted-foreground">Loading pamphlets...</p>
             ) : (
               <div className="space-y-3">
                 {articles.map((a: AdminArticle) => (
@@ -490,7 +490,7 @@ export default withAuth(function AdminPage() {
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "published" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-green-50 text-green-700 hover:shadow-md"
-                          title="Unarchive article"
+                          title="Unarchive pamphlet"
                         >
                           Unarchive
                         </button>
@@ -498,7 +498,7 @@ export default withAuth(function AdminPage() {
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "archived" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-amber-50 text-amber-700 hover:shadow-md"
-                          title="Archive article"
+                          title="Archive pamphlet"
                         >
                           Archive
                         </button>

@@ -154,7 +154,7 @@ export default function Home() {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      openModal("like articles");
+      openModal("like pamphlets");
       return;
     }
     
@@ -178,7 +178,7 @@ export default function Home() {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      openModal("bookmark articles");
+      openModal("bookmark pamphlets");
       return;
     }
     // Optimistic update - check both optimistic state and fetched bookmarked IDs
@@ -269,7 +269,7 @@ export default function Home() {
   if (error) {
     return (
       <main className="px-4 py-6 max-w-4xl mx-auto">
-        <p className="text-red-500">Failed to load articles</p>
+        <p className="text-red-500">Failed to load pamphlets</p>
       </main>
     );
   }
@@ -280,13 +280,13 @@ export default function Home() {
     <>
       <NextSeo
         title="Home"
-        description="Browse curated articles on career, academic, and religious topics from expert writers."
+        description="Browse curated pamphlets on career, academic, and religious topics from expert writers."
         openGraph={{
           url: "https://pamflets.vercel.app",
           type: "website",
-          title: "Pamphlets - Expert Articles",
+          title: "Pamphlets - Expert Pamphlets",
           description:
-            "Browse curated articles on career, academic, and religious topics from expert writers.",
+            "Browse curated pamphlets on career, academic, and religious topics from expert writers.",
           images: [
             {
               url: "https://pamflets.vercel.app/pamphlets.png",
@@ -301,15 +301,15 @@ export default function Home() {
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Pamphlets - Articles Collection",
-          description: "Collection of expert-written articles on career, academic, and religious topics",
+          name: "Pamphlets - Pamphlets Collection",
+          description: "Collection of expert-written pamphlets on career, academic, and religious topics",
           url: "https://pamflets.vercel.app",
           mainEntity: {
             "@type": "WebSite",
             name: "Pamphlets",
             url: "https://pamflets.vercel.app",
             description:
-              "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
+              "Discover insightful pamphlets on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
             potentialAction: {
               "@type": "SearchAction",
               target: "https://pamflets.vercel.app?q={search_term_string}",
@@ -360,7 +360,7 @@ export default function Home() {
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              {searchQuery ? "No articles match your search" : "No articles yet"}
+              {searchQuery ? "No pamphlets match your search" : "No pamphlets yet"}
             </p>
           </div>
         ) : (

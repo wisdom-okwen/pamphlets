@@ -3,9 +3,9 @@ import { DefaultSeoProps } from "next-seo";
 const SEO_CONFIG: DefaultSeoProps = {
     titleTemplate: "%s | Pamphlets",
     defaultTitle:
-        "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
+        "Pamphlets - Expert Pamphlets on Career, Academic & Religious Topics",
     description:
-        "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey. Read curated content from experts and community members.",
+        "Discover insightful pamphlets on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey. Read curated content from experts and community members.",
     canonical: "https://pamflets.vercel.app",
     languageAlternates: [
         {
@@ -18,9 +18,9 @@ const SEO_CONFIG: DefaultSeoProps = {
         locale: "en_US",
         url: "https://pamflets.vercel.app",
         siteName: "Pamphlets",
-        title: "Pamphlets - Expert Articles on Career, Academic & Religious Topics",
+        title: "Pamphlets - Expert Pamphlets on Career, Academic & Religious Topics",
         description:
-            "Discover insightful articles on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
+            "Discover insightful pamphlets on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
         images: [
             {
                 url: "https://pamflets.vercel.app/pamphlets.png",
@@ -52,7 +52,7 @@ const SEO_CONFIG: DefaultSeoProps = {
         {
             name: "keywords",
             content:
-                "articles, career advice, academic resources, religious education, expert content, pamphlets, guides, learning, knowledge",
+                "pamphlets, career advice, academic resources, religious education, expert content, guides, learning, knowledge",
         },
         {
             httpEquiv: "x-ua-compatible",

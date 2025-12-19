@@ -95,7 +95,7 @@ function CommentsPage() {
     <>
       <NextSeo
         title="My Comments"
-        description="Your comments on articles"
+        description="Your comments on pamphlets"
         noindex
       />
 
@@ -110,13 +110,13 @@ function CommentsPage() {
             <MessageCircle className="size-16 mx-auto text-muted-foreground/50 mb-4" />
             <h2 className="text-xl font-semibold mb-2">No comments yet</h2>
             <p className="text-muted-foreground mb-6">
-              Join the conversation by commenting on articles you read.
+              Join the conversation by commenting on pamphlets you read.
             </p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
-              Browse Articles
+              Browse Pamphlets
             </Link>
           </div>
         ) : (
@@ -157,7 +157,7 @@ function CommentsPage() {
                       <Link
                         href={`/articles/${article.slug}#comments`}
                         className="flex items-center gap-2 px-3 py-1.5 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors"
-                        title="View all comments on this article"
+                        title="View all comments on this pamphlet"
                       >
                         <MessageCircle size={16} />
                         <span className="hidden sm:inline">View Comments</span>
@@ -165,10 +165,10 @@ function CommentsPage() {
                       <Link
                         href={`/articles/${article.slug}`}
                         className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors"
-                        title="View article"
+                        title="View pamphlet"
                       >
                         <Eye size={16} />
-                        <span className="hidden sm:inline">View Article</span>
+                        <span className="hidden sm:inline">View Pamphlet</span>
                       </Link>
                     </div>
                   </div>
@@ -213,7 +213,7 @@ function CommentsPage() {
         {/* Summary */}
         {comments.length > 0 && (
           <div className="mt-8 text-center text-sm text-muted-foreground">
-            {comments.length} comment{comments.length === 1 ? "" : "s"} on {articleGroups.length} article{articleGroups.length === 1 ? "" : "s"}
+            {comments.length} comment{comments.length === 1 ? "" : "s"} on {articleGroups.length} pamphlet{articleGroups.length === 1 ? "" : "s"}
           </div>
         )}
       </div>

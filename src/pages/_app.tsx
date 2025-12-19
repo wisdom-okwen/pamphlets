@@ -38,7 +38,7 @@ const getPageTitle = (pathname: string): string => {
     "/comments": "My Comments",
     "/settings": "Settings",
     "/admin": "Admin",
-    "/admin/articles/new": "New Article",
+    "/admin/articles/new": "New Pamphlet",
   };
   return titles[pathname] || "";
 };

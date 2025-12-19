@@ -47,7 +47,7 @@ function BookmarksPage() {
     <>
       <NextSeo
         title="My Bookmarks"
-        description="Your saved articles"
+        description="Your saved pamphlets"
         noindex
       />
 
@@ -62,13 +62,13 @@ function BookmarksPage() {
             <Bookmark className="size-16 mx-auto text-muted-foreground/50 mb-4" />
             <h2 className="text-xl font-semibold mb-2">No bookmarks yet</h2>
             <p className="text-muted-foreground mb-6">
-              Save articles you want to read later by clicking the bookmark icon.
+              Save pamphlets you want to read later by clicking the bookmark icon.
             </p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
-              Browse Articles
+              Browse Pamphlets
             </Link>
           </div>
         ) : (

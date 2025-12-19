@@ -729,7 +729,7 @@ export default function ArticleModalPage() {
   if (!article) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="text-white">Article not found</div>
+        <div className="text-white">Pamphlet not found</div>
       </div>
     );
   }
@@ -738,7 +738,7 @@ export default function ArticleModalPage() {
   if (article.status !== "published") {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="text-white">Article no longer available</div>
+        <div className="text-white">Pamphlet no longer available</div>
       </div>
     );
   }

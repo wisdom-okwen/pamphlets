@@ -117,11 +117,11 @@ function EditArticlePage() {
 
   if (loadingArticle) return <p className="p-4">Loading...</p>;
 
-  if (!article) return <p className="p-4">Article not found</p>;
+  if (!article) return <p className="p-4">Pamphlet not found</p>;
 
   return (
     <>
-      <NextSeo title={`Edit: ${article.title}`} description={`Edit article ${article.title}`} noindex />
+      <NextSeo title={`Edit: ${article.title}`} description={`Edit pamphlet ${article.title}`} noindex />
 
       <div className="min-h-screen bg-background">
         <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -133,7 +133,7 @@ function EditArticlePage() {
               </Link>
             </div>
 
-            <h1 className="text-lg font-bold text-center w-1/3">Edit Article</h1>
+            <h1 className="text-lg font-bold text-center w-1/3">Edit Pamphlet</h1>
 
             <div className="flex items-center gap-2 w-1/3 justify-end">
               <Button type="button" variant="outline" size="sm" onClick={() => handleSubmit("draft")} disabled={isSubmitting}>
@@ -189,8 +189,8 @@ function EditArticlePage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="excerpt" className="text-base font-medium">Synopsis <span className="text-destructive">*</span></Label>
-                    <Textarea id="excerpt" placeholder="A brief summary of your article..." value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} required />
-                    <p className="text-xs text-muted-foreground">A short description that appears in article previews (required)</p>
+                    <Textarea id="excerpt" placeholder="A brief summary of your pamphlet..." value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} required />
+                    <p className="text-xs text-muted-foreground">A short description that appears in pamphlet previews (required)</p>
                   </div>
 
                   <div className="space-y-2">
