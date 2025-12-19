@@ -239,14 +239,14 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
                   }`}
                 >
                   {message.role === 'assistant' ? (
-                    <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0">
+                    <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-p:text-sm prose-headings:text-sm prose-li:text-sm">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
-                          ul: ({ children }) => <ul className="ml-4 mb-1">{children}</ul>,
-                          ol: ({ children }) => <ol className="ml-4 mb-1">{children}</ol>,
-                          li: ({ children }) => <li className="mb-0.5">{children}</li>,
+                          p: ({ children }) => <p className="mb-1 last:mb-0 text-sm">{children}</p>,
+                          ul: ({ children }) => <ul className="ml-4 mb-1 text-sm">{children}</ul>,
+                          ol: ({ children }) => <ol className="ml-4 mb-1 text-sm">{children}</ol>,
+                          li: ({ children }) => <li className="mb-0.5 text-sm">{children}</li>,
                           code: ({ children }) => (
                             <code className="bg-gray-200 dark:bg-zinc-600 px-1 py-0.5 rounded text-xs font-mono">
                               {children}
@@ -263,7 +263,7 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
                       </ReactMarkdown>
                     </div>
                   ) : (
-                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
                   )}
                   <div className={`text-xs mt-1 ${
                     message.role === 'user' ? 'text-blue-200' : 'text-gray-500 dark:text-gray-400'
