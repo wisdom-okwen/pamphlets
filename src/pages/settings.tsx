@@ -58,13 +58,28 @@ function SettingsPage() {
   // Language state
   const [language, setLanguage] = useState("en");
 
-  // Notification settings
+  // Notification settings state
+  const [subscribeNewArticles, setSubscribeNewArticles] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [commentNotifications, setCommentNotifications] = useState(true);
-  const [likeNotifications, setLikeNotifications] = useState(false);
+  const [subscribeReactionNotifications, setSubscribeReactionNotifications] = useState(true);
 
   // Fetch user profile
   const { data: profile, isLoading: profileLoading } = trpc.users.getMyProfile.useQuery();
+
+  // Fetch notification preferences from database
+  const { data: preferences } = trpc.notifications.getPreferences.useQuery();
+
+  // Update preference mutations
+  const updatePreferencesMutation = trpc.notifications.updatePreferences.useMutation({
+    onSuccess: () => {
+      utils.notifications.getPreferences.invalidate();
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    },
+    onError: (err) => {
+      setError(err.message);
+    },
+  });
 
   // Update profile when data loads
   useEffect(() => {
@@ -75,19 +90,19 @@ function SettingsPage() {
     }
   }, [profile]);
 
-  // Load saved preferences from localStorage
+  // Load preferences from database
+  useEffect(() => {
+    if (preferences) {
+      setSubscribeNewArticles(preferences.subscribeNewArticles);
+      setEmailNotifications(preferences.emailNotifications);
+      setSubscribeReactionNotifications(preferences.subscribeReactionNotifications);
+    }
+  }, [preferences]);
+
+  // Load saved language from localStorage
   useEffect(() => {
     const savedLang = localStorage.getItem("pamphlets-language");
     if (savedLang) setLanguage(savedLang);
-
-    const savedNotifEmail = localStorage.getItem("pamphlets-notif-email");
-    if (savedNotifEmail !== null) setEmailNotifications(savedNotifEmail === "true");
-
-    const savedNotifComment = localStorage.getItem("pamphlets-notif-comment");
-    if (savedNotifComment !== null) setCommentNotifications(savedNotifComment === "true");
-
-    const savedNotifLike = localStorage.getItem("pamphlets-notif-like");
-    if (savedNotifLike !== null) setLikeNotifications(savedNotifLike === "true");
   }, []);
 
   // Real-time subscription for profile updates
@@ -204,11 +219,11 @@ function SettingsPage() {
   };
 
   const handleSaveNotifications = () => {
-    localStorage.setItem("pamphlets-notif-email", String(emailNotifications));
-    localStorage.setItem("pamphlets-notif-comment", String(commentNotifications));
-    localStorage.setItem("pamphlets-notif-like", String(likeNotifications));
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    updatePreferencesMutation.mutate({
+      emailNotifications,
+      subscribeNewArticles,
+      subscribeReactionNotifications,
+    });
   };
 
   const sections = [
@@ -434,6 +449,27 @@ function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
+                  <p className="font-medium">Subscribe to New Articles</p>
+                  <p className="text-sm text-muted-foreground">
+                    Get notified when new articles are published
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSubscribeNewArticles(!subscribeNewArticles)}
+                  className={`w-12 h-6 rounded-full transition-colors ${
+                    subscribeNewArticles ? "bg-primary" : "bg-muted"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
+                      subscribeNewArticles ? "translate-x-6" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-lg border">
+                <div>
                   <p className="font-medium">Email Notifications</p>
                   <p className="text-sm text-muted-foreground">
                     Receive important updates via email
@@ -455,48 +491,30 @@ function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
-                  <p className="font-medium">Comment Notifications</p>
+                  <p className="font-medium">Reaction Notifications</p>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when someone comments on your articles
+                    Get notified when someone likes or reacts to your articles
                   </p>
                 </div>
                 <button
-                  onClick={() => setCommentNotifications(!commentNotifications)}
+                  onClick={() => setSubscribeReactionNotifications(!subscribeReactionNotifications)}
                   className={`w-12 h-6 rounded-full transition-colors ${
-                    commentNotifications ? "bg-primary" : "bg-muted"
+                    subscribeReactionNotifications ? "bg-primary" : "bg-muted"
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-                      commentNotifications ? "translate-x-6" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-4 rounded-lg border">
-                <div>
-                  <p className="font-medium">Like Notifications</p>
-                  <p className="text-sm text-muted-foreground">
-                    Get notified when someone likes your content
-                  </p>
-                </div>
-                <button
-                  onClick={() => setLikeNotifications(!likeNotifications)}
-                  className={`w-12 h-6 rounded-full transition-colors ${
-                    likeNotifications ? "bg-primary" : "bg-muted"
-                  }`}
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${
-                      likeNotifications ? "translate-x-6" : "translate-x-0.5"
+                      subscribeReactionNotifications ? "translate-x-6" : "translate-x-0.5"
                     }`}
                   />
                 </button>
               </div>
             </div>
 
-            <Button onClick={handleSaveNotifications}>
+            <Button
+              onClick={handleSaveNotifications}
+              disabled={updatePreferencesMutation.isPending}
+            >
               {saveSuccess ? <Check className="size-4 mr-2" /> : null}
               {saveSuccess ? "Saved!" : "Save Preferences"}
             </Button>

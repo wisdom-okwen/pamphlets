@@ -9,6 +9,7 @@ import {
     json,
     uniqueIndex,
     uuid,
+    boolean,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -23,6 +24,12 @@ export const reactionTypeEnum = pgEnum("reaction_type", [
     "like",
     "love",
     "support",
+]);
+export const notificationTypeEnum = pgEnum("notification_type", [
+    "new_article",
+    "new_comment",
+    "new_like",
+    "new_reply",
 ]);
 
 // Content block types for rich content
@@ -56,6 +63,37 @@ export const users = pgTable(
         usernameIdx: uniqueIndex("username_idx").on(table.username),
     })
 );
+
+// ============ USER PREFERENCES TABLE ============
+export const userPreferences = pgTable("user_preferences", {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" })
+        .unique(),
+    emailNotifications: boolean("email_notifications").default(true).notNull(),
+    subscribeNewArticles: boolean("subscribe_new_articles").default(true).notNull(),
+    subscribeReactionNotifications: boolean("subscribe_reaction_notifications").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// ============ NOTIFICATIONS TABLE ============
+export const notifications = pgTable("notifications", {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    type: notificationTypeEnum("type").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    message: text("message").notNull(),
+    articleId: integer("article_id").references(() => articles.id, { onDelete: "cascade" }),
+    commentId: integer("comment_id").references(() => comments.id, { onDelete: "cascade" }),
+    fromUserId: uuid("from_user_id").references(() => users.id, { onDelete: "set null" }),
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
 
 // ============ GENRES TABLE ============
 export const genres = pgTable("genres", {
@@ -196,11 +234,41 @@ export const reactions = pgTable("reactions", {
 
 // ============ RELATIONS ============
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(users, ({ many, one }) => ({
     articles: many(articles),
     comments: many(comments),
     bookmarks: many(bookmarks),
     reactions: many(reactions),
+    preferences: one(userPreferences),
+    notifications: many(notifications),
+    sentNotifications: many(notifications, { relationName: "fromUser" }),
+}));
+
+export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
+    user: one(users, {
+        fields: [userPreferences.userId],
+        references: [users.id],
+    }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+    user: one(users, {
+        fields: [notifications.userId],
+        references: [users.id],
+    }),
+    article: one(articles, {
+        fields: [notifications.articleId],
+        references: [articles.id],
+    }),
+    comment: one(comments, {
+        fields: [notifications.commentId],
+        references: [comments.id],
+    }),
+    fromUser: one(users, {
+        fields: [notifications.fromUserId],
+        references: [users.id],
+        relationName: "fromUser",
+    }),
 }));
 
 export const genresRelations = relations(genres, ({ many }) => ({
@@ -268,6 +336,12 @@ export const reactionsRelations = relations(reactions, ({ one }) => ({
 // ============ TYPE EXPORTS ============
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type NewUserPreferences = typeof userPreferences.$inferInsert;
+
+export type Notification = typeof notifications.$inferSelect;
+export type NewNotification = typeof notifications.$inferInsert;
 
 export type Genre = typeof genres.$inferSelect;
 export type NewGenre = typeof genres.$inferInsert;

@@ -1,10 +1,12 @@
-import React, { ReactNode } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
-import { Sun, Moon, Archive, ArrowLeft, User, LogIn } from "lucide-react";
+import { Sun, Moon, Archive, ArrowLeft, User, LogIn, Bell } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/clients/browser";
+import { trpc } from "@/lib/trpc";
 
 export default function NavBar({
   title,
@@ -22,13 +24,50 @@ export default function NavBar({
   const router = useRouter();
   const { theme, toggle, mounted } = useTheme();
   const { user } = useAuth();
+  const supabase = useMemo(() => createClient(), []);
+  const utils = trpc.useUtils();
+  const isUserReady = mounted && user !== undefined;
+
+  // Fetch unread notification count
+  const { data: unreadCountData } = trpc.notifications.getUnreadCount.useQuery(
+    undefined,
+    {
+      enabled: !!user && isUserReady,
+      refetchInterval: 30000,
+    }
+  );
+
+  // Setup realtime subscription for notifications
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`notifications-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          utils.notifications.getUnreadCount.invalidate();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, supabase, utils]);
 
   const computedTitle =
     title || (router.pathname === "/" ? "Home" : router.pathname.replace("/", " "));
 
   return (
     <header className="w-full sticky top-0 z-50 border-b bg-white/95 dark:bg-black/90 dark:border-zinc-800 backdrop-blur-sm">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-[60px] flex items-center">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-15 flex items-center">
         {/* Left: Logo / Back button */}
         <div className="flex items-center gap-2 w-1/3">
           {backHref ? (
@@ -58,7 +97,7 @@ export default function NavBar({
         {/* Center: Page title */}
         <h1 className="text-lg font-bold text-center w-1/3">{computedTitle}</h1>
 
-        {/* Right: Theme toggle, auth & actions */}
+        {/* Right: Notifications, Theme toggle, auth & actions */}
         <div className="flex items-center gap-2 w-1/3 justify-end">
           {/* Custom actions */}
           {actions}
@@ -72,6 +111,21 @@ export default function NavBar({
               <Archive size={16} />
             </button>
           ) : null}
+
+          {isUserReady && user && (
+            <Link
+              href="/notifications"
+              className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 relative"
+              title="Notifications"
+            >
+              <Bell size={16} />
+              {(unreadCountData || 0) > 0 && (
+                <span className="absolute top-1 right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full min-w-5">
+                  {(unreadCountData || 0) > 99 ? "99+" : unreadCountData || 0}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* Theme toggle - only render after mount to avoid hydration mismatch */}
           {mounted ? (

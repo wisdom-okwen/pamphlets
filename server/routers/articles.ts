@@ -5,9 +5,10 @@ import {
     protectedProcedure,
     adminProcedure,
 } from "../trpc";
-import { articles, articleGenres, reactions } from "@/db/schema";
+import { articles, articleGenres, reactions, userPreferences, notifications, users } from "@/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
+import { sendEmail, createNotificationEmail } from "../utils/email";
 
 interface ReactionType {
     id: number;
@@ -244,6 +245,61 @@ export const articlesRouter = createTRPCRouter({
                 .onConflictDoNothing()
                 .execute();
 
+            // If article is being created as published, send notifications
+            if (input.status === "published") {
+                try {
+                    const subscribedUsers = await ctx.db
+                        .select({ userId: userPreferences.userId })
+                        .from(userPreferences)
+                        .where(eq(userPreferences.subscribeNewArticles, true));
+
+                    const author = await ctx.db.query.users.findFirst({
+                        where: eq(users.id, ctx.subject.id),
+                    });
+
+                    for (const pref of subscribedUsers) {
+                        // Create notification in database
+                        await ctx.db
+                            .insert(notifications)
+                            .values({
+                                userId: pref.userId,
+                                type: "new_article",
+                                title: `New article: ${article.title}`,
+                                message: `${author?.username || "Someone"} published a new article`,
+                                articleId: article.id,
+                                fromUserId: ctx.subject.id,
+                                isRead: false,
+                            });
+
+                        // Send email if user enabled notifications
+                        const recipientPrefs = await ctx.db.query.userPreferences.findFirst({
+                            where: eq(userPreferences.userId, pref.userId),
+                        });
+
+                        const recipientUser = await ctx.db.query.users.findFirst({
+                            where: eq(users.id, pref.userId),
+                        });
+
+                        if (recipientPrefs?.emailNotifications && recipientUser?.email) {
+                            const emailHtml = createNotificationEmail(
+                                "new_article",
+                                `${author?.username || "Someone"} published a new article`,
+                                article.title,
+                                article.slug
+                            );
+
+                            await sendEmail({
+                                to: recipientUser.email,
+                                subject: `New article: ${article.title}`,
+                                html: emailHtml,
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error creating notifications for new article:", error);
+                }
+            }
+
             return article;
         }),
 
@@ -263,6 +319,10 @@ export const articlesRouter = createTRPCRouter({
         )
         .mutation(async ({ ctx, input }) => {
             const { id, genreIds, ...data } = input;
+
+            const existingArticle = await ctx.db.query.articles.findFirst({
+                where: eq(articles.id, id),
+            });
 
             // If genreIds provided, update join table and set primary genre
             if (genreIds) {
@@ -309,6 +369,65 @@ export const articlesRouter = createTRPCRouter({
                 })
                 .where(eq(articles.id, id))
                 .returning();
+
+            // If article is being published for the first time, send notifications
+            if (
+                data.status === "published" &&
+                existingArticle?.status !== "published"
+            ) {
+                try {
+                    const subscribedUsers = await ctx.db
+                        .select({ userId: userPreferences.userId })
+                        .from(userPreferences)
+                        .where(eq(userPreferences.subscribeNewArticles, true));
+
+                    const author = await ctx.db.query.users.findFirst({
+                        where: eq(users.id, ctx.subject.id),
+                    });
+
+                    // Create notifications for all subscribed users (including the author if they want)
+                    for (const pref of subscribedUsers) {
+                        // Create notification in database
+                        await ctx.db
+                            .insert(notifications)
+                            .values({
+                                userId: pref.userId,
+                                type: "new_article",
+                                title: `New article: ${article.title}`,
+                                message: `${author?.username || "Someone"} published a new article`,
+                                articleId: article.id,
+                                fromUserId: ctx.subject.id,
+                                isRead: false,
+                            });
+
+                        // Send email if user enabled notifications
+                        const recipientPrefs = await ctx.db.query.userPreferences.findFirst({
+                            where: eq(userPreferences.userId, pref.userId),
+                        });
+
+                        const recipientUser = await ctx.db.query.users.findFirst({
+                            where: eq(users.id, pref.userId),
+                        });
+
+                        if (recipientPrefs?.emailNotifications && recipientUser?.email) {
+                            const emailHtml = createNotificationEmail(
+                                "new_article",
+                                `${author?.username || "Someone"} published a new article`,
+                                article.title,
+                                article.slug
+                            );
+
+                            await sendEmail({
+                                to: recipientUser.email,
+                                subject: `New article: ${article.title}`,
+                                html: emailHtml,
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error creating notifications:", error);
+                }
+            }
 
             return article;
         }),
