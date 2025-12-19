@@ -280,13 +280,13 @@ export default function Home() {
     <>
       <NextSeo
         title="Home"
-        description="Browse curated pamphlets on career, academic, and religious topics from expert writers."
+        description="Read and share personal writings, free writeups, and thoughts on anything."
         openGraph={{
           url: "https://pamflets.vercel.app",
           type: "website",
-          title: "Pamphlets - Expert Pamphlets",
+          title: "Pamphlets - Read & Share Personal Writings",
           description:
-            "Browse curated pamphlets on career, academic, and religious topics from expert writers.",
+            "Read and share personal writings, free writeups, and thoughts on anything.",
           images: [
             {
               url: "https://pamflets.vercel.app/pamphlets.png",
@@ -301,15 +301,15 @@ export default function Home() {
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "Pamphlets - Pamphlets Collection",
-          description: "Collection of expert-written pamphlets on career, academic, and religious topics",
+          name: "Pamphlets - Personal Writings Collection",
+          description: "A collection of personal writings, free writeups, and thoughts from our community",
           url: "https://pamflets.vercel.app",
           mainEntity: {
             "@type": "WebSite",
             name: "Pamphlets",
             url: "https://pamflets.vercel.app",
             description:
-              "Discover insightful pamphlets on Career, Academic, Religious topics and more. Expert-written pamphlets to guide your journey.",
+              "A platform for reading and posting personal writeups, free writings, and thoughts on anything.",
             potentialAction: {
               "@type": "SearchAction",
               target: "https://pamflets.vercel.app?q={search_term_string}",

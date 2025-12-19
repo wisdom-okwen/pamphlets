@@ -1,7 +1,7 @@
 {
   "name": "Pamphlets",
   "short_name": "Pamphlets",
-  "description": "Discover insightful pamphlets on Career, Academic, Religious topics and more.",
+  "description": "Read and share personal writings, free writeups, and thoughts on anything.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

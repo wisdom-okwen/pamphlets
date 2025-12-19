@@ -301,7 +301,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
             ) : messages.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
                 <Bot size={32} className="mx-auto mb-2 opacity-50" />
-                <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform dedicated to personal development, wellbeing, and positive behavioral change. I can help you find and learn about pamphlets, and answer questions about your interactions across the platform!</p>
+                <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform for reading and sharing personal writings on anything. I can help you discover pamphlets, find content you&apos;ve interacted with, and answer questions about your activity on the platform!</p>
               </div>
             ) : null}
             {messages.map((message) => (

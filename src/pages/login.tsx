@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, Heart, Users, Sparkles } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 
 export default function LoginPage() {
@@ -77,118 +77,194 @@ export default function LoginPage() {
         noindex
       />
 
-      <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-            <CardDescription>
-              Sign in to your account to continue
-            </CardDescription>
-          </CardHeader>
+      <main className="flex min-h-screen">
+        {/* Left Side - About Section */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-primary/80 text-white p-12 flex-col justify-between relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-10 left-10 w-32 h-32 border border-white/20 rounded-full" />
+            <div className="absolute top-40 right-20 w-24 h-24 border border-white/20 rounded-full" />
+            <div className="absolute bottom-20 left-1/4 w-40 h-40 border border-white/20 rounded-full" />
+            <div className="absolute bottom-40 right-10 w-20 h-20 border border-white/20 rounded-full" />
+          </div>
 
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl font-bold">Pamphlets</span>
+            </div>
+            <p className="text-white/80 text-lg">Read and share personal writings on anything</p>
+          </div>
+
+          <div className="relative z-10 space-y-8">
+            <h2 className="text-4xl font-bold leading-tight">
+              Your thoughts.<br />
+              Your stories.
+            </h2>
+            <p className="text-white/90 text-lg max-w-md">
+              A platform for reading and posting personal writeups, free writings, and thoughts on anything that matters to you.
+            </p>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <Sparkles className="size-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Free Expression</h3>
+                  <p className="text-white/70 text-sm">Write about anything - no topic restrictions</p>
+                </div>
               </div>
-            )}
 
-            {/* Google OAuth */}
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleGoogleLogin}
-              disabled={isGoogleLoading || isLoading}
-            >
-              {isGoogleLoading ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <GoogleIcon className="mr-2 size-4" />
-              )}
-              Continue with Google
-            </Button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <Heart className="size-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Personal Writings</h3>
+                  <p className="text-white/70 text-sm">Share your thoughts, stories, and ideas</p>
+                </div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
-                  Or continue with email
-                </span>
+
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                  <Users className="size-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Community of Writers & Readers</h3>
+                  <p className="text-white/70 text-sm">Connect with others who love to read and write</p>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Email/Password Form */}
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign in"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-
-          <CardFooter className="flex justify-center">
-            <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-primary hover:underline"
-              >
-                Sign up
-              </Link>
+          <div className="relative z-10">
+            <p className="text-white/60 text-sm">
+              &quot;There is no greater agony than bearing an untold story inside you.&quot;
             </p>
-          </CardFooter>
-        </Card>
+            <p className="text-white/40 text-sm mt-1">— Maya Angelou</p>
+          </div>
+        </div>
+
+        {/* Right Side - Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 py-8">
+          <Card className="w-full max-w-md border-0 shadow-none lg:shadow-lg lg:border">
+            <CardHeader className="space-y-1 text-center">
+              {/* Mobile Logo */}
+              <div className="lg:hidden flex justify-center mb-4">
+                <div className="flex items-center gap-2 text-primary">
+                  <span className="text-2xl font-bold">Pamphlets</span>
+                </div>
+              </div>
+              <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+              <CardDescription>
+                Sign in to your account to continue
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+
+              {/* Google OAuth */}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading || isLoading}
+              >
+                {isGoogleLoading ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <GoogleIcon className="mr-2 size-4" />
+                )}
+                Continue with Google
+              </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Or continue with email
+                  </span>
+                </div>
+              </div>
+
+              {/* Email/Password Form */}
+              <form onSubmit={handleEmailLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 size-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+
+            <CardFooter className="flex justify-center">
+              <p className="text-sm text-muted-foreground">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/signup"
+                  className="font-medium text-primary hover:underline"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
       </main>
     </>
   );
