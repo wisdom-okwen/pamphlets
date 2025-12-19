@@ -5,8 +5,15 @@ import {
     protectedProcedure,
     adminProcedure,
 } from "../trpc";
-import { articles, articleGenres, reactions, userPreferences, notifications, users } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import {
+    articles,
+    articleGenres,
+    reactions,
+    userPreferences,
+    notifications,
+    users,
+} from "@/db/schema";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
 import { sendEmail, createNotificationEmail } from "../utils/email";
 
@@ -98,7 +105,9 @@ export const articlesRouter = createTRPCRouter({
                     : false;
                 return {
                     ...it,
-                    genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+                    genres: (it.articleGenres || []).map(
+                        (ag: ArticleGenreType) => ag.genre
+                    ),
                     likeCount: likeReactions.length,
                     commentCount: (it.comments || []).length,
                     userHasLiked,
@@ -161,7 +170,9 @@ export const articlesRouter = createTRPCRouter({
                 (r: ReactionType) => r.type === "like"
             );
             const userHasLiked = ctx.subject
-                ? likeReactions.some((r: ReactionType) => r.userId === ctx.subject!.id)
+                ? likeReactions.some(
+                      (r: ReactionType) => r.userId === ctx.subject!.id
+                  )
                 : false;
 
             return {
@@ -198,7 +209,9 @@ export const articlesRouter = createTRPCRouter({
 
             return items.map((it) => ({
                 ...it,
-                genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+                genres: (it.articleGenres || []).map(
+                    (ag: ArticleGenreType) => ag.genre
+                ),
             }));
         }),
 
@@ -210,7 +223,16 @@ export const articlesRouter = createTRPCRouter({
                 slug: z.string().min(1).max(255).optional(),
                 excerpt: z.string().optional(),
                 content: z.array(z.any()),
-                coverImageUrl: z.string().refine((val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), { message: 'Must be a URL or relative path' }).optional(),
+                coverImageUrl: z
+                    .string()
+                    .refine(
+                        (val) =>
+                            val.startsWith("/") ||
+                            val.startsWith("http://") ||
+                            val.startsWith("https://"),
+                        { message: "Must be a URL or relative path" }
+                    )
+                    .optional(),
                 genreIds: z.array(z.number()).min(1),
                 status: z
                     .enum(["draft", "published", "archived"])
@@ -273,31 +295,38 @@ export const articlesRouter = createTRPCRouter({
 
                     for (const pref of subscribedUsers) {
                         // Create notification in database
-                        await ctx.db
-                            .insert(notifications)
-                            .values({
-                                userId: pref.userId,
-                                type: "new_article",
-                                title: `New article: ${article.title}`,
-                                message: `${author?.username || "Someone"} published a new article`,
-                                articleId: article.id,
-                                fromUserId: ctx.subject.id,
-                                isRead: false,
-                            });
+                        await ctx.db.insert(notifications).values({
+                            userId: pref.userId,
+                            type: "new_article",
+                            title: `New article: ${article.title}`,
+                            message: `${
+                                author?.username || "Someone"
+                            } published a new article`,
+                            articleId: article.id,
+                            fromUserId: ctx.subject.id,
+                            isRead: false,
+                        });
 
                         // Send email if user enabled notifications
-                        const recipientPrefs = await ctx.db.query.userPreferences.findFirst({
-                            where: eq(userPreferences.userId, pref.userId),
-                        });
+                        const recipientPrefs =
+                            await ctx.db.query.userPreferences.findFirst({
+                                where: eq(userPreferences.userId, pref.userId),
+                            });
 
-                        const recipientUser = await ctx.db.query.users.findFirst({
-                            where: eq(users.id, pref.userId),
-                        });
+                        const recipientUser =
+                            await ctx.db.query.users.findFirst({
+                                where: eq(users.id, pref.userId),
+                            });
 
-                        if (recipientPrefs?.emailNotifications && recipientUser?.email) {
+                        if (
+                            recipientPrefs?.emailNotifications &&
+                            recipientUser?.email
+                        ) {
                             const emailHtml = createNotificationEmail(
                                 "new_article",
-                                `${author?.username || "Someone"} published a new article`,
+                                `${
+                                    author?.username || "Someone"
+                                } published a new article`,
                                 article.title,
                                 article.slug
                             );
@@ -310,7 +339,10 @@ export const articlesRouter = createTRPCRouter({
                         }
                     }
                 } catch (error) {
-                    console.error("Error creating notifications for new article:", error);
+                    console.error(
+                        "Error creating notifications for new article:",
+                        error
+                    );
                 }
             }
 
@@ -326,7 +358,16 @@ export const articlesRouter = createTRPCRouter({
                 slug: z.string().min(1).max(255).optional(),
                 excerpt: z.string().optional(),
                 content: z.array(z.any()).optional(),
-                coverImageUrl: z.string().refine((val) => val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'), { message: 'Must be a URL or relative path' }).optional(),
+                coverImageUrl: z
+                    .string()
+                    .refine(
+                        (val) =>
+                            val.startsWith("/") ||
+                            val.startsWith("http://") ||
+                            val.startsWith("https://"),
+                        { message: "Must be a URL or relative path" }
+                    )
+                    .optional(),
                 genreIds: z.array(z.number()).optional(),
                 status: z.enum(["draft", "published", "archived"]).optional(),
             })
@@ -402,31 +443,38 @@ export const articlesRouter = createTRPCRouter({
                     // Create notifications for all subscribed users (including the author if they want)
                     for (const pref of subscribedUsers) {
                         // Create notification in database
-                        await ctx.db
-                            .insert(notifications)
-                            .values({
-                                userId: pref.userId,
-                                type: "new_article",
-                                title: `New article: ${article.title}`,
-                                message: `${author?.username || "Someone"} published a new article`,
-                                articleId: article.id,
-                                fromUserId: ctx.subject.id,
-                                isRead: false,
-                            });
+                        await ctx.db.insert(notifications).values({
+                            userId: pref.userId,
+                            type: "new_article",
+                            title: `New article: ${article.title}`,
+                            message: `${
+                                author?.username || "Someone"
+                            } published a new article`,
+                            articleId: article.id,
+                            fromUserId: ctx.subject.id,
+                            isRead: false,
+                        });
 
                         // Send email if user enabled notifications
-                        const recipientPrefs = await ctx.db.query.userPreferences.findFirst({
-                            where: eq(userPreferences.userId, pref.userId),
-                        });
+                        const recipientPrefs =
+                            await ctx.db.query.userPreferences.findFirst({
+                                where: eq(userPreferences.userId, pref.userId),
+                            });
 
-                        const recipientUser = await ctx.db.query.users.findFirst({
-                            where: eq(users.id, pref.userId),
-                        });
+                        const recipientUser =
+                            await ctx.db.query.users.findFirst({
+                                where: eq(users.id, pref.userId),
+                            });
 
-                        if (recipientPrefs?.emailNotifications && recipientUser?.email) {
+                        if (
+                            recipientPrefs?.emailNotifications &&
+                            recipientUser?.email
+                        ) {
                             const emailHtml = createNotificationEmail(
                                 "new_article",
-                                `${author?.username || "Someone"} published a new article`,
+                                `${
+                                    author?.username || "Someone"
+                                } published a new article`,
                                 article.title,
                                 article.slug
                             );
@@ -491,7 +539,9 @@ export const articlesRouter = createTRPCRouter({
 
             const mapped = items.map((it) => ({
                 ...it,
-                genres: (it.articleGenres || []).map((ag: ArticleGenreType) => ag.genre),
+                genres: (it.articleGenres || []).map(
+                    (ag: ArticleGenreType) => ag.genre
+                ),
             }));
 
             return { items: mapped, nextCursor };
