@@ -1,83 +1,92 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import OpenAI from 'openai';
+import { NextApiRequest, NextApiResponse } from "next";
+import OpenAI from "openai";
 
 interface ChatbotData {
-  user: {
-    id: string;
-    username: string;
-    role: string;
-    joinedAt: Date;
-  };
-  interactions: {
-    likedArticles: Array<{
-      id: number;
-      title: string;
-      slug: string;
-      publishedAt: Date | null;
-    }>;
-    bookmarkedArticles: Array<{
-      id: number;
-      title: string;
-      slug: string;
-      publishedAt: Date | null;
-    }>;
-    comments: Array<{
-      id: number;
-      content: string;
-      createdAt: Date;
-      article: {
-        id: number;
-        title: string;
-        slug: string;
-      };
-      reactionCount: number;
-      reactions: {
-        likes: number;
-        loves: number;
-        supports: number;
-      };
-    }>;
-  };
+    user: {
+        id: string;
+        username: string;
+        role: string;
+        joinedAt: Date;
+    };
+    interactions: {
+        likedArticles: Array<{
+            id: number;
+            title: string;
+            slug: string;
+            publishedAt: Date | null;
+        }>;
+        bookmarkedArticles: Array<{
+            id: number;
+            title: string;
+            slug: string;
+            publishedAt: Date | null;
+        }>;
+        comments: Array<{
+            id: number;
+            content: string;
+            createdAt: Date;
+            article: {
+                id: number;
+                title: string;
+                slug: string;
+            };
+            reactionCount: number;
+            reactions: {
+                likes: number;
+                loves: number;
+                supports: number;
+            };
+        }>;
+    };
 }
 
 interface ArticleStats {
-  items: Array<{
-    id: number;
-    title: string;
-    publishedAt: string | Date | null;
-    excerpt?: string;
-  }>;
-  totalCount: number;
+    items: Array<{
+        id: number;
+        title: string;
+        publishedAt: string | Date | null;
+        excerpt?: string;
+    }>;
+    totalCount: number;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
-    const { message, context, stats } = req.body;
-
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Message is required' });
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method not allowed" });
     }
 
-    // Check if API key is configured
-    if (!process.env.NEXT_PUBLIC_OPENAI_KEY) {
-      console.error('OpenAI API key not configured');
-      return res.status(500).json({
-        error: "OpenAI API key is not configured. Please check your environment variables."
-      });
-    }
+    try {
+        const { message, context, stats } = req.body;
 
-    console.log('API key length:', process.env.NEXT_PUBLIC_OPENAI_KEY.length);
-    console.log('API key starts with:', process.env.NEXT_PUBLIC_OPENAI_KEY.substring(0, 20));
+        if (!message || typeof message !== "string") {
+            return res.status(400).json({ error: "Message is required" });
+        }
 
-    const openai = new OpenAI({
-      apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
-    });
+        // Check if API key is configured
+        if (!process.env.NEXT_PUBLIC_OPENAI_KEY) {
+            console.error("OpenAI API key not configured");
+            return res.status(500).json({
+                error: "OpenAI API key is not configured. Please check your environment variables.",
+            });
+        }
 
-    const systemPrompt = `You are a helpful AI assistant for "Pamphlets" - a platform for reading and sharing personal writings and free writeups about anything.
+        console.log(
+            "API key length:",
+            process.env.NEXT_PUBLIC_OPENAI_KEY.length
+        );
+        console.log(
+            "API key starts with:",
+            process.env.NEXT_PUBLIC_OPENAI_KEY.substring(0, 20)
+        );
+
+        const openai = new OpenAI({
+            apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
+        });
+
+        const systemPrompt = `You are a helpful AI assistant for "Pamphlets" - a platform for reading and sharing personal writings and free writeups about anything.
 
 STRICT SCOPE LIMITATION:
 You MUST ONLY answer questions related to:
@@ -103,21 +112,43 @@ Platform Overview:
 - The platform supports markdown formatting
 
 User Context:
-${context ? `
+${
+    context
+        ? `
 Current user: ${context.user.username} (Role: ${context.user.role})
 Joined: ${new Date(context.user.joinedAt).toLocaleDateString()}
 Liked pamphlets: ${context.interactions.likedArticles.length}
-${context.interactions.likedArticles.length > 0 ? `Recent likes: ${context.interactions.likedArticles.slice(0, 3).map((a: { title: string }) => a.title).join(', ')}` : ''}
+${
+    context.interactions.likedArticles.length > 0
+        ? `Recent likes: ${context.interactions.likedArticles
+              .slice(0, 3)
+              .map((a: { title: string }) => a.title)
+              .join(", ")}`
+        : ""
+}
 Bookmarked pamphlets: ${context.interactions.bookmarkedArticles.length}
-${context.interactions.bookmarkedArticles.length > 0 ? `Recent bookmarks: ${context.interactions.bookmarkedArticles.slice(0, 3).map((a: { title: string }) => a.title).join(', ')}` : ''}
+${
+    context.interactions.bookmarkedArticles.length > 0
+        ? `Recent bookmarks: ${context.interactions.bookmarkedArticles
+              .slice(0, 3)
+              .map((a: { title: string }) => a.title)
+              .join(", ")}`
+        : ""
+}
 Comments made: ${context.interactions.comments.length}
-` : 'No user context available (user not logged in)'}
+`
+        : "No user context available (user not logged in)"
+}
 
 Platform Statistics:
-${stats ? `
+${
+    stats
+        ? `
 Total pamphlets: ${stats.totalCount}
-Most recent pamphlet: ${stats.items?.[0]?.title || 'None'}
-` : 'No statistics available'}
+Most recent pamphlet: ${stats.items?.[0]?.title || "None"}
+`
+        : "No statistics available"
+}
 
 Instructions:
 - Help users discover pamphlets on the platform
@@ -126,43 +157,55 @@ Instructions:
 - Keep responses concise and friendly
 - ALWAYS stay within the platform scope - refuse off-topic questions politely`;
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: message }
-      ],
-      max_tokens: 500,
-      temperature: 0.7,
-    });
-
-    const response = completion.choices[0]?.message?.content || "I'm sorry, I couldn't generate a response right now.";
-
-    res.status(200).json({ response });
-  } catch (error) {
-    console.error('OpenAI API error:', error);
-
-    // Provide more specific error messages
-    if (error instanceof Error) {
-      if (error.message.includes('401') || error.message.includes('Incorrect API key')) {
-        return res.status(500).json({
-          error: "Authentication failed. Please check the OpenAI API key configuration."
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: message },
+            ],
+            max_tokens: 500,
+            temperature: 0.7,
         });
-      }
-      if (error.message.includes('429') || error.message.includes('rate limit')) {
-        return res.status(500).json({
-          error: "Rate limit exceeded. Please try again later."
+
+        const response =
+            completion.choices[0]?.message?.content ||
+            "I'm sorry, I couldn't generate a response right now.";
+
+        res.status(200).json({ response });
+    } catch (error) {
+        console.error("OpenAI API error:", error);
+
+        // Provide more specific error messages
+        if (error instanceof Error) {
+            if (
+                error.message.includes("401") ||
+                error.message.includes("Incorrect API key")
+            ) {
+                return res.status(500).json({
+                    error: "Authentication failed. Please check the OpenAI API key configuration.",
+                });
+            }
+            if (
+                error.message.includes("429") ||
+                error.message.includes("rate limit")
+            ) {
+                return res.status(500).json({
+                    error: "Rate limit exceeded. Please try again later.",
+                });
+            }
+            if (
+                error.message.includes("500") ||
+                error.message.includes("502") ||
+                error.message.includes("503")
+            ) {
+                return res.status(500).json({
+                    error: "OpenAI service is temporarily unavailable. Please try again later.",
+                });
+            }
+        }
+
+        res.status(500).json({
+            error: "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again later.",
         });
-      }
-      if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
-        return res.status(500).json({
-          error: "OpenAI service is temporarily unavailable. Please try again later."
-        });
-      }
     }
-
-    res.status(500).json({
-      error: "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again later."
-    });
-  }
 }
