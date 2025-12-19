@@ -252,7 +252,7 @@ export function Sidebar() {
       {/* Mobile hamburger button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-3 left-4 z-40 p-2 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm"
+        className="lg:hidden fixed top-3 left-4 z-40 p-2.5 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm touch-manipulation"
         aria-label="Open menu"
       >
         <Menu size={20} />
@@ -276,7 +276,7 @@ export function Sidebar() {
           <aside className="absolute left-0 top-0 bottom-0 w-72 bg-white dark:bg-zinc-950 shadow-xl">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="absolute top-4 right-4 p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation"
               aria-label="Close menu"
             >
               <X size={20} />

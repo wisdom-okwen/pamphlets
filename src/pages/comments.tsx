@@ -99,10 +99,10 @@ function CommentsPage() {
         noindex
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center gap-3 mb-8">
-          <MessageCircle className="size-8 text-blue-500" />
-          <h1 className="text-3xl font-bold">My Comments</h1>
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+          <MessageCircle className="size-6 sm:size-8 text-blue-500" />
+          <h1 className="text-2xl sm:text-3xl font-bold">My Comments</h1>
         </div>
 
         {articleGroups.length === 0 ? (
@@ -130,33 +130,35 @@ function CommentsPage() {
                   className="bg-card rounded-xl border overflow-hidden"
                 >
                   {/* Article Header */}
-                  <div className="flex items-center gap-4 p-4 bg-muted/30 border-b">
-                    {article.coverImageUrl && (
-                      <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
-                        <img
-                          src={article.coverImageUrl}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-lg line-clamp-1">
-                        {article.title}
-                      </h3>
-                      {article.author && (
-                        <p className="text-sm text-muted-foreground">
-                          by {article.author.username}
-                        </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/30 border-b">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {article.coverImageUrl && (
+                        <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                          <img
+                            src={article.coverImageUrl}
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </div>
                       )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base sm:text-lg line-clamp-2 sm:line-clamp-1">
+                          {article.title}
+                        </h3>
+                        {article.author && (
+                          <p className="text-xs sm:text-sm text-muted-foreground">
+                            by {article.author.username}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 shrink-0">
                       <Link
                         href={`/articles/${article.slug}#comments`}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors touch-manipulation"
                         title="View all comments on this pamphlet"
                       >
                         <MessageCircle size={16} />
@@ -164,7 +166,7 @@ function CommentsPage() {
                       </Link>
                       <Link
                         href={`/articles/${article.slug}`}
-                        className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors touch-manipulation"
                         title="View pamphlet"
                       >
                         <Eye size={16} />
@@ -195,7 +197,7 @@ function CommentsPage() {
                           <button
                             onClick={(e) => handleDeleteComment(e, comment.id)}
                             disabled={deletingId === comment.id}
-                            className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-2.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors disabled:opacity-50 touch-manipulation"
                             title="Delete comment"
                           >
                             <Trash2 size={16} />

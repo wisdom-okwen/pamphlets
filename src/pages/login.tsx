@@ -153,32 +153,38 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 py-8 relative">
+        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 sm:px-6 py-8 min-h-screen relative">
           {/* Theme Toggle */}
           {mounted && (
             <button
               onClick={toggle}
               aria-label="toggle-theme"
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-10"
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
           )}
           <Card className="w-full max-w-md border-0 shadow-none lg:shadow-lg lg:border">
-            <CardHeader className="space-y-1 text-center">
+            <CardHeader className="space-y-1 text-center px-4 sm:px-6">
               {/* Mobile Logo */}
-              <div className="lg:hidden flex justify-center mb-4">
-                <div className="flex items-center gap-2 text-primary">
+              <div className="lg:hidden flex flex-col items-center mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <img
+                    src="/pamphlets.svg"
+                    alt="Pamphlets Logo"
+                    className="size-10"
+                  />
                   <span className="text-2xl font-bold">Pamphlets</span>
                 </div>
+                <p className="text-sm text-muted-foreground">Read and share personal writings</p>
               </div>
-              <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl font-bold">Welcome back</CardTitle>
               <CardDescription>
                 Sign in to your account to continue
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-4 sm:px-6">
               {error && (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
@@ -189,7 +195,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full h-11"
                 onClick={handleGoogleLogin}
                 disabled={isGoogleLoading || isLoading}
               >
@@ -256,7 +262,7 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full h-11" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 size-4 animate-spin" />
@@ -269,7 +275,7 @@ export default function LoginPage() {
               </form>
             </CardContent>
 
-            <CardFooter className="flex justify-center">
+            <CardFooter className="flex justify-center px-4 sm:px-6 pb-8">
               <p className="text-sm text-muted-foreground">
                 Don&apos;t have an account?{" "}
                 <Link

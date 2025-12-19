@@ -204,13 +204,13 @@ export default function SignupPage() {
         </div>
 
         {/* Right Side - Signup Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 py-8 overflow-y-auto relative">
+        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 sm:px-6 py-8 min-h-screen overflow-y-auto relative">
           {/* Theme Toggle */}
           {mounted && (
             <button
               onClick={toggle}
               aria-label="toggle-theme"
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-10"
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -218,17 +218,17 @@ export default function SignupPage() {
           <Card className="w-full max-w-md border-0 shadow-none lg:shadow-lg lg:border my-auto">
             {showConfirmation ? (
               <>
-                <CardHeader className="space-y-1 text-center">
+                <CardHeader className="space-y-1 text-center px-4 sm:px-6">
                   <div className="mb-2 flex justify-center">
                     <Mail className="size-12 text-primary" />
                   </div>
-                  <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
+                  <CardTitle className="text-xl sm:text-2xl font-bold">Check your email</CardTitle>
                   <CardDescription>
                     We&apos;ve sent a confirmation link to <strong>{confirmationEmail}</strong>
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 px-4 sm:px-6">
                   {error && (
                     <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                       {error}
@@ -247,7 +247,7 @@ export default function SignupPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-11"
                     onClick={() => {
                       setShowConfirmation(false);
                       setError(null);
@@ -257,7 +257,7 @@ export default function SignupPage() {
                   </Button>
                 </CardContent>
 
-                <CardFooter className="flex flex-col gap-2">
+                <CardFooter className="flex flex-col gap-2 px-4 sm:px-6 pb-8">
                   <p className="text-center text-xs text-muted-foreground">
                     Once you confirm your email, you&apos;ll be able to sign in to your account.
                   </p>
@@ -274,20 +274,26 @@ export default function SignupPage() {
               </>
             ) : (
               <>
-                <CardHeader className="space-y-1 text-center">
+                <CardHeader className="space-y-1 text-center px-4 sm:px-6">
                   {/* Mobile Logo */}
-                  <div className="lg:hidden flex justify-center mb-4">
-                    <div className="flex items-center gap-2 text-primary">
+                  <div className="lg:hidden flex flex-col items-center mb-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <img
+                        src="/pamphlets.svg"
+                        alt="Pamphlets Logo"
+                        className="size-10"
+                      />
                       <span className="text-2xl font-bold">Pamphlets</span>
                     </div>
+                    <p className="text-sm text-muted-foreground">Read and share personal writings</p>
                   </div>
-                  <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+                  <CardTitle className="text-xl sm:text-2xl font-bold">Create an account</CardTitle>
                   <CardDescription>
                     Sign up to start reading and writing pamphlets
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 px-4 sm:px-6">
                   {error && (
                     <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                       {error}
@@ -297,7 +303,7 @@ export default function SignupPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full h-11"
                     onClick={handleGoogleSignup}
                     disabled={isGoogleLoading || isLoading}
                   >
@@ -393,7 +399,7 @@ export default function SignupPage() {
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    <Button type="submit" className="w-full h-11" disabled={isLoading}>
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 size-4 animate-spin" />
@@ -417,7 +423,7 @@ export default function SignupPage() {
                   </p>
                 </CardContent>
 
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex justify-center px-4 sm:px-6 pb-8">
                   <p className="text-sm text-muted-foreground">
                     Already have an account?{" "}
                     <Link

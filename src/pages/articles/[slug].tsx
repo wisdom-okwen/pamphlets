@@ -760,22 +760,204 @@ export default function ArticleModalPage() {
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 md:p-6"
         onClick={close}
       >
         <div
-          className="relative flex flex-col items-center"
+          className="relative flex flex-col items-center w-full max-w-[1100px]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={close}
-            className="absolute -top-3 -right-3 z-30 p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg"
+            className="absolute -top-2 -right-2 md:-top-3 md:-right-3 z-30 p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
           >
             <X size={20} />
           </button>
 
-          <div className="flex">
+          {/* Mobile Layout - Single page view */}
+          <div className="md:hidden w-full">
+            <div className="bg-amber-50 dark:bg-zinc-900 rounded-lg shadow-2xl overflow-hidden">
+              {/* Mobile content */}
+              <div className="p-4 min-h-[70vh] max-h-[75vh] overflow-y-auto">
+                {spread === 0 ? (
+                  // Cover page on mobile
+                  <div className="flex flex-col h-full">
+                    <h1 className="text-xl font-bold mb-3 leading-tight">{article.title}</h1>
+                    {article.excerpt && (
+                      <p className="text-sm text-muted-foreground italic mb-3">{article.excerpt}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {genres.map((g: GenreType) => (
+                        <span
+                          key={g.id}
+                          className={`px-2 py-0.5 rounded-full text-xs ${getGenreColor(g.slug)}`}
+                        >
+                          {g.name}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-auto">
+                      By {typedArticle.author?.username ?? "Unknown"}
+                    </div>
+                  </div>
+                ) : (
+                  // Content pages on mobile - show one page at a time
+                  <div className="book-page-content text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">
+                    {textPages[spread - 1] && renderMarkdown(textPages[spread - 1])}
+                  </div>
+                )}
+              </div>
+              
+              {/* Mobile page number */}
+              <div className="text-center text-xs text-muted-foreground py-2 border-t border-amber-200/50 dark:border-zinc-700/50">
+                {spread === 0 ? "Cover" : `Page ${spread} of ${textPages.length}`}
+              </div>
+            </div>
+
+            {/* Mobile action buttons */}
+            <div className="flex justify-center gap-3 mt-4">
+              <button
+                onClick={handleLike}
+                className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : ""}`}
+              >
+                <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-medium min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                  {likeCount}
+                </span>
+              </button>
+              <button
+                onClick={() => setShowComments(!showComments)}
+                className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : ""}`}
+              >
+                <MessageCircle size={20} fill={showComments ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[10px] font-medium min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                  {typedArticle.commentCount ?? 0}
+                </span>
+              </button>
+              <button
+                onClick={handleToggleBookmark}
+                className={`p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : ""}`}
+              >
+                <Bookmark size={20} fill={bookmarked ? "currentColor" : "none"} />
+              </button>
+              <button
+                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation"
+              >
+                <Share2 size={20} />
+              </button>
+            </div>
+
+            {/* Mobile comments panel */}
+            {showComments && (
+              <div className="mt-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-4 max-h-[40vh] flex flex-col">
+                <h3 className="text-sm font-semibold mb-3 shrink-0">Comments ({typedArticle.commentCount ?? 0})</h3>
+                <div className="flex-1 overflow-y-auto space-y-3 mb-3 min-h-0">
+                  {commentsLoading ? (
+                    <div className="text-xs text-muted-foreground">Loading comments...</div>
+                  ) : commentsData?.items && commentsData.items.length > 0 ? (
+                    commentsData.items.map((comment: CommentType) => (
+                      <div key={comment.id} className="bg-zinc-100 dark:bg-zinc-700 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="w-6 h-6 rounded-full bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center text-xs font-medium">
+                            {comment.user?.username?.[0]?.toUpperCase() || "?"}
+                          </div>
+                          <span className="text-xs font-medium">{comment.user?.username || "Unknown"}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {formatRelativeTime(comment.createdAt)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-700 dark:text-zinc-300 mb-2">{comment.content}</p>
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => handleCommentReaction(comment.id, "like")}
+                            className={`flex items-center gap-1 transition-colors touch-manipulation ${
+                              comment.userLiked 
+                                ? "text-blue-500" 
+                                : "text-zinc-500 hover:text-blue-500"
+                            }`}
+                          >
+                            <ThumbsUp size={14} className={comment.userLiked ? "fill-current" : ""} />
+                            <span className="text-[10px]">{comment.likeCount || 0}</span>
+                          </button>
+                          <button 
+                            onClick={() => handleCommentReaction(comment.id, "love")}
+                            className={`flex items-center gap-1 transition-colors touch-manipulation ${
+                              comment.userLoved 
+                                ? "text-red-500" 
+                                : "text-zinc-500 hover:text-red-500"
+                            }`}
+                          >
+                            <Heart size={14} className={comment.userLoved ? "fill-current" : ""} />
+                            <span className="text-[10px]">{comment.loveCount || 0}</span>
+                          </button>
+                          <button 
+                            onClick={() => handleCommentReaction(comment.id, "support")}
+                            className={`flex items-center gap-1 transition-colors touch-manipulation ${
+                              comment.userSupported 
+                                ? "text-green-500" 
+                                : "text-zinc-500 hover:text-green-500"
+                            }`}
+                          >
+                            <HandHeart size={14} className={comment.userSupported ? "fill-current" : ""} />
+                            <span className="text-[10px]">{comment.supportCount || 0}</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-xs text-muted-foreground italic">No comments yet. Be the first to comment!</div>
+                  )}
+                </div>
+                <div className="flex-shrink-0 flex flex-col gap-2">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder={user ? "Write a comment..." : "Sign in to comment"}
+                    disabled={!user}
+                    rows={2}
+                    className="w-full text-sm px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50"
+                  />
+                  <button 
+                    onClick={handlePostComment}
+                    disabled={!user || !commentText.trim() || postingComment}
+                    className="w-full px-4 py-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  >
+                    {postingComment ? "Posting..." : "Post"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Mobile Navigation */}
+            <div className="flex items-center justify-center gap-6 mt-4">
+              <button
+                onClick={() => {
+                  if (spread > 0) setSpread(s => s - 1);
+                }}
+                disabled={spread === 0}
+                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <span className="text-sm text-white min-w-[80px] text-center">
+                {spread === 0 ? "Cover" : `${spread} / ${textPages.length}`}
+              </span>
+              <button
+                onClick={() => {
+                  if (spread < textPages.length) setSpread(s => s + 1);
+                }}
+                disabled={spread >= textPages.length}
+                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Layout - Book spread view */}
+          <div className="hidden md:flex flex-col items-center">
+            <div className="flex">
           {/* Book container with flip effect */}
           <div className="relative flex rounded-lg shadow-2xl" style={{ perspective: "2000px" }}>
             {/* Left page (static) */}
@@ -1017,10 +1199,10 @@ export default function ArticleModalPage() {
               </div>
             </div>
           </div>
-        </div>
+            </div>
 
-        {/* Navigation */}
-        <div className="flex items-center gap-6 mt-4">
+        {/* Navigation - Desktop only */}
+        <div className="hidden md:flex items-center gap-6 mt-4">
           <button
             onClick={prev}
             disabled={spread === 0}
@@ -1039,6 +1221,7 @@ export default function ArticleModalPage() {
             <ChevronRight size={24} />
           </button>
         </div>
+          </div>
         </div>
       </div>
     </>

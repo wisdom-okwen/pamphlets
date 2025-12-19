@@ -74,7 +74,7 @@ export default function NavBar({
             <button
               onClick={() => router.push(backHref)}
               aria-label="back"
-              className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="p-2.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation"
             >
               <ArrowLeft size={18} />
             </button>
@@ -115,7 +115,7 @@ export default function NavBar({
           {isUserReady && user && (
             <Link
               href="/notifications"
-              className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 relative"
+              className="p-2.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 relative touch-manipulation"
               title="Notifications"
             >
               <Bell size={16} />
@@ -132,12 +132,12 @@ export default function NavBar({
             <button
               onClick={toggle}
               aria-label="toggle-theme"
-              className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="p-2.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation"
             >
               {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           ) : (
-            <div className="p-2 w-8 h-8" />
+            <div className="p-2.5 w-9 h-9" />
           )}
 
           {/* Auth: Login button or Profile avatar. Hidden when `hideAuth` true (sidebar shows auth controls) */}
@@ -164,7 +164,7 @@ export default function NavBar({
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors touch-manipulation"
               >
                 <LogIn size={14} />
                 <span className="hidden sm:inline">Login</span>

@@ -564,10 +564,10 @@ function SettingsPage() {
     <>
       <NextSeo title="Settings" description="Manage your account settings" noindex />
 
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="flex items-center gap-3 mb-8">
-          <Settings className="size-8" />
-          <h1 className="text-3xl font-bold">Settings</h1>
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl">
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+          <Settings className="size-6 sm:size-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
         </div>
 
         {error && (
@@ -580,24 +580,24 @@ function SettingsPage() {
           </div>
         )}
 
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row gap-4 sm:gap-8">
           {/* Sidebar Navigation */}
           <nav className="md:w-64 shrink-0">
-            <div className="space-y-1">
+            <div className="flex md:flex-col overflow-x-auto md:overflow-visible gap-2 md:gap-1 pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
               {sections.map((section) => (
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(section.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2.5 md:py-3 rounded-lg transition-colors whitespace-nowrap touch-manipulation ${
                     activeSection === section.id
                       ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
+                      : "bg-muted/50 md:bg-transparent hover:bg-muted"
                   }`}
                 >
-                  <section.icon className="size-5" />
-                  <span className="font-medium">{section.label}</span>
+                  <section.icon className="size-4 md:size-5" />
+                  <span className="font-medium text-sm md:text-base">{section.label}</span>
                   <ChevronRight
-                    className={`size-4 ml-auto transition-transform ${
+                    className={`size-4 ml-auto hidden md:block transition-transform ${
                       activeSection === section.id ? "rotate-90" : ""
                     }`}
                   />
@@ -608,7 +608,7 @@ function SettingsPage() {
 
           {/* Content Area */}
           <main className="flex-1 min-w-0">
-            <div className="bg-card rounded-xl border p-6">{renderContent()}</div>
+            <div className="bg-card rounded-xl border p-4 sm:p-6">{renderContent()}</div>
           </main>
         </div>
       </div>

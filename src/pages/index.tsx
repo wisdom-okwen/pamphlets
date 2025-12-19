@@ -328,8 +328,8 @@ export default function Home() {
       </script>
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
-      <div className="sticky top-[60px] z-40 bg-background px-4 border-b">
-        <div className="max-w-4xl mx-auto py-4">
+      <div className="sticky top-0 lg:top-[60px] z-40 bg-background px-4 border-b">
+        <div className="max-w-4xl mx-auto py-3 sm:py-4">
           <div className="relative mb-2">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
             <input
@@ -337,12 +337,12 @@ export default function Home() {
               placeholder="Search by title, tags, or content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+              className="w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
               >
                 <X size={18} />
               </button>
@@ -430,14 +430,14 @@ export default function Home() {
                       </div>
 
                       {/* Right: Views, Likes & action buttons */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground px-2">
+                      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground px-1 sm:px-2">
                           <Eye size={12} />
                           <span>{article.viewCount}</span>
                         </div>
                         <button
                           onClick={(e) => handleLike(e, article.id)}
-                          className={`relative p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                          className={`relative p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                             (optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : ""
                           }`}
                           title="Like"
@@ -453,7 +453,7 @@ export default function Home() {
                         </button>
                         <button
                           onClick={(e) => handleBookmark(e, article.id)}
-                          className={`p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                          className={`p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                             (optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : ""
                           }`}
                           title="Bookmark"
@@ -466,7 +466,7 @@ export default function Home() {
                         </button>
                         <button
                           onClick={(e) => handleComment(e, article.id)}
-                          className="relative p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150"
+                          className="relative p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation"
                           title="Comments"
                         >
                           <MessageCircle size={16} className="text-muted-foreground hover:text-blue-500" />
@@ -477,7 +477,7 @@ export default function Home() {
                         <div className="relative" ref={shareMenuOpen === article.id ? shareMenuRef : null}>
                           <button
                             onClick={(e) => handleShareClick(e, article.id)}
-                            className={`p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 ${
+                            className={`p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                               copiedArticleId === article.id ? "text-green-500" : ""
                             }`}
                             title="Share"
@@ -489,10 +489,10 @@ export default function Home() {
                             )}
                           </button>
                           {shareMenuOpen === article.id && (
-                            <div className="absolute bottom-full right-0 mb-2 bg-background border rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+                            <div className="absolute bottom-full right-0 mb-2 bg-background border rounded-lg shadow-lg py-1 min-w-[160px] z-50">
                               <button
                                 onClick={(e) => handleCopyLink(e, { id: article.id, slug: article.slug })}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors"
+                                className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition-colors touch-manipulation"
                               >
                                 <Copy size={14} />
                                 Copy link
@@ -500,7 +500,7 @@ export default function Home() {
                               {typeof navigator !== "undefined" && "share" in navigator && (
                                 <button
                                   onClick={(e) => handleNativeShare(e, { title: article.title, slug: article.slug })}
-                                  className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted transition-colors"
+                                  className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition-colors touch-manipulation"
                                 >
                                   <Share2 size={14} />
                                   Share...

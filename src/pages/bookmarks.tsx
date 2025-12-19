@@ -51,10 +51,10 @@ function BookmarksPage() {
         noindex
       />
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center gap-3 mb-8">
-          <Bookmark className="size-8 text-yellow-500" />
-          <h1 className="text-3xl font-bold">My Bookmarks</h1>
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+          <Bookmark className="size-6 sm:size-8 text-yellow-500" />
+          <h1 className="text-2xl sm:text-3xl font-bold">My Bookmarks</h1>
         </div>
 
         {bookmarks.length === 0 ? (
@@ -83,11 +83,11 @@ function BookmarksPage() {
                 <Link
                   key={bookmark.id}
                   href={`/articles/${article.slug}`}
-                  className="group flex gap-4 p-4 bg-card hover:bg-muted/50 rounded-xl border transition-all duration-200 hover:shadow-md"
+                  className="group flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 bg-card hover:bg-muted/50 rounded-xl border transition-all duration-200 hover:shadow-md"
                 >
                   {/* Cover Image */}
                   {article.coverImageUrl && (
-                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
+                    <div className="relative w-full h-40 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden bg-muted">
                       <img
                         src={article.coverImageUrl}
                         alt={article.title}
@@ -119,7 +119,7 @@ function BookmarksPage() {
                         )}
 
                         {/* Title */}
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors line-clamp-1">
+                        <h3 className="font-semibold text-base sm:text-lg group-hover:text-primary transition-colors line-clamp-2 sm:line-clamp-1">
                           {article.title}
                         </h3>
 
@@ -131,7 +131,7 @@ function BookmarksPage() {
                         )}
 
                         {/* Meta */}
-                        <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mt-3 text-xs sm:text-sm text-muted-foreground">
                           {article.author && (
                             <span>by {article.author.username}</span>
                           )}
@@ -148,7 +148,7 @@ function BookmarksPage() {
                       {/* Remove Button */}
                       <button
                         onClick={(e) => handleRemoveBookmark(e, article.id)}
-                        className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                        className="p-2.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors touch-manipulation"
                         title="Remove bookmark"
                       >
                         <Trash2 size={18} />
