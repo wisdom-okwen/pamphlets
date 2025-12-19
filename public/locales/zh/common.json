@@ -18,7 +18,8 @@
     "seeMore": "查看更多",
     "seeLess": "收起",
     "saveChanges": "保存更改",
-    "saved": "已保存！"
+    "saved": "已保存！",
+    "archive": "归档"
   },
   "nav": {
     "home": "首页",
@@ -26,13 +27,19 @@
     "comments": "我的评论",
     "settings": "设置",
     "admin": "管理员",
-    "aiAssistant": "AI助手",
+    "aiAssistant": "AI 助手",
     "notifications": "通知",
     "profile": "个人资料",
     "signIn": "登录",
     "signOut": "退出",
     "login": "登录",
     "signUp": "注册"
+  },
+  "sidebar": {
+    "guest": "访客",
+    "notSignedIn": "未登录",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单"
   },
   "auth": {
     "welcomeBack": "欢迎回来",
@@ -114,13 +121,16 @@
     "title": "我的收藏",
     "empty": "暂无收藏",
     "emptyDesc": "您收藏的文章将显示在这里",
-    "removeConfirm": "取消收藏？"
+    "removeConfirm": "移除收藏？",
+    "browsePamphlets": "浏览文章"
   },
   "myComments": {
     "title": "我的评论",
     "empty": "暂无评论",
     "emptyDesc": "您在文章上的评论将显示在这里",
-    "onArticle": "在 {{title}}"
+    "onArticle": "在 {{title}}",
+    "viewComments": "查看评论",
+    "viewPamphlet": "查看文章"
   },
   "notifications": {
     "title": "通知",

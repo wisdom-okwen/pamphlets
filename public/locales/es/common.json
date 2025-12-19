@@ -18,7 +18,8 @@
     "seeMore": "Ver más",
     "seeLess": "Ver menos",
     "saveChanges": "Guardar Cambios",
-    "saved": "¡Guardado!"
+    "saved": "¡Guardado!",
+    "archive": "Archivar"
   },
   "nav": {
     "home": "Inicio",
@@ -33,6 +34,12 @@
     "signOut": "Cerrar Sesión",
     "login": "Entrar",
     "signUp": "Registrarse"
+  },
+  "sidebar": {
+    "guest": "Invitado",
+    "notSignedIn": "No has iniciado sesión",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",
@@ -113,14 +120,17 @@
   "bookmarks": {
     "title": "Mis Marcadores",
     "empty": "Aún no hay marcadores",
-    "emptyDesc": "Los panfletos que guardes aparecerán aquí",
-    "removeConfirm": "¿Quitar marcador?"
+    "emptyDesc": "Los panfletos que marques aparecerán aquí",
+    "removeConfirm": "¿Quitar marcador?",
+    "browsePamphlets": "Explorar Panfletos"
   },
   "myComments": {
     "title": "Mis Comentarios",
     "empty": "Aún no hay comentarios",
     "emptyDesc": "Los comentarios que hagas en los panfletos aparecerán aquí",
-    "onArticle": "en {{title}}"
+    "onArticle": "en {{title}}",
+    "viewComments": "Ver Comentarios",
+    "viewPamphlet": "Ver Panfleto"
   },
   "notifications": {
     "title": "Notificaciones",

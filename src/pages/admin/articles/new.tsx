@@ -140,8 +140,8 @@ function NewArticlePage() {
   return (
     <>
       <NextSeo
-        title="New Pamphlet"
-        description="Create a new pamphlet"
+        title={t("admin.newPamphlet")}
+        description={t("admin.newPamphlet")}
         noindex
       />
 

@@ -18,7 +18,8 @@
     "seeMore": "Voir plus",
     "seeLess": "Voir moins",
     "saveChanges": "Enregistrer les Modifications",
-    "saved": "Enregistré !"
+    "saved": "Enregistré !",
+    "archive": "Archiver"
   },
   "nav": {
     "home": "Accueil",
@@ -33,6 +34,12 @@
     "signOut": "Se Déconnecter",
     "login": "Connexion",
     "signUp": "S'inscrire"
+  },
+  "sidebar": {
+    "guest": "Invité",
+    "notSignedIn": "Non connecté",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "auth": {
     "welcomeBack": "Bon retour",
@@ -114,13 +121,16 @@
     "title": "Mes Favoris",
     "empty": "Pas encore de favoris",
     "emptyDesc": "Les pamphlets que vous ajoutez aux favoris apparaîtront ici",
-    "removeConfirm": "Retirer des favoris ?"
+    "removeConfirm": "Retirer des favoris ?",
+    "browsePamphlets": "Parcourir les Pamphlets"
   },
   "myComments": {
     "title": "Mes Commentaires",
     "empty": "Pas encore de commentaires",
     "emptyDesc": "Les commentaires que vous faites sur les pamphlets apparaîtront ici",
-    "onArticle": "sur {{title}}"
+    "onArticle": "sur {{title}}",
+    "viewComments": "Voir les Commentaires",
+    "viewPamphlet": "Voir le Pamphlet"
   },
   "notifications": {
     "title": "Notifications",

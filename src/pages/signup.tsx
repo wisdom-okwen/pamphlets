@@ -129,8 +129,8 @@ export default function SignupPage() {
   return (
     <>
       <NextSeo
-        title="Sign Up"
-        description="Create your Pamphlets account"
+        title={t("nav.signUp")}
+        description={t("auth.joinCommunity")}
         noindex
       />
 

@@ -65,8 +65,37 @@ export default function NavBar({
     };
   }, [user?.id, supabase, utils]);
 
-  const computedTitle =
-    title || (router.pathname === "/" ? t("nav.home") : router.pathname.replace("/", " "));
+  // Map routes to translation keys for dynamic page titles
+  const getPageTitle = () => {
+    if (title) return title;
+    
+    const pathToTitleKey: Record<string, string> = {
+      "/": "nav.home",
+      "/bookmarks": "bookmarks.title",
+      "/comments": "myComments.title",
+      "/settings": "settings.pageTitle",
+      "/notifications": "notifications.title",
+      "/profile": "nav.profile",
+      "/login": "nav.login",
+      "/signup": "nav.signUp",
+      "/admin": "admin.title",
+      "/admin/new": "admin.newPamphlet",
+    };
+
+    const titleKey = pathToTitleKey[router.pathname];
+    if (titleKey) {
+      return t(titleKey);
+    }
+
+    // For dynamic routes like /articles/[slug], return empty or handle separately
+    if (router.pathname.startsWith("/articles/")) {
+      return "";
+    }
+
+    return router.pathname.replace("/", "").replace(/-/g, " ").replace(/^\w/, c => c.toUpperCase());
+  };
+
+  const computedTitle = getPageTitle();
 
   return (
     <header className="w-full sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm">

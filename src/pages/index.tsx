@@ -282,8 +282,8 @@ export default function Home() {
   return (
     <>
       <NextSeo
-        title="Home"
-        description="Read and share personal writings, free writeups, and thoughts on anything."
+        title={t("nav.home")}
+        description={t("common.tagline")}
         openGraph={{
           url: "https://pamflets.vercel.app",
           type: "website",
@@ -443,7 +443,7 @@ export default function Home() {
                           className={`relative p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                             (optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : "text-zinc-500 dark:text-zinc-400"
                           }`}
-                          title="Like"
+                          title={t("article.like")}
                         >
                           <Heart 
                             size={14} 
@@ -459,7 +459,7 @@ export default function Home() {
                           className={`p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                             (optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : "text-zinc-500 dark:text-zinc-400"
                           }`}
-                          title="Bookmark"
+                          title={t("article.bookmark")}
                         >
                           <Bookmark 
                             size={14} 
@@ -470,7 +470,7 @@ export default function Home() {
                         <button
                           onClick={(e) => handleComment(e, article.id)}
                           className="relative p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation text-zinc-500 dark:text-zinc-400"
-                          title="Comments"
+                          title={t("article.comments")}
                         >
                           <MessageCircle size={14} className="sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400 hover:text-blue-500" />
                           <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[14px] sm:min-w-4 h-[14px] sm:h-4 rounded-full flex items-center justify-center px-0.5">
@@ -483,7 +483,7 @@ export default function Home() {
                             className={`p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
                               copiedArticleId === article.id ? "text-green-500" : "text-zinc-500 dark:text-zinc-400"
                             }`}
-                            title="Share"
+                            title={t("article.share")}
                           >
                             {copiedArticleId === article.id ? (
                               <Check size={14} className="sm:w-4 sm:h-4 text-green-500" />

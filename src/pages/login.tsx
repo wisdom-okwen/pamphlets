@@ -78,8 +78,8 @@ export default function LoginPage() {
   return (
     <>
       <NextSeo
-        title="Login"
-        description="Sign in to your Pamphlets account"
+        title={t("nav.login")}
+        description={t("auth.signInToContinue")}
         noindex
       />
 

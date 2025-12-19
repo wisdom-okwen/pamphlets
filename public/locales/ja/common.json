@@ -18,7 +18,8 @@
     "seeMore": "もっと見る",
     "seeLess": "閉じる",
     "saveChanges": "変更を保存",
-    "saved": "保存しました！"
+    "saved": "保存しました！",
+    "archive": "アーカイブ"
   },
   "nav": {
     "home": "ホーム",
@@ -26,13 +27,19 @@
     "comments": "コメント",
     "settings": "設定",
     "admin": "管理者",
-    "aiAssistant": "AIアシスタント",
+    "aiAssistant": "AI アシスタント",
     "notifications": "通知",
     "profile": "プロフィール",
     "signIn": "ログイン",
     "signOut": "ログアウト",
     "login": "ログイン",
     "signUp": "新規登録"
+  },
+  "sidebar": {
+    "guest": "ゲスト",
+    "notSignedIn": "未ログイン",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる"
   },
   "auth": {
     "welcomeBack": "おかえりなさい",
@@ -114,13 +121,16 @@
     "title": "ブックマーク",
     "empty": "まだブックマークがありません",
     "emptyDesc": "ブックマークした記事がここに表示されます",
-    "removeConfirm": "ブックマークを解除しますか？"
+    "removeConfirm": "ブックマークを削除しますか？",
+    "browsePamphlets": "記事を閲覧"
   },
   "myComments": {
     "title": "コメント",
     "empty": "まだコメントがありません",
     "emptyDesc": "記事へのコメントがここに表示されます",
-    "onArticle": "{{title}} へのコメント"
+    "onArticle": "{{title}} へのコメント",
+    "viewComments": "コメントを見る",
+    "viewPamphlet": "記事を見る"
   },
   "notifications": {
     "title": "通知",

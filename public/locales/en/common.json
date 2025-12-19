@@ -18,7 +18,8 @@
     "seeMore": "See more",
     "seeLess": "See less",
     "saveChanges": "Save Changes",
-    "saved": "Saved!"
+    "saved": "Saved!",
+    "archive": "Archive"
   },
   "nav": {
     "home": "Home",
@@ -33,6 +34,12 @@
     "signOut": "Sign Out",
     "login": "Login",
     "signUp": "Sign Up"
+  },
+  "sidebar": {
+    "guest": "Guest",
+    "notSignedIn": "Not signed in",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -114,13 +121,16 @@
     "title": "My Bookmarks",
     "empty": "No bookmarks yet",
     "emptyDesc": "Pamphlets you bookmark will appear here",
-    "removeConfirm": "Remove bookmark?"
+    "removeConfirm": "Remove bookmark?",
+    "browsePamphlets": "Browse Pamphlets"
   },
   "myComments": {
     "title": "My Comments",
     "empty": "No comments yet",
     "emptyDesc": "Comments you make on pamphlets will appear here",
-    "onArticle": "on {{title}}"
+    "onArticle": "on {{title}}",
+    "viewComments": "View Comments",
+    "viewPamphlet": "View Pamphlet"
   },
   "notifications": {
     "title": "Notifications",

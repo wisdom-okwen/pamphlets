@@ -18,11 +18,12 @@
     "seeMore": "Ona zaidi",
     "seeLess": "Ona kidogo",
     "saveChanges": "Hifadhi Mabadiliko",
-    "saved": "Imehifadhiwa!"
+    "saved": "Imehifadhiwa!",
+    "archive": "Hifadhi"
   },
   "nav": {
     "home": "Nyumbani",
-    "bookmarks": "Alamisho Zangu",
+    "bookmarks": "Alama Zangu",
     "comments": "Maoni Yangu",
     "settings": "Mipangilio",
     "admin": "Msimamizi",
@@ -30,9 +31,15 @@
     "notifications": "Arifa",
     "profile": "Wasifu",
     "signIn": "Ingia",
-    "signOut": "Toka",
+    "signOut": "Ondoka",
     "login": "Ingia",
     "signUp": "Jisajili"
+  },
+  "sidebar": {
+    "guest": "Mgeni",
+    "notSignedIn": "Hujaingia",
+    "openMenu": "Fungua menyu",
+    "closeMenu": "Funga menyu"
   },
   "auth": {
     "welcomeBack": "Karibu tena",
@@ -114,13 +121,16 @@
     "title": "Alamisho Zangu",
     "empty": "Hakuna alamisho bado",
     "emptyDesc": "Vijitabu unavyoweka alama vitaonekana hapa",
-    "removeConfirm": "Ondoa alamisho?"
+    "removeConfirm": "Ondoa alamisho?",
+    "browsePamphlets": "Vinjari Vijitabu"
   },
   "myComments": {
     "title": "Maoni Yangu",
     "empty": "Hakuna maoni bado",
     "emptyDesc": "Maoni unayofanya kwenye vijitabu yataonekana hapa",
-    "onArticle": "kwenye {{title}}"
+    "onArticle": "kwenye {{title}}",
+    "viewComments": "Ona Maoni",
+    "viewPamphlet": "Ona Kijitabu"
   },
   "notifications": {
     "title": "Arifa",

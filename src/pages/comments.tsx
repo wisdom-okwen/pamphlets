@@ -54,7 +54,7 @@ function CommentsPage() {
   const handleDeleteComment = (e: React.MouseEvent, commentId: number) => {
     e.preventDefault();
     e.stopPropagation();
-    if (confirm("Are you sure you want to delete this comment?")) {
+    if (confirm(t("article.confirmDelete"))) {
       setDeletingId(commentId);
       deleteCommentMutation.mutate({ id: commentId });
     }
@@ -162,18 +162,18 @@ function CommentsPage() {
                       <Link
                         href={`/articles/${article.slug}#comments`}
                         className="flex items-center gap-2 px-3 py-2 text-sm bg-muted hover:bg-muted/80 rounded-lg transition-colors touch-manipulation"
-                        title="View all comments on this pamphlet"
+                        title={t("myComments.viewComments")}
                       >
                         <MessageCircle size={16} />
-                        <span className="hidden sm:inline">View Comments</span>
+                        <span className="hidden sm:inline">{t("myComments.viewComments")}</span>
                       </Link>
                       <Link
                         href={`/articles/${article.slug}`}
                         className="flex items-center gap-2 px-3 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors touch-manipulation"
-                        title="View pamphlet"
+                        title={t("myComments.viewPamphlet")}
                       >
                         <Eye size={16} />
-                        <span className="hidden sm:inline">View Pamphlet</span>
+                        <span className="hidden sm:inline">{t("myComments.viewPamphlet")}</span>
                       </Link>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ function CommentsPage() {
                             onClick={(e) => handleDeleteComment(e, comment.id)}
                             disabled={deletingId === comment.id}
                             className="p-2.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors disabled:opacity-50 touch-manipulation"
-                            title="Delete comment"
+                            title={t("article.deleteComment")}
                           >
                             <Trash2 size={16} />
                           </button>
