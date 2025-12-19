@@ -16,7 +16,9 @@
     "search": "Search",
     "noResults": "No results found",
     "seeMore": "See more",
-    "seeLess": "See less"
+    "seeLess": "See less",
+    "saveChanges": "Save Changes",
+    "saved": "Saved!"
   },
   "nav": {
     "home": "Home",
@@ -132,6 +134,7 @@
   },
   "settings": {
     "pageTitle": "Settings",
+    "pageDescription": "Manage your account settings and preferences",
     "sections": {
       "profile": "Profile",
       "appearance": "Appearance",
@@ -145,13 +148,15 @@
       "profilePicture": "Profile Picture",
       "changePhoto": "Change Photo",
       "photoHint": "JPG, PNG or GIF. Max 2MB.",
+      "imageRequirements": "JPG, PNG or GIF. Max 2MB.",
       "username": "Username",
       "usernamePlaceholder": "Your username",
       "email": "Email",
       "emailHint": "Email cannot be changed",
+      "emailNote": "Email cannot be changed",
       "bio": "Bio",
       "bioPlaceholder": "Tell us about yourself...",
-      "characters": "{{count}}/{{max}} characters"
+      "characters": "characters"
     },
     "appearance": {
       "title": "Appearance",
@@ -165,17 +170,23 @@
     "language": {
       "title": "Language",
       "description": "Choose your preferred language",
-      "selectLanguage": "Select Language"
+      "selectLanguage": "Select Language",
+      "saveLanguage": "Save Language"
     },
     "notifications": {
       "title": "Notification Preferences",
       "description": "Manage how you receive notifications",
       "emailNotifications": "Email Notifications",
       "emailNotificationsDesc": "Receive email notifications for important updates",
+      "email": "Email Notifications",
+      "emailDesc": "Receive email notifications for important updates",
       "newArticles": "New Article Notifications",
       "newArticlesDesc": "Get notified when new pamphlets are published",
+      "newPamphlets": "New Pamphlet Notifications",
+      "newPamphletsDesc": "Get notified when new pamphlets are published",
       "reactions": "Reaction Notifications",
-      "reactionsDesc": "Get notified when someone reacts to your comments"
+      "reactionsDesc": "Get notified when someone reacts to your comments",
+      "savePreferences": "Save Preferences"
     },
     "privacy": {
       "title": "Privacy Settings",
@@ -186,7 +197,13 @@
       "showActivityDesc": "Let others see your activity",
       "dataDownload": "Download Your Data",
       "dataDownloadDesc": "Get a copy of your data",
-      "comingSoon": "Coming soon"
+      "comingSoon": "Coming soon",
+      "accountData": "Account Data",
+      "accountDataDesc": "Download a copy of your data or request account deletion",
+      "requestExport": "Request Data Export",
+      "dangerZone": "Danger Zone",
+      "dangerZoneDesc": "Permanently delete your account and all associated data",
+      "deleteAccount": "Delete Account"
     },
     "saveChanges": "Save Changes",
     "saving": "Saving...",

@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import { Sun, Moon, Archive, ArrowLeft, User, LogIn, Bell } from "lucide-react";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext";
@@ -37,6 +38,8 @@ export default function NavBar({
     }
   );
 
+  const { t } = useTranslation("common");
+
   // Setup realtime subscription for notifications
   useEffect(() => {
     if (!user?.id) return;
@@ -63,7 +66,7 @@ export default function NavBar({
   }, [user?.id, supabase, utils]);
 
   const computedTitle =
-    title || (router.pathname === "/" ? "Home" : router.pathname.replace("/", " "));
+    title || (router.pathname === "/" ? t("nav.home") : router.pathname.replace("/", " "));
 
   return (
     <header className="w-full sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm">
@@ -106,7 +109,7 @@ export default function NavBar({
             <button
               onClick={onArchive}
               className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              title="Archive"
+              title={t("common.archive", { defaultValue: "Archive" })}
             >
               <Archive size={16} />
             </button>
@@ -116,7 +119,7 @@ export default function NavBar({
             <Link
               href="/notifications"
               className="p-2.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 relative touch-manipulation"
-              title="Notifications"
+              title={t("nav.notifications")}
             >
               <Bell size={16} />
               {(unreadCountData || 0) > 0 && (
@@ -167,7 +170,7 @@ export default function NavBar({
                 className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors touch-manipulation"
               >
                 <LogIn size={14} />
-                <span className="hidden sm:inline">Login</span>
+                <span className="hidden sm:inline">{t("nav.login")}</span>
               </Link>
             )
           )}

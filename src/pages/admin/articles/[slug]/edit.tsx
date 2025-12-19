@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { trpc } from "@/lib/trpc";
 import { withAuth } from "@/components/auth/withAuth";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -20,6 +22,7 @@ interface GenreType {
 }
 
 function EditArticlePage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { slug } = router.query as { slug?: string };
 
@@ -129,20 +132,20 @@ function EditArticlePage() {
             <div className="flex items-center gap-2 w-1/3">
               <Link href="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800">
                 <ArrowLeft className="size-4" />
-                <span className="hidden sm:inline">Back</span>
+                <span className="hidden sm:inline">{t("common.back")}</span>
               </Link>
             </div>
 
-            <h1 className="text-lg font-bold text-center w-1/3">Edit Pamphlet</h1>
+            <h1 className="text-lg font-bold text-center w-1/3">{t("admin.editPamphlet")}</h1>
 
             <div className="flex items-center gap-2 w-1/3 justify-end">
               <Button type="button" variant="outline" size="sm" onClick={() => handleSubmit("draft")} disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Save className="mr-2 size-4" />}
-                <span className="hidden sm:inline">Save Draft</span>
+                <span className="hidden sm:inline">{t("admin.saveDraft")}</span>
               </Button>
               <Button type="button" size="sm" onClick={() => handleSubmit("published")} disabled={isSubmitting}>
                 {isSubmitting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Send className="mr-2 size-4" />}
-                <span className="hidden sm:inline">Publish</span>
+                <span className="hidden sm:inline">{t("admin.publish")}</span>
               </Button>
               {mounted && (
                 <button onClick={toggle} aria-label="toggle-theme" className="p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800">
@@ -161,12 +164,12 @@ function EditArticlePage() {
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="title" className="text-base font-medium">Title</Label>
+                    <Label htmlFor="title" className="text-base font-medium">{t("admin.pamphletTitle")}</Label>
                     <Input id="title" type="text" placeholder="Enter your article title..." value={title} onChange={(e) => setTitle(e.target.value)} className="text-lg" />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-base font-medium">Genres</Label>
+                    <Label className="text-base font-medium">{t("admin.pamphletGenres")}</Label>
                     <div className="flex gap-2 overflow-x-auto max-w-full py-1">
                       {genresLoading ? (
                         <div className="text-sm text-muted-foreground">Loading genres...</div>
@@ -188,13 +191,13 @@ function EditArticlePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="excerpt" className="text-base font-medium">Synopsis <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="excerpt" className="text-base font-medium">{t("admin.pamphletExcerpt")} <span className="text-destructive">*</span></Label>
                     <Textarea id="excerpt" placeholder="A brief summary of your pamphlet..." value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} required />
                     <p className="text-xs text-muted-foreground">A short description that appears in pamphlet previews (required)</p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-base font-medium">Cover Image <span className="font-normal text-muted-foreground">(optional)</span></Label>
+                    <Label className="text-base font-medium">{t("admin.pamphletCover")} <span className="font-normal text-muted-foreground">(optional)</span></Label>
                     
                     {/* Toggle between URL and Upload */}
                     <div className="flex gap-2 mb-3">
@@ -336,7 +339,7 @@ function EditArticlePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-base font-medium">Content</Label>
+                    <Label className="text-base font-medium">{t("admin.pamphletContent")}</Label>
                     <MarkdownEditor value={content} onChange={setContent} placeholder="Write your article content in markdown..." minHeight="min-h-[400px]" />
                     <p className="text-xs text-muted-foreground">Supports Markdown formatting. Use the toolbar or write markdown directly.</p>
                   </div>
@@ -348,6 +351,14 @@ function EditArticlePage() {
       </div>
     </>
   );
+}
+
+export async function getServerSideProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || 'en', ["common"])),
+    },
+  };
 }
 
 export default withAuth(EditArticlePage, { requireAdmin: true });

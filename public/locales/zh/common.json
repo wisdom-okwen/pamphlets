@@ -16,7 +16,9 @@
     "search": "搜索",
     "noResults": "未找到结果",
     "seeMore": "查看更多",
-    "seeLess": "收起"
+    "seeLess": "收起",
+    "saveChanges": "保存更改",
+    "saved": "已保存！"
   },
   "nav": {
     "home": "首页",
@@ -132,6 +134,7 @@
   },
   "settings": {
     "pageTitle": "设置",
+    "pageDescription": "管理您的账户设置和偏好",
     "sections": {
       "profile": "个人资料",
       "appearance": "外观",
@@ -145,13 +148,15 @@
       "profilePicture": "头像",
       "changePhoto": "更换照片",
       "photoHint": "JPG、PNG 或 GIF。最大 2MB。",
+      "imageRequirements": "JPG、PNG 或 GIF。最大 2MB。",
       "username": "用户名",
       "usernamePlaceholder": "您的用户名",
       "email": "邮箱",
       "emailHint": "邮箱无法更改",
+      "emailNote": "邮箱无法更改",
       "bio": "简介",
       "bioPlaceholder": "介绍一下自己...",
-      "characters": "{{count}}/{{max}} 字符"
+      "characters": "字符"
     },
     "appearance": {
       "title": "外观",
@@ -165,17 +170,23 @@
     "language": {
       "title": "语言",
       "description": "选择您偏好的语言",
-      "selectLanguage": "选择语言"
+      "selectLanguage": "选择语言",
+      "saveLanguage": "保存语言"
     },
     "notifications": {
       "title": "通知偏好",
       "description": "管理您接收通知的方式",
       "emailNotifications": "邮件通知",
       "emailNotificationsDesc": "接收重要更新的邮件通知",
+      "email": "邮件通知",
+      "emailDesc": "接收重要更新的邮件通知",
       "newArticles": "新文章通知",
       "newArticlesDesc": "新文章发布时收到通知",
+      "newPamphlets": "新文章通知",
+      "newPamphletsDesc": "新文章发布时收到通知",
       "reactions": "回应通知",
-      "reactionsDesc": "有人回应您的评论时收到通知"
+      "reactionsDesc": "有人回应您的评论时收到通知",
+      "savePreferences": "保存偏好"
     },
     "privacy": {
       "title": "隐私设置",
@@ -186,7 +197,13 @@
       "showActivityDesc": "让其他人看到您的活动",
       "dataDownload": "下载您的数据",
       "dataDownloadDesc": "获取您数据的副本",
-      "comingSoon": "即将推出"
+      "comingSoon": "即将推出",
+      "accountData": "账户数据",
+      "accountDataDesc": "下载您的数据副本或请求删除账户",
+      "requestExport": "请求数据导出",
+      "dangerZone": "危险区域",
+      "dangerZoneDesc": "永久删除您的账户和所有相关数据",
+      "deleteAccount": "删除账户"
     },
     "saveChanges": "保存更改",
     "saving": "保存中...",

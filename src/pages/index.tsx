@@ -2,6 +2,8 @@ import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
 import { NextSeo, ArticleJsonLd } from "next-seo";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X, Copy, Check } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +27,7 @@ interface ArticleWithCounts {
 }
 
 export default function Home() {
+  const { t } = useTranslation("common");
   const { user } = useAuth();
   const { isOpen, action, openModal, closeModal } = useAuthModal();
   const [searchQuery, setSearchQuery] = useState("");
@@ -269,7 +272,7 @@ export default function Home() {
   if (error) {
     return (
       <main className="px-4 py-6 max-w-4xl mx-auto">
-        <p className="text-red-500">Failed to load pamphlets</p>
+        <p className="text-red-500">{t("errors.somethingWentWrong")}</p>
       </main>
     );
   }
@@ -334,7 +337,7 @@ export default function Home() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={18} />
             <input
               type="text"
-              placeholder="Search by title, tags, or content..."
+              placeholder={t("home.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-10 py-2 sm:py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm sm:text-base"
@@ -350,7 +353,7 @@ export default function Home() {
           </div>
           {searchQuery && (
             <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-              {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for &ldquo;{searchQuery}&rdquo;
+              {t("home.resultsFor", { count: filteredArticles.length, query: searchQuery })}
             </p>
           )}
         </div>
@@ -360,7 +363,7 @@ export default function Home() {
         {filteredArticles.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <p className="text-zinc-500 dark:text-zinc-400 text-sm sm:text-base">
-              {searchQuery ? "No pamphlets match your search" : "No pamphlets yet"}
+              {searchQuery ? t("home.noMatchingPamphlets") : t("home.noPamphlets")}
             </p>
           </div>
         ) : (
@@ -495,7 +498,7 @@ export default function Home() {
                                 className="w-full flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
                               >
                                 <Copy size={12} className="sm:w-3.5 sm:h-3.5" />
-                                Copy link
+                                {t("article.copyLink")}
                               </button>
                               {typeof navigator !== "undefined" && "share" in navigator && (
                                 <button
@@ -503,7 +506,7 @@ export default function Home() {
                                   className="w-full flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
                                 >
                                   <Share2 size={12} className="sm:w-3.5 sm:h-3.5" />
-                                  Share...
+                                  {t("article.share")}...
                                 </button>
                               )}
                             </div>
@@ -520,4 +523,12 @@ export default function Home() {
       </main>
     </>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }

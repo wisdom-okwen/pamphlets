@@ -16,7 +16,9 @@
     "search": "Buscar",
     "noResults": "No se encontraron resultados",
     "seeMore": "Ver más",
-    "seeLess": "Ver menos"
+    "seeLess": "Ver menos",
+    "saveChanges": "Guardar Cambios",
+    "saved": "¡Guardado!"
   },
   "nav": {
     "home": "Inicio",
@@ -132,6 +134,7 @@
   },
   "settings": {
     "pageTitle": "Configuración",
+    "pageDescription": "Administra la configuración y preferencias de tu cuenta",
     "sections": {
       "profile": "Perfil",
       "appearance": "Apariencia",
@@ -145,13 +148,15 @@
       "profilePicture": "Foto de Perfil",
       "changePhoto": "Cambiar Foto",
       "photoHint": "JPG, PNG o GIF. Máximo 2MB.",
+      "imageRequirements": "JPG, PNG o GIF. Máximo 2MB.",
       "username": "Nombre de Usuario",
       "usernamePlaceholder": "Tu nombre de usuario",
       "email": "Correo Electrónico",
       "emailHint": "El correo no se puede cambiar",
+      "emailNote": "El correo no se puede cambiar",
       "bio": "Biografía",
       "bioPlaceholder": "Cuéntanos sobre ti...",
-      "characters": "{{count}}/{{max}} caracteres"
+      "characters": "caracteres"
     },
     "appearance": {
       "title": "Apariencia",
@@ -165,17 +170,23 @@
     "language": {
       "title": "Idioma",
       "description": "Elige tu idioma preferido",
-      "selectLanguage": "Seleccionar Idioma"
+      "selectLanguage": "Seleccionar Idioma",
+      "saveLanguage": "Guardar Idioma"
     },
     "notifications": {
       "title": "Preferencias de Notificación",
       "description": "Administra cómo recibes notificaciones",
       "emailNotifications": "Notificaciones por Correo",
       "emailNotificationsDesc": "Recibe notificaciones por correo para actualizaciones importantes",
+      "email": "Notificaciones por Correo",
+      "emailDesc": "Recibe notificaciones por correo para actualizaciones importantes",
       "newArticles": "Notificaciones de Nuevos Artículos",
       "newArticlesDesc": "Recibe notificaciones cuando se publiquen nuevos panfletos",
+      "newPamphlets": "Notificaciones de Nuevos Panfletos",
+      "newPamphletsDesc": "Recibe notificaciones cuando se publiquen nuevos panfletos",
       "reactions": "Notificaciones de Reacciones",
-      "reactionsDesc": "Recibe notificaciones cuando alguien reaccione a tus comentarios"
+      "reactionsDesc": "Recibe notificaciones cuando alguien reaccione a tus comentarios",
+      "savePreferences": "Guardar Preferencias"
     },
     "privacy": {
       "title": "Configuración de Privacidad",
@@ -186,7 +197,13 @@
       "showActivityDesc": "Dejar que otros vean tu actividad",
       "dataDownload": "Descargar tus Datos",
       "dataDownloadDesc": "Obtén una copia de tus datos",
-      "comingSoon": "Próximamente"
+      "comingSoon": "Próximamente",
+      "accountData": "Datos de la Cuenta",
+      "accountDataDesc": "Descarga una copia de tus datos o solicita eliminar tu cuenta",
+      "requestExport": "Solicitar Exportación de Datos",
+      "dangerZone": "Zona de Peligro",
+      "dangerZoneDesc": "Eliminar permanentemente tu cuenta y todos los datos asociados",
+      "deleteAccount": "Eliminar Cuenta"
     },
     "saveChanges": "Guardar Cambios",
     "saving": "Guardando...",

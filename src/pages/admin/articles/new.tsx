@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { trpc } from "@/lib/trpc";
 import { withAuth } from "@/components/auth/withAuth";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,7 @@ import { Loader2, Save, Send, Upload, Link as LinkIcon, X } from "lucide-react";
 import { useNavBarActions } from "@/contexts/NavBarContext";
 
 function NewArticlePage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { setActions } = useNavBarActions();
   const [title, setTitle] = useState("");
@@ -110,8 +113,8 @@ function NewArticlePage() {
           ) : (
             <Save className="mr-2 size-4" />
           )}
-          <span className="hidden sm:inline">Save Draft</span>
-          <span className="sm:hidden">Draft</span>
+          <span className="hidden sm:inline">{t("admin.saveDraft")}</span>
+          <span className="sm:hidden">{t("admin.draft")}</span>
         </Button>
         <Button
           type="button"
@@ -124,8 +127,8 @@ function NewArticlePage() {
           ) : (
             <Send className="mr-2 size-4" />
           )}
-          <span className="hidden sm:inline">Publish</span>
-          <span className="sm:hidden">Post</span>
+          <span className="hidden sm:inline">{t("admin.publish")}</span>
+          <span className="sm:hidden">{t("admin.publish")}</span>
         </Button>
       </>
     );
@@ -158,7 +161,7 @@ function NewArticlePage() {
             {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title" className="text-base font-medium">
-                Title
+                {t("admin.pamphletTitle")}
               </Label>
               <Input
                 id="title"
@@ -173,7 +176,7 @@ function NewArticlePage() {
             {/* Genre (multi-select chips) */}
             <div className="space-y-2">
               <Label className="text-base font-medium">
-                Genres
+                {t("admin.pamphletGenres")}
               </Label>
 
               <div className="relative">
@@ -216,7 +219,7 @@ function NewArticlePage() {
             {/* Synopsis */}
             <div className="space-y-2">
               <Label htmlFor="excerpt" className="text-base font-medium">
-                Synopsis <span className="text-destructive">*</span>
+                {t("admin.pamphletExcerpt")} <span className="text-destructive">*</span>
               </Label>
               <Textarea
                 id="excerpt"
@@ -234,7 +237,7 @@ function NewArticlePage() {
             {/* Cover Image */}
             <div className="space-y-2">
               <Label className="text-base font-medium">
-                Cover Image{" "}
+                {t("admin.pamphletCover")}{" "}
                 <span className="font-normal text-muted-foreground">
                   (optional)
                 </span>
@@ -394,7 +397,7 @@ function NewArticlePage() {
 
             {/* Content Editor */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">Content</Label>
+              <Label className="text-base font-medium">{t("admin.pamphletContent")}</Label>
               <MarkdownEditor
                 value={content}
                 onChange={setContent}
@@ -414,6 +417,14 @@ function NewArticlePage() {
       </div>
     </>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }
 
 export default withAuth(NewArticlePage, { requireAdmin: true });

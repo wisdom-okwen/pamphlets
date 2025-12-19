@@ -5,8 +5,11 @@ import { getGenreColor } from "@/models/genreColors";
 import { withAuth } from "@/components/auth/withAuth";
 import { NextSeo } from "next-seo";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 function BookmarksPage() {
+  const { t } = useTranslation("common");
   const utils = trpc.useUtils();
   
   const { data, isLoading, error } = trpc.bookmarks.getMyBookmarks.useQuery({
@@ -46,23 +49,23 @@ function BookmarksPage() {
   return (
     <>
       <NextSeo
-        title="My Bookmarks"
-        description="Your saved pamphlets"
+        title={t("bookmarks.title")}
+        description={t("bookmarks.emptyDesc")}
         noindex
       />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <Bookmark className="size-6 sm:size-8 text-yellow-500" />
-          <h1 className="text-2xl sm:text-3xl font-bold">My Bookmarks</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t("bookmarks.title")}</h1>
         </div>
 
         {bookmarks.length === 0 ? (
           <div className="text-center py-16 bg-muted/30 rounded-xl">
             <Bookmark className="size-16 mx-auto text-muted-foreground/50 mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No bookmarks yet</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("bookmarks.empty")}</h2>
             <p className="text-muted-foreground mb-6">
-              Save pamphlets you want to read later by clicking the bookmark icon.
+              {t("bookmarks.emptyDesc")}
             </p>
             <Link
               href="/"
@@ -166,3 +169,11 @@ function BookmarksPage() {
 }
 
 export default withAuth(BookmarksPage);
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}

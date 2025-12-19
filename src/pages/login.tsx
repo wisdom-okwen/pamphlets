@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createClient } from "@/utils/supabase/clients/browser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +21,7 @@ import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function LoginPage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const { theme, toggle, mounted } = useTheme();
@@ -98,18 +101,17 @@ export default function LoginPage() {
                 alt="Pamphlets Logo"
                 className="size-12"
               />
-              <span className="text-4xl font-bold">Pamphlets</span>
+              <span className="text-4xl font-bold">{t("common.appName")}</span>
             </div>
-            <p className="text-white/80 text-lg">Read and share personal writings on anything</p>
+            <p className="text-white/80 text-lg">{t("common.tagline")}</p>
           </div>
 
           <div className="relative z-10 space-y-8">
             <h2 className="text-4xl font-bold leading-tight">
-              Your thoughts.<br />
-              Your stories.
+              {t("about.tagline")}
             </h2>
             <p className="text-white/90 text-lg max-w-md">
-              A platform for reading and posting personal writeups, free writings, and thoughts on anything that matters to you.
+              {t("about.description")}
             </p>
 
             <div className="space-y-4">
@@ -118,8 +120,8 @@ export default function LoginPage() {
                   <Sparkles className="size-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Free Expression</h3>
-                  <p className="text-white/70 text-sm">Write about anything - no topic restrictions</p>
+                  <h3 className="font-semibold">{t("about.features.freeExpression")}</h3>
+                  <p className="text-white/70 text-sm">{t("about.features.freeExpressionDesc")}</p>
                 </div>
               </div>
 
@@ -128,8 +130,8 @@ export default function LoginPage() {
                   <Heart className="size-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Personal Writings</h3>
-                  <p className="text-white/70 text-sm">Share your thoughts, stories, and ideas</p>
+                  <h3 className="font-semibold">{t("about.features.personalWritings")}</h3>
+                  <p className="text-white/70 text-sm">{t("about.features.personalWritingsDesc")}</p>
                 </div>
               </div>
 
@@ -138,8 +140,8 @@ export default function LoginPage() {
                   <Users className="size-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Community of Writers & Readers</h3>
-                  <p className="text-white/70 text-sm">Connect with others who love to read and write</p>
+                  <h3 className="font-semibold">{t("about.features.community")}</h3>
+                  <p className="text-white/70 text-sm">{t("about.features.communityDesc")}</p>
                 </div>
               </div>
             </div>
@@ -147,9 +149,9 @@ export default function LoginPage() {
 
           <div className="relative z-10">
             <p className="text-white/60 text-sm">
-              &quot;There is no greater agony than bearing an untold story inside you.&quot;
+              &quot;{t("about.quote")}&quot;
             </p>
-            <p className="text-white/40 text-sm mt-1">— Maya Angelou</p>
+            <p className="text-white/40 text-sm mt-1">— {t("about.quoteAuthor")}</p>
           </div>
         </div>
 
@@ -161,11 +163,11 @@ export default function LoginPage() {
               <>
                 <button
                   onClick={() => setShowAbout(true)}
-                  aria-label="About Pamphlets"
+                  aria-label={t("about.title")}
                   className="lg:hidden p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 text-sm text-muted-foreground"
                 >
                   <Info size={18} />
-                  <span>About</span>
+                  <span>{t("about.title").replace("About ", "")}</span>
                 </button>
                 <button
                   onClick={toggle}
@@ -187,13 +189,13 @@ export default function LoginPage() {
                     alt="Pamphlets Logo"
                     className="size-10"
                   />
-                  <span className="text-2xl font-bold">Pamphlets</span>
+                  <span className="text-2xl font-bold">{t("common.appName")}</span>
                 </div>
-                <p className="text-sm text-muted-foreground">Read and share personal writings</p>
+                <p className="text-sm text-muted-foreground">{t("common.tagline")}</p>
               </div>
-              <CardTitle className="text-xl sm:text-2xl font-bold">Welcome back</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl font-bold">{t("auth.welcomeBack")}</CardTitle>
               <CardDescription>
-                Sign in to your account to continue
+                {t("auth.signInToContinue")}
               </CardDescription>
             </CardHeader>
 
@@ -217,7 +219,7 @@ export default function LoginPage() {
                 ) : (
                   <GoogleIcon className="mr-2 size-4" />
                 )}
-                Continue with Google
+                {t("auth.continueWithGoogle")}
               </Button>
 
               <div className="relative">
@@ -226,7 +228,7 @@ export default function LoginPage() {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with email
+                    {t("auth.orContinueWith")} email
                   </span>
                 </div>
               </div>
@@ -234,7 +236,7 @@ export default function LoginPage() {
               {/* Email/Password Form */}
               <form onSubmit={handleEmailLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("auth.email")}</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -252,12 +254,12 @@ export default function LoginPage() {
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t("auth.password")}</Label>
                     <Link
                       href="/forgot-password"
                       className="text-sm text-primary hover:underline"
                     >
-                      Forgot password?
+                      {t("auth.forgotPassword")}
                     </Link>
                   </div>
                   <div className="relative">
@@ -279,10 +281,10 @@ export default function LoginPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 size-4 animate-spin" />
-                      Signing in...
+                      {t("auth.signingIn")}
                     </>
                   ) : (
-                    "Sign in"
+                    t("nav.signIn")
                   )}
                 </Button>
               </form>
@@ -290,12 +292,12 @@ export default function LoginPage() {
 
             <CardFooter className="flex justify-center px-4 sm:px-6 pb-8">
               <p className="text-sm text-muted-foreground">
-                Don&apos;t have an account?{" "}
+                {t("auth.noAccount")}{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-primary hover:underline"
                 >
-                  Sign up
+                  {t("auth.signUpNow")}
                 </Link>
               </p>
             </CardFooter>
@@ -328,16 +330,16 @@ export default function LoginPage() {
                   alt="Pamphlets Logo"
                   className="size-10"
                 />
-                <span className="text-2xl font-bold">Pamphlets</span>
+                <span className="text-2xl font-bold">{t("common.appName")}</span>
               </div>
-              <p className="text-white/80 text-sm mb-6">Read and share personal writings on anything</p>
+              <p className="text-white/80 text-sm mb-6">{t("common.tagline")}</p>
 
               {/* Content */}
               <h2 className="text-xl font-bold mb-3">
-                Your thoughts.<br />Your stories.
+                {t("about.tagline")}
               </h2>
               <p className="text-white/80 text-sm mb-6">
-                A platform for reading and posting personal writeups, free writings, and thoughts on anything that matters to you.
+                {t("about.description")}
               </p>
 
               <div className="space-y-4 mb-6">
@@ -346,8 +348,8 @@ export default function LoginPage() {
                     <Sparkles className="size-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm">Free Expression</h3>
-                    <p className="text-white/60 text-xs">Write about anything - no topic restrictions</p>
+                    <h3 className="font-semibold text-sm">{t("about.features.freeExpression")}</h3>
+                    <p className="text-white/60 text-xs">{t("about.features.freeExpressionDesc")}</p>
                   </div>
                 </div>
 
@@ -356,8 +358,8 @@ export default function LoginPage() {
                     <Heart className="size-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm">Personal Writings</h3>
-                    <p className="text-white/60 text-xs">Share your thoughts, stories, and ideas</p>
+                    <h3 className="font-semibold text-sm">{t("about.features.personalWritings")}</h3>
+                    <p className="text-white/60 text-xs">{t("about.features.personalWritingsDesc")}</p>
                   </div>
                 </div>
 
@@ -366,8 +368,8 @@ export default function LoginPage() {
                     <Users className="size-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-sm">Community</h3>
-                    <p className="text-white/60 text-xs">Connect with others who love to read and write</p>
+                    <h3 className="font-semibold text-sm">{t("about.features.community")}</h3>
+                    <p className="text-white/60 text-xs">{t("about.features.communityDesc")}</p>
                   </div>
                 </div>
               </div>
@@ -375,9 +377,9 @@ export default function LoginPage() {
               {/* Quote */}
               <div className="border-t border-white/10 pt-4">
                 <p className="text-white/50 text-xs italic">
-                  &quot;There is no greater agony than bearing an untold story inside you.&quot;
+                  &quot;{t("about.quote")}&quot;
                 </p>
-                <p className="text-white/30 text-xs mt-1">— Maya Angelou</p>
+                <p className="text-white/30 text-xs mt-1">— {t("about.quoteAuthor")}</p>
               </div>
             </div>
           </div>
@@ -385,4 +387,12 @@ export default function LoginPage() {
       </main>
     </>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }

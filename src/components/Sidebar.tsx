@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTranslation } from "next-i18next";
 import {
   Home,
   Bookmark,
@@ -38,6 +39,7 @@ const adminItems = [
 ];
 
 export function Sidebar() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { user, signOut, isAdmin, role } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -102,12 +104,12 @@ export function Sidebar() {
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
           <Image
             src="/pamphlets.svg"
-            alt="Pamphlets"
+            alt={t("common.appName")}
             width={28}
             height={28}
             className="dark:invert dark:brightness-200"
           />
-          <span className="font-bold text-lg leading-none">Pamphlets</span>
+          <span className="font-bold text-lg leading-none">{t("common.appName")}</span>
         </Link>
       </div>
 
@@ -116,6 +118,7 @@ export function Sidebar() {
         {/* Public nav items (Home) */}
         {publicNavItems.map((item) => {
           const isActive = router.pathname === item.href;
+          const labelKey = item.href === "/" ? "nav.home" : item.label;
           return (
             <Link
               key={item.href}
@@ -128,7 +131,7 @@ export function Sidebar() {
               }`}
             >
               <item.icon size={20} />
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium">{t(labelKey)}</span>
             </Link>
           );
         })}
@@ -136,6 +139,11 @@ export function Sidebar() {
         {/* Protected nav items - show to everyone but require auth */}
         {protectedNavItems.map((item) => {
           const isActive = router.pathname === item.href;
+          const labelKey = item.href === "/bookmarks" ? "nav.bookmarks" 
+            : item.href === "/comments" ? "nav.comments" 
+            : item.href === "/settings" ? "nav.settings" 
+            : item.isChatbot ? "nav.aiAssistant" 
+            : item.label;
           return (
             <Link
               key={item.href}
@@ -148,7 +156,7 @@ export function Sidebar() {
               }`}
             >
               <item.icon size={20} />
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium">{t(labelKey)}</span>
             </Link>
           );
         })}
@@ -158,7 +166,7 @@ export function Sidebar() {
           <>
             <div className="pt-4 pb-2">
               <span className="px-3 text-xs font-semibold uppercase text-muted-foreground">
-                Admin
+                {t("nav.admin")}
               </span>
             </div>
             {adminItems.map((item) => {
@@ -175,7 +183,7 @@ export function Sidebar() {
                   }`}
                 >
                   <item.icon size={20} />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium">{t("nav.admin")}</span>
                 </Link>
               );
             })}
@@ -217,7 +225,7 @@ export function Sidebar() {
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
             >
               <LogOut size={16} />
-              <span>Sign out</span>
+              <span>{t("nav.signOut")}</span>
             </button>
           </>
         ) : (
@@ -227,8 +235,8 @@ export function Sidebar() {
                 <User size={20} className="text-zinc-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">Guest</p>
-                <p className="text-xs text-muted-foreground">Not signed in</p>
+                <p className="text-sm font-medium">{t("sidebar.guest", { defaultValue: "Guest" })}</p>
+                <p className="text-xs text-muted-foreground">{t("sidebar.notSignedIn", { defaultValue: "Not signed in" })}</p>
               </div>
             </div>
             <Link
@@ -237,7 +245,7 @@ export function Sidebar() {
               className="flex items-center gap-2 w-full px-3 py-2 text-sm bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-colors justify-center"
             >
               <LogIn size={16} />
-              <span>Sign In</span>
+              <span>{t("nav.signIn")}</span>
             </Link>
           </>
         )}
@@ -253,7 +261,7 @@ export function Sidebar() {
       <button
         onClick={() => setIsOpen(true)}
         className="lg:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm touch-manipulation"
-        aria-label="Open menu"
+        aria-label={t("sidebar.openMenu", { defaultValue: "Open menu" })}
       >
         <Menu size={20} />
       </button>
@@ -277,7 +285,7 @@ export function Sidebar() {
             <button
               onClick={() => setIsOpen(false)}
               className="absolute top-4 left-4 p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation"
-              aria-label="Close menu"
+              aria-label={t("sidebar.closeMenu", { defaultValue: "Close menu" })}
             >
               <X size={20} />
             </button>

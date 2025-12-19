@@ -16,7 +16,9 @@
     "search": "検索",
     "noResults": "結果が見つかりません",
     "seeMore": "もっと見る",
-    "seeLess": "閉じる"
+    "seeLess": "閉じる",
+    "saveChanges": "変更を保存",
+    "saved": "保存しました！"
   },
   "nav": {
     "home": "ホーム",
@@ -132,6 +134,7 @@
   },
   "settings": {
     "pageTitle": "設定",
+    "pageDescription": "アカウント設定と設定を管理",
     "sections": {
       "profile": "プロフィール",
       "appearance": "外観",
@@ -145,13 +148,15 @@
       "profilePicture": "プロフィール画像",
       "changePhoto": "写真を変更",
       "photoHint": "JPG、PNG、GIF。最大 2MB。",
+      "imageRequirements": "JPG、PNG、GIF。最大 2MB。",
       "username": "ユーザー名",
       "usernamePlaceholder": "あなたのユーザー名",
       "email": "メールアドレス",
       "emailHint": "メールアドレスは変更できません",
+      "emailNote": "メールアドレスは変更できません",
       "bio": "自己紹介",
       "bioPlaceholder": "自己紹介を書いてください...",
-      "characters": "{{count}}/{{max}} 文字"
+      "characters": "文字"
     },
     "appearance": {
       "title": "外観",
@@ -165,17 +170,23 @@
     "language": {
       "title": "言語",
       "description": "お好みの言語を選択してください",
-      "selectLanguage": "言語を選択"
+      "selectLanguage": "言語を選択",
+      "saveLanguage": "言語を保存"
     },
     "notifications": {
       "title": "通知設定",
       "description": "通知の受け取り方を管理",
       "emailNotifications": "メール通知",
       "emailNotificationsDesc": "重要な更新のメール通知を受け取る",
+      "email": "メール通知",
+      "emailDesc": "重要な更新のメール通知を受け取る",
       "newArticles": "新着記事通知",
       "newArticlesDesc": "新しい記事が公開されたときに通知を受け取る",
+      "newPamphlets": "新着記事通知",
+      "newPamphletsDesc": "新しい記事が公開されたときに通知を受け取る",
       "reactions": "リアクション通知",
-      "reactionsDesc": "誰かがあなたのコメントにリアクションしたときに通知を受け取る"
+      "reactionsDesc": "誰かがあなたのコメントにリアクションしたときに通知を受け取る",
+      "savePreferences": "設定を保存"
     },
     "privacy": {
       "title": "プライバシー設定",
@@ -186,7 +197,13 @@
       "showActivityDesc": "他のユーザーにアクティビティを公開する",
       "dataDownload": "データをダウンロード",
       "dataDownloadDesc": "あなたのデータのコピーを取得",
-      "comingSoon": "近日公開"
+      "comingSoon": "近日公開",
+      "accountData": "アカウントデータ",
+      "accountDataDesc": "データのコピーをダウンロードまたはアカウント削除をリクエスト",
+      "requestExport": "データエクスポートをリクエスト",
+      "dangerZone": "危険ゾーン",
+      "dangerZoneDesc": "アカウントと関連するすべてのデータを完全に削除",
+      "deleteAccount": "アカウントを削除"
     },
     "saveChanges": "変更を保存",
     "saving": "保存中...",

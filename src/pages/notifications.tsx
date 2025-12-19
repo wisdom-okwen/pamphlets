@@ -10,6 +10,8 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +20,7 @@ import type { Notification } from "@/server/db/schema";
 type TabType = "all" | "subscribe";
 
 function NotificationsPage() {
+  const { t } = useTranslation("common");
   const supabase = useMemo(() => createClient(), []);
   const utils = trpc.useUtils();
 
@@ -149,8 +152,8 @@ function NotificationsPage() {
   return (
     <>
       <NextSeo
-        title="Notifications"
-        description="Manage your notifications"
+        title={t("notifications.title")}
+        description={t("notifications.emptyDesc")}
         noindex
       />
 
@@ -190,7 +193,7 @@ function NotificationsPage() {
                   notifications.every((n) => n.isRead)
                 }
               >
-                Mark all as read
+                {t("notifications.markAllRead")}
               </Button>
             )}
           </div>
@@ -205,10 +208,10 @@ function NotificationsPage() {
                 <div className="flex flex-col items-center justify-center py-12 text-center px-4">
                   <Bell className="size-12 text-muted-foreground mb-3 opacity-50" />
                   <p className="font-medium text-muted-foreground">
-                    No notifications yet
+                    {t("notifications.empty")}
                   </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Stay tuned for updates about new articles and interactions
+                    {t("notifications.emptyDesc")}
                   </p>
                 </div>
               ) : (
@@ -342,3 +345,11 @@ function NotificationsPage() {
 }
 
 export default withAuth(NotificationsPage);
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}

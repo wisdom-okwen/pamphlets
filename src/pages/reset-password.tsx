@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import { createClient } from "@/utils/supabase/clients/browser";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +19,7 @@ import {
 import { Lock, Loader2, Check } from "lucide-react";
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -77,8 +80,8 @@ export default function ResetPasswordPage() {
     return (
       <>
         <NextSeo
-          title="Password Reset"
-          description="Your password has been reset"
+          title={t("auth.passwordResetSuccess", "Password Reset")}
+          description={t("auth.passwordUpdated", "Your password has been reset")}
           noindex
         />
 
@@ -89,22 +92,22 @@ export default function ResetPasswordPage() {
                 <Check className="size-6 text-primary" />
               </div>
               <CardTitle className="text-2xl font-bold">
-                Password reset successful
+                {t("auth.passwordResetSuccess", "Password reset successful")}
               </CardTitle>
               <CardDescription>
-                Your password has been updated
+                {t("auth.passwordUpdated", "Your password has been updated")}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="text-center">
               <p className="text-sm text-muted-foreground">
-                You can now sign in with your new password.
+                {t("auth.canSignInNow", "You can now sign in with your new password.")}
               </p>
             </CardContent>
 
             <CardFooter className="flex justify-center">
               <Button asChild className="w-full">
-                <Link href="/login">Sign in</Link>
+                <Link href="/login">{t("nav.signIn")}</Link>
               </Button>
             </CardFooter>
           </Card>
@@ -116,8 +119,8 @@ export default function ResetPasswordPage() {
   return (
     <>
       <NextSeo
-        title="Reset Password"
-        description="Set your new password"
+        title={t("auth.resetPassword")}
+        description={t("auth.newPasswordDesc", "Set your new password")}
         noindex
       />
 
@@ -125,9 +128,9 @@ export default function ResetPasswordPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">
-              Reset your password
+              {t("auth.resetPassword")}
             </CardTitle>
-            <CardDescription>Enter your new password below</CardDescription>
+            <CardDescription>{t("auth.enterNewPassword", "Enter your new password below")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -139,7 +142,7 @@ export default function ResetPasswordPage() {
 
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">New Password</Label>
+                <Label htmlFor="password">{t("auth.newPassword", "New Password")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -155,12 +158,12 @@ export default function ResetPasswordPage() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Must be at least 8 characters
+                  {t("auth.passwordRequirements")}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Label htmlFor="confirmPassword">{t("auth.confirmPassword")}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -180,10 +183,10 @@ export default function ResetPasswordPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Resetting...
+                    {t("auth.resetting", "Resetting...")}
                   </>
                 ) : (
-                  "Reset password"
+                  t("auth.resetPasswordBtn", "Reset password")
                 )}
               </Button>
             </form>
@@ -194,11 +197,19 @@ export default function ResetPasswordPage() {
               href="/login"
               className="text-sm text-muted-foreground hover:text-primary"
             >
-              Back to login
+              {t("auth.backToLogin", "Back to login")}
             </Link>
           </CardFooter>
         </Card>
       </main>
     </>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }

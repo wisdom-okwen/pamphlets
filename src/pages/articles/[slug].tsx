@@ -6,6 +6,9 @@ import { getGenreColor } from "@/models/genreColors";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
 import { createClient } from "@/utils/supabase/clients/browser";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { GetServerSideProps } from "next";
 
 interface GenreType {
   id: number;
@@ -446,6 +449,7 @@ function formatRelativeTime(date: Date | string): string {
 }
 
 export default function ArticleModalPage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const slug = String(router.query.slug || "");
   const { user } = useAuth();
@@ -760,7 +764,7 @@ export default function ArticleModalPage() {
   if (isLoading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="text-white">Loading...</div>
+        <div className="text-white">{t("common.loading")}</div>
       </div>
     );
   }
@@ -768,7 +772,7 @@ export default function ArticleModalPage() {
   if (!article) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="text-white">Pamphlet not found</div>
+        <div className="text-white">{t("errors.notFound")}</div>
       </div>
     );
   }
@@ -777,7 +781,7 @@ export default function ArticleModalPage() {
   if (article.status !== "published") {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="text-white">Pamphlet no longer available</div>
+        <div className="text-white">{t("errors.notFound")}</div>
       </div>
     );
   }
@@ -847,7 +851,7 @@ export default function ArticleModalPage() {
                       ))}
                     </div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-auto pt-2">
-                      By {typedArticle.author?.username ?? "Unknown"}
+                      {t("article.by", { author: typedArticle.author?.username ?? t("common.unknown", "Unknown") })}
                     </div>
                   </div>
                 ) : (
@@ -901,10 +905,10 @@ export default function ArticleModalPage() {
             {/* Mobile comments panel */}
             {showComments && (
               <div className="mt-3 sm:mt-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-3 sm:p-4 max-h-[35vh] sm:max-h-[40vh] flex flex-col">
-                <h3 className="text-sm font-semibold mb-2 sm:mb-3 shrink-0 text-zinc-900 dark:text-zinc-100">Comments ({typedArticle.commentCount ?? 0})</h3>
+                <h3 className="text-sm font-semibold mb-2 sm:mb-3 shrink-0 text-zinc-900 dark:text-zinc-100">{t("article.comments")} ({typedArticle.commentCount ?? 0})</h3>
                 <div className="flex-1 overflow-y-auto space-y-3 mb-3 min-h-0">
                   {commentsLoading ? (
-                    <div className="text-xs text-muted-foreground">Loading comments...</div>
+                    <div className="text-xs text-muted-foreground">{t("common.loading")}</div>
                   ) : commentsData?.items && commentsData.items.length > 0 ? (
                     commentsData.items.map((comment: CommentType) => (
                       <div key={comment.id} className="bg-zinc-100 dark:bg-zinc-700 rounded-lg p-3">
@@ -912,7 +916,7 @@ export default function ArticleModalPage() {
                           <div className="w-6 h-6 rounded-full bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center text-xs font-medium">
                             {comment.user?.username?.[0]?.toUpperCase() || "?"}
                           </div>
-                          <span className="text-xs font-medium">{comment.user?.username || "Unknown"}</span>
+                          <span className="text-xs font-medium">{comment.user?.username || t("common.unknown", "Unknown")}</span>
                           <span className="text-[10px] text-muted-foreground">
                             {formatRelativeTime(comment.createdAt)}
                           </span>
@@ -956,14 +960,14 @@ export default function ArticleModalPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-xs text-muted-foreground italic">No comments yet. Be the first to comment!</div>
+                    <div className="text-xs text-muted-foreground italic">{t("article.noComments")}</div>
                   )}
                 </div>
                 <div className="flex-shrink-0 flex flex-col gap-2">
                   <textarea
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    placeholder={user ? "Write a comment..." : "Sign in to comment"}
+                    placeholder={user ? t("article.writeComment") : t("nav.signIn")}
                     disabled={!user}
                     rows={2}
                     className="w-full text-sm px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50"
@@ -973,7 +977,7 @@ export default function ArticleModalPage() {
                     disabled={!user || !commentText.trim() || postingComment}
                     className="w-full px-4 py-2.5 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
-                    {postingComment ? "Posting..." : "Post"}
+                    {postingComment ? t("article.posting") : t("article.postComment")}
                   </button>
                 </div>
               </div>
@@ -1046,7 +1050,7 @@ export default function ArticleModalPage() {
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground shrink-0">
-                    By {typedArticle.author?.username ?? "Unknown"}
+                    {t("article.by", { author: typedArticle.author?.username ?? t("common.unknown", "Unknown") })}
                   </div>
                 </div>
               ) : (
@@ -1073,7 +1077,7 @@ export default function ArticleModalPage() {
                 </div>
               ) : (
                 <div className="flex-1 min-h-0 flex items-center justify-center text-muted-foreground text-sm">
-                  End of article
+                  {t("common.end", "End of article")}
                 </div>
               )}
               <div className="shrink-0 pt-2 text-center text-xs text-muted-foreground border-t border-amber-200/50 dark:border-zinc-700/50 mt-auto">
@@ -1174,10 +1178,10 @@ export default function ArticleModalPage() {
               showComments ? "w-[280px] sm:w-[320px] opacity-100" : "w-0 opacity-0"
             }`}>
               <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-4 h-full flex flex-col">
-                <h3 className="text-sm font-semibold mb-3 shrink-0">Comments ({typedArticle.commentCount ?? 0})</h3>
+                <h3 className="text-sm font-semibold mb-3 shrink-0">{t("article.comments")} ({typedArticle.commentCount ?? 0})</h3>
                 <div className="flex-1 overflow-y-auto space-y-3 mb-3">
                   {commentsLoading ? (
-                    <div className="text-xs text-muted-foreground">Loading comments...</div>
+                    <div className="text-xs text-muted-foreground">{t("common.loading")}</div>
                   ) : commentsData?.items && commentsData.items.length > 0 ? (
                     commentsData.items.map((comment: CommentType) => (
                       <div key={comment.id} className="bg-zinc-100 dark:bg-zinc-700 rounded-lg p-3">
@@ -1185,7 +1189,7 @@ export default function ArticleModalPage() {
                           <div className="w-6 h-6 rounded-full bg-zinc-300 dark:bg-zinc-600 flex items-center justify-center text-xs font-medium">
                             {comment.user?.username?.[0]?.toUpperCase() || "?"}
                           </div>
-                          <span className="text-xs font-medium">{comment.user?.username || "Unknown"}</span>
+                          <span className="text-xs font-medium">{comment.user?.username || t("common.unknown", "Unknown")}</span>
                           <span className="text-[10px] text-muted-foreground">
                             {formatRelativeTime(comment.createdAt)}
                           </span>
@@ -1229,7 +1233,7 @@ export default function ArticleModalPage() {
                       </div>
                     ))
                   ) : (
-                    <div className="text-xs text-muted-foreground italic">No comments yet. Be the first to comment!</div>
+                    <div className="text-xs text-muted-foreground italic">{t("article.noComments")}</div>
                   )}
                 </div>
                 <div className="flex-shrink-0 flex flex-col gap-2">
@@ -1244,7 +1248,7 @@ export default function ArticleModalPage() {
                         }
                       }
                     }}
-                    placeholder={user ? "Write a comment..." : "Sign in to comment"}
+                    placeholder={user ? t("article.writeComment") : t("nav.signIn")}
                     disabled={!user}
                     rows={3}
                     className="w-full text-sm px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none disabled:opacity-50"
@@ -1254,7 +1258,7 @@ export default function ArticleModalPage() {
                     disabled={!user || !commentText.trim() || postingComment}
                     className="w-full px-4 py-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {postingComment ? "Posting..." : "Post"}
+                    {postingComment ? t("article.posting") : t("article.postComment")}
                   </button>
                 </div>
               </div>
@@ -1288,3 +1292,11 @@ export default function ArticleModalPage() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale || "en", ["common"])),
+    },
+  };
+};

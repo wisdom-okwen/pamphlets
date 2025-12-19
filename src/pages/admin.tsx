@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
 import { trpc } from "@/lib/trpc";
 import { withAuth } from "@/components/auth/withAuth";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { createClient } from "@/utils/supabase/clients/browser";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
@@ -27,6 +29,7 @@ interface AdminArticle {
 }
 
 export default withAuth(function AdminPage() {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const { isAdmin, user } = useAuth();
   const supabase = useMemo(() => createClient(), []);
@@ -248,11 +251,11 @@ export default withAuth(function AdminPage() {
 
   return (
     <>
-      <NextSeo title="Admin" description="Admin dashboard" noindex />
+      <NextSeo title={t("admin.title")} description={t("admin.title")} noindex />
 
       <main className="min-h-screen bg-background px-4 py-6 max-w-6xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("admin.title")}</h1>
 
           {/* Top card buttons (only on home) */}
           {activeView === "home" && (
@@ -264,8 +267,8 @@ export default withAuth(function AdminPage() {
                 <div className="flex items-center gap-3">
                   <Users className="text-primary" />
                   <div>
-                    <span className="text-sm font-semibold">Manage Users</span>
-                    <div className="text-xs text-muted-foreground">View, change roles, and remove users</div>
+                    <span className="text-sm font-semibold">{t("admin.manageUsers")}</span>
+                    <div className="text-xs text-muted-foreground">{t("admin.manageUsersDesc", "View, change roles, and remove users")}</div>
                   </div>
                 </div>
               </button>
@@ -277,8 +280,8 @@ export default withAuth(function AdminPage() {
                 <div className="flex items-center gap-3">
                   <FileText className="text-primary" />
                   <div>
-                    <span className="text-sm font-semibold">Manage Pamphlets</span>
-                    <div className="text-xs text-muted-foreground">Edit, publish, or delete pamphlets</div>
+                    <span className="text-sm font-semibold">{t("admin.managePamphlets")}</span>
+                    <div className="text-xs text-muted-foreground">{t("admin.managePamphletsDesc", "Edit, publish, or delete pamphlets")}</div>
                   </div>
                 </div>
               </button>
@@ -290,8 +293,8 @@ export default withAuth(function AdminPage() {
                 <div className="flex items-center gap-3">
                   <PlusSquare className="text-primary" />
                   <div>
-                    <span className="text-sm font-semibold">Create New Pamphlet</span>
-                    <div className="text-xs text-muted-foreground">Open the editor to publish a new pamphlet</div>
+                    <span className="text-sm font-semibold">{t("admin.newPamphlet")}</span>
+                    <div className="text-xs text-muted-foreground">{t("admin.newPamphletDesc", "Open the editor to publish a new pamphlet")}</div>
                   </div>
                 </div>
               </Link>
@@ -303,19 +306,19 @@ export default withAuth(function AdminPage() {
             <div className="mb-6">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">Total Users</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.totalUsers", "Total Users")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalUsers ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">Total Pamphlets</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.totalPamphlets", "Total Pamphlets")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.totalArticles ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">Published</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.published")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.published ?? 0)}</div>
                 </div>
                 <div className="p-3 rounded border shadow-sm bg-card">
-                  <div className="text-xs text-muted-foreground">Archived</div>
+                  <div className="text-xs text-muted-foreground">{t("admin.archived", "Archived")}</div>
                   <div className="text-lg font-semibold">{Number(statsOverview?.archived ?? 0)}</div>
                 </div>
               </div>
@@ -376,7 +379,7 @@ export default withAuth(function AdminPage() {
         {/* Users section (only when active) */}
         {activeView === "users" && (
           <section id="users-section" className="mb-8">
-            <h2 className="text-lg font-semibold mb-3">Users</h2>
+            <h2 className="text-lg font-semibold mb-3">{t("admin.users", "Users")}</h2>
             {usersLoading ? (
               <p className="text-sm text-muted-foreground">Loading users...</p>
             ) : usersError ? (
@@ -413,7 +416,7 @@ export default withAuth(function AdminPage() {
                             onClick={() => handleDeleteUser(u.id)}
                             className="text-sm text-destructive px-2 py-1 rounded bg-destructive/10 hover:underline"
                           >
-                            Delete
+                            {t("common.delete")}
                           </button>
                         </td>
                       </tr>
@@ -429,31 +432,31 @@ export default withAuth(function AdminPage() {
         {activeView === "articles" && (
           <section id="articles-section">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold">Pamphlets</h2>
+              <h2 className="text-lg font-semibold">{t("admin.pamphlets", "Pamphlets")}</h2>
               <div className="flex gap-1 bg-muted/20 rounded p-1">
                 <button
                   onClick={() => setViewStatus("published")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "published" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  Published
+                  {t("admin.published")}
                 </button>
                 <button
                   onClick={() => setViewStatus("draft")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "draft" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  Drafts
+                  {t("admin.drafts", "Drafts")}
                 </button>
                 <button
                   onClick={() => setViewStatus("archived")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "archived" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  Archived
+                  {t("admin.archived", "Archived")}
                 </button>
                 <button
                   onClick={() => setViewStatus("all")}
                   className={`text-sm px-3 py-1 rounded transition-colors ${viewStatus === "all" ? "bg-primary text-primary-foreground" : "hover:bg-muted/40"}`}
                 >
-                  All
+                  {t("admin.all", "All")}
                 </button>
               </div>
             </div>
@@ -484,26 +487,26 @@ export default withAuth(function AdminPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Link href={`/articles/${a.slug}`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 text-primary hover:shadow-md">View</Link>
-                      <Link href={`/admin/articles/${a.slug}/edit`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 hover:shadow-md">Edit</Link>
+                      <Link href={`/articles/${a.slug}`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 text-primary hover:shadow-md">{t("admin.view", "View")}</Link>
+                      <Link href={`/admin/articles/${a.slug}/edit`} className="text-sm px-2 py-1 rounded border shadow-sm bg-muted/5 hover:shadow-md">{t("common.edit")}</Link>
                       {a.status === "archived" ? (
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "published" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-green-50 text-green-700 hover:shadow-md"
-                          title="Unarchive pamphlet"
+                          title={t("admin.unarchive", "Unarchive pamphlet")}
                         >
-                          Unarchive
+                          {t("admin.unarchive", "Unarchive")}
                         </button>
                       ) : (
                         <button
                           onClick={() => updateArticle.mutate({ id: a.id, status: "archived" })}
                           className="text-sm px-2 py-1 rounded border shadow-sm bg-amber-50 text-amber-700 hover:shadow-md"
-                          title="Archive pamphlet"
+                          title={t("admin.archive", "Archive pamphlet")}
                         >
-                          Archive
+                          {t("admin.archive", "Archive")}
                         </button>
                       )}
-                      <button onClick={() => handleDeleteArticle(a.id)} className="text-sm px-2 py-1 rounded border shadow-sm bg-destructive/10 text-destructive hover:shadow-md">Delete</button>
+                      <button onClick={() => handleDeleteArticle(a.id)} className="text-sm px-2 py-1 rounded border shadow-sm bg-destructive/10 text-destructive hover:shadow-md">{t("common.delete")}</button>
                     </div>
                   </div>
                 ))}
@@ -515,3 +518,11 @@ export default withAuth(function AdminPage() {
     </>
   );
 }, { requireAdmin: true });
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "next-i18next";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/contexts/AuthContext";
 import { MessageCircle, X, Send, Bot, User, Trash2 } from "lucide-react";
@@ -58,6 +59,7 @@ interface ChatbotProps {
 }
 
 export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
+  const { t } = useTranslation("common");
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -192,7 +194,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
       return data.response;
     } catch (error) {
       console.error('Chatbot API error:', error);
-      return "I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again later.";
+      return t("chatbot.error");
     }
   };
 
@@ -247,7 +249,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
   };
 
   const handleClearHistory = () => {
-    if (confirm("Are you sure you want to clear your chat history?")) {
+    if (confirm(t("chatbot.clearConfirm"))) {
       deleteChatHistory.mutate({});
     }
   };
@@ -279,14 +281,14 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
           <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-zinc-700">
             <div className="flex items-center gap-2">
               <Bot size={20} className="text-blue-600" />
-              <span className="font-medium text-sm">Pamphlets Assistant</span>
+              <span className="font-medium text-sm">{t("chatbot.title")}</span>
             </div>
             <div className="flex items-center gap-1">
               {messages.length > 0 && (
                 <button
                   onClick={handleClearHistory}
                   className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 p-1"
-                  title="Clear chat history"
+                  title={t("chatbot.clearHistory")}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -309,12 +311,12 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
-                <p>Loading chat history...</p>
+                <p>{t("chatbot.loadingHistory")}</p>
               </div>
             ) : messages.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
                 <Bot size={32} className="mx-auto mb-2 opacity-50" />
-                <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform for reading and sharing personal writings on anything. I can help you discover pamphlets, find content you&apos;ve interacted with, and answer questions about your activity on the platform!</p>
+                <p>{t("chatbot.welcome")}</p>
               </div>
             ) : null}
             {messages.map((message) => (
@@ -393,7 +395,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about pamphlets or your interactions..."
+                placeholder={t("chatbot.placeholder")}
                 className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-zinc-600 rounded-lg bg-white dark:bg-zinc-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isLoading}
               />

@@ -5,6 +5,9 @@ import { NextSeo } from "next-seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { createClient } from "@/utils/supabase/clients/browser";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
 import {
   Settings,
   User,
@@ -31,12 +34,14 @@ const LANGUAGES = [
   { code: "en", name: "English", flag: "🇺🇸" },
   { code: "es", name: "Español", flag: "🇪🇸" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
-  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "sw", name: "Kiswahili", flag: "🇰🇪" },
   { code: "zh", name: "中文", flag: "🇨🇳" },
   { code: "ja", name: "日本語", flag: "🇯🇵" },
 ];
 
 function SettingsPage() {
+  const { t } = useTranslation("common");
+  const router = useRouter();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const utils = trpc.useUtils();
@@ -55,8 +60,8 @@ function SettingsPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
-  // Language state
-  const [language, setLanguage] = useState("en");
+  // Language state - use current locale from router
+  const [language, setLanguage] = useState(router.locale || "en");
 
   // Notification settings state
   const [subscribeNewArticles, setSubscribeNewArticles] = useState(true);
@@ -99,11 +104,12 @@ function SettingsPage() {
     }
   }, [preferences]);
 
-  // Load saved language from localStorage
+  // Sync language state with router locale
   useEffect(() => {
-    const savedLang = localStorage.getItem("pamphlets-language");
-    if (savedLang) setLanguage(savedLang);
-  }, []);
+    if (router.locale) {
+      setLanguage(router.locale);
+    }
+  }, [router.locale]);
 
   // Real-time subscription for profile updates
   useEffect(() => {
@@ -214,6 +220,7 @@ function SettingsPage() {
 
   const handleSaveLanguage = () => {
     localStorage.setItem("pamphlets-language", language);
+    router.push(router.pathname, router.asPath, { locale: language });
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
@@ -227,11 +234,11 @@ function SettingsPage() {
   };
 
   const sections = [
-    { id: "profile" as const, label: "Profile", icon: User },
-    { id: "appearance" as const, label: "Appearance", icon: Palette },
-    { id: "language" as const, label: "Language", icon: Globe },
-    { id: "notifications" as const, label: "Notifications", icon: Bell },
-    { id: "privacy" as const, label: "Privacy", icon: Shield },
+    { id: "profile" as const, label: t("settings.sections.profile"), icon: User },
+    { id: "appearance" as const, label: t("settings.sections.appearance"), icon: Palette },
+    { id: "language" as const, label: t("settings.sections.language"), icon: Globe },
+    { id: "notifications" as const, label: t("settings.sections.notifications"), icon: Bell },
+    { id: "privacy" as const, label: t("settings.sections.privacy"), icon: Shield },
   ];
 
   const renderContent = () => {
@@ -240,9 +247,9 @@ function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Profile Settings</h2>
+              <h2 className="text-xl font-semibold mb-1">{t("settings.profile.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage your public profile information
+                {t("settings.profile.description")}
               </p>
             </div>
 
@@ -254,7 +261,7 @@ function SettingsPage() {
               <div className="space-y-6">
                 {/* Avatar */}
                 <div className="space-y-2">
-                  <Label>Profile Picture</Label>
+                  <Label>{t("settings.profile.profilePicture")}</Label>
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <div className="w-20 h-20 rounded-full bg-muted overflow-hidden">
@@ -291,10 +298,10 @@ function SettingsPage() {
                         disabled={isUploadingAvatar}
                       >
                         <Camera className="size-4 mr-2" />
-                        Change Photo
+                        {t("settings.profile.changePhoto")}
                       </Button>
                       <p className="text-xs text-muted-foreground">
-                        JPG, PNG or GIF. Max 2MB.
+                        {t("settings.profile.imageRequirements")}
                       </p>
                     </div>
                   </div>
@@ -302,19 +309,19 @@ function SettingsPage() {
 
                 {/* Username */}
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username">{t("settings.profile.username")}</Label>
                   <Input
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Your username"
+                    placeholder={t("settings.profile.usernamePlaceholder")}
                     maxLength={50}
                   />
                 </div>
 
                 {/* Email (read-only) */}
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("settings.profile.email")}</Label>
                   <Input
                     id="email"
                     value={user?.email || ""}
@@ -322,23 +329,23 @@ function SettingsPage() {
                     className="bg-muted"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Email cannot be changed
+                    {t("settings.profile.emailNote")}
                   </p>
                 </div>
 
                 {/* Bio */}
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio">{t("settings.profile.bio")}</Label>
                   <Textarea
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    placeholder="Tell us about yourself..."
+                    placeholder={t("settings.profile.bioPlaceholder")}
                     rows={4}
                     maxLength={500}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {bio.length}/500 characters
+                    {bio.length}/500 {t("settings.profile.characters")}
                   </p>
                 </div>
 
@@ -348,7 +355,7 @@ function SettingsPage() {
                   ) : saveSuccess ? (
                     <Check className="size-4 mr-2" />
                   ) : null}
-                  {saveSuccess ? "Saved!" : "Save Changes"}
+                  {saveSuccess ? t("common.saved") : t("common.saveChanges")}
                 </Button>
               </div>
             )}
@@ -359,14 +366,14 @@ function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Appearance</h2>
+              <h2 className="text-xl font-semibold mb-1">{t("settings.appearance.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Customize how Pamphlets looks for you
+                {t("settings.appearance.description")}
               </p>
             </div>
 
             <div className="space-y-4">
-              <Label>Theme</Label>
+              <Label>{t("settings.appearance.theme")}</Label>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setTheme("light")}
@@ -377,7 +384,7 @@ function SettingsPage() {
                   }`}
                 >
                   <Sun className="size-6" />
-                  <span className="text-sm font-medium">Light</span>
+                  <span className="text-sm font-medium">{t("settings.appearance.light")}</span>
                 </button>
                 <button
                   onClick={() => setTheme("dark")}
@@ -388,7 +395,7 @@ function SettingsPage() {
                   }`}
                 >
                   <Moon className="size-6" />
-                  <span className="text-sm font-medium">Dark</span>
+                  <span className="text-sm font-medium">{t("settings.appearance.dark")}</span>
                 </button>
               </div>
             </div>
@@ -399,9 +406,9 @@ function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Language</h2>
+              <h2 className="text-xl font-semibold mb-1">{t("settings.language.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Choose your preferred language
+                {t("settings.language.description")}
               </p>
             </div>
 
@@ -427,12 +434,8 @@ function SettingsPage() {
 
             <Button onClick={handleSaveLanguage}>
               {saveSuccess ? <Check className="size-4 mr-2" /> : null}
-              {saveSuccess ? "Saved!" : "Save Language"}
+              {saveSuccess ? t("common.saved") : t("settings.language.saveLanguage")}
             </Button>
-
-            <p className="text-xs text-muted-foreground">
-              Note: Language translation is coming soon. Currently only English is fully supported.
-            </p>
           </div>
         );
 
@@ -440,18 +443,18 @@ function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Notifications</h2>
+              <h2 className="text-xl font-semibold mb-1">{t("settings.notifications.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage how you receive notifications
+                {t("settings.notifications.description")}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
-                  <p className="font-medium">Subscribe to New Pamphlets</p>
+                  <p className="font-medium">{t("settings.notifications.newPamphlets")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when new pamphlets are published
+                    {t("settings.notifications.newPamphletsDesc")}
                   </p>
                 </div>
                 <button
@@ -470,9 +473,9 @@ function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
-                  <p className="font-medium">Email Notifications</p>
+                  <p className="font-medium">{t("settings.notifications.email")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Receive important updates via email
+                    {t("settings.notifications.emailDesc")}
                   </p>
                 </div>
                 <button
@@ -491,9 +494,9 @@ function SettingsPage() {
 
               <div className="flex items-center justify-between p-4 rounded-lg border">
                 <div>
-                  <p className="font-medium">Reaction Notifications</p>
+                  <p className="font-medium">{t("settings.notifications.reactions")}</p>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when someone likes or reacts to your articles
+                    {t("settings.notifications.reactionsDesc")}
                   </p>
                 </div>
                 <button
@@ -516,7 +519,7 @@ function SettingsPage() {
               disabled={updatePreferencesMutation.isPending}
             >
               {saveSuccess ? <Check className="size-4 mr-2" /> : null}
-              {saveSuccess ? "Saved!" : "Save Preferences"}
+              {saveSuccess ? t("common.saved") : t("settings.notifications.savePreferences")}
             </Button>
           </div>
         );
@@ -525,30 +528,30 @@ function SettingsPage() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Privacy</h2>
+              <h2 className="text-xl font-semibold mb-1">{t("settings.privacy.title")}</h2>
               <p className="text-sm text-muted-foreground">
-                Manage your privacy settings
+                {t("settings.privacy.description")}
               </p>
             </div>
 
             <div className="space-y-4">
               <div className="p-4 rounded-lg border">
-                <h3 className="font-medium mb-2">Account Data</h3>
+                <h3 className="font-medium mb-2">{t("settings.privacy.accountData")}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Download a copy of all your data including articles, comments, and bookmarks.
+                  {t("settings.privacy.accountDataDesc")}
                 </p>
                 <Button variant="outline" size="sm">
-                  Request Data Export
+                  {t("settings.privacy.requestExport")}
                 </Button>
               </div>
 
               <div className="p-4 rounded-lg border border-destructive/50 bg-destructive/5">
-                <h3 className="font-medium text-destructive mb-2">Danger Zone</h3>
+                <h3 className="font-medium text-destructive mb-2">{t("settings.privacy.dangerZone")}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Once you delete your account, there is no going back. Please be certain.
+                  {t("settings.privacy.dangerZoneDesc")}
                 </p>
                 <Button variant="destructive" size="sm">
-                  Delete Account
+                  {t("settings.privacy.deleteAccount")}
                 </Button>
               </div>
             </div>
@@ -562,12 +565,12 @@ function SettingsPage() {
 
   return (
     <>
-      <NextSeo title="Settings" description="Manage your account settings" noindex />
+      <NextSeo title={t("settings.pageTitle")} description={t("settings.pageDescription")} noindex />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl">
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <Settings className="size-6 sm:size-8" />
-          <h1 className="text-2xl sm:text-3xl font-bold">Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t("settings.pageTitle")}</h1>
         </div>
 
         {error && (
@@ -617,3 +620,11 @@ function SettingsPage() {
 }
 
 export default withAuth(SettingsPage);
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}

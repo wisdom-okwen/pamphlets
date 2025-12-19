@@ -16,7 +16,9 @@
     "search": "Tafuta",
     "noResults": "Hakuna matokeo yaliyopatikana",
     "seeMore": "Ona zaidi",
-    "seeLess": "Ona kidogo"
+    "seeLess": "Ona kidogo",
+    "saveChanges": "Hifadhi Mabadiliko",
+    "saved": "Imehifadhiwa!"
   },
   "nav": {
     "home": "Nyumbani",
@@ -132,6 +134,7 @@
   },
   "settings": {
     "pageTitle": "Mipangilio",
+    "pageDescription": "Simamia mipangilio na mapendeleo ya akaunti yako",
     "sections": {
       "profile": "Wasifu",
       "appearance": "Muonekano",
@@ -145,13 +148,15 @@
       "profilePicture": "Picha ya Wasifu",
       "changePhoto": "Badilisha Picha",
       "photoHint": "JPG, PNG au GIF. Kiwango cha juu 2MB.",
+      "imageRequirements": "JPG, PNG au GIF. Kiwango cha juu 2MB.",
       "username": "Jina la Mtumiaji",
       "usernamePlaceholder": "Jina lako la mtumiaji",
       "email": "Barua pepe",
       "emailHint": "Barua pepe haiwezi kubadilishwa",
+      "emailNote": "Barua pepe haiwezi kubadilishwa",
       "bio": "Maelezo",
       "bioPlaceholder": "Tuambie kuhusu wewe...",
-      "characters": "{{count}}/{{max}} herufi"
+      "characters": "herufi"
     },
     "appearance": {
       "title": "Muonekano",
@@ -165,17 +170,23 @@
     "language": {
       "title": "Lugha",
       "description": "Chagua lugha unayopendelea",
-      "selectLanguage": "Chagua Lugha"
+      "selectLanguage": "Chagua Lugha",
+      "saveLanguage": "Hifadhi Lugha"
     },
     "notifications": {
       "title": "Mapendeleo ya Arifa",
       "description": "Simamia jinsi unavyopokea arifa",
       "emailNotifications": "Arifa za Barua pepe",
       "emailNotificationsDesc": "Pokea arifa za barua pepe kwa masasisho muhimu",
+      "email": "Arifa za Barua pepe",
+      "emailDesc": "Pokea arifa za barua pepe kwa masasisho muhimu",
       "newArticles": "Arifa za Makala Mpya",
       "newArticlesDesc": "Pata arifa wakati vijitabu vipya vinachapishwa",
+      "newPamphlets": "Arifa za Vijitabu Vipya",
+      "newPamphletsDesc": "Pata arifa wakati vijitabu vipya vinachapishwa",
       "reactions": "Arifa za Majibu",
-      "reactionsDesc": "Pata arifa wakati mtu anajibu maoni yako"
+      "reactionsDesc": "Pata arifa wakati mtu anajibu maoni yako",
+      "savePreferences": "Hifadhi Mapendeleo"
     },
     "privacy": {
       "title": "Mipangilio ya Faragha",
@@ -186,7 +197,13 @@
       "showActivityDesc": "Ruhusu wengine kuona shughuli zako",
       "dataDownload": "Pakua Data Yako",
       "dataDownloadDesc": "Pata nakala ya data yako",
-      "comingSoon": "Inakuja hivi karibuni"
+      "comingSoon": "Inakuja hivi karibuni",
+      "accountData": "Data ya Akaunti",
+      "accountDataDesc": "Pakua nakala ya data yako au omba kufuta akaunti",
+      "requestExport": "Omba Usafirishaji wa Data",
+      "dangerZone": "Eneo la Hatari",
+      "dangerZoneDesc": "Futa akaunti yako kabisa na data yote inayohusiana",
+      "deleteAccount": "Futa Akaunti"
     },
     "saveChanges": "Hifadhi Mabadiliko",
     "saving": "Inahifadhi...",

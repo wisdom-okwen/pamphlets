@@ -12,6 +12,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { Chatbot } from "@/components/Chatbot";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
+import { appWithTranslation } from "next-i18next";
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
@@ -87,4 +88,4 @@ function App(props: AppProps) {
   );
 }
 
-export default trpc.withTRPC(App);
+export default trpc.withTRPC(appWithTranslation(App));

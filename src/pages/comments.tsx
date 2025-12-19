@@ -7,8 +7,11 @@ import { formatDistanceToNow } from "date-fns";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createClient } from "@/utils/supabase/clients/browser";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 function CommentsPage() {
+  const { t } = useTranslation("common");
   const { user } = useAuth();
   const utils = trpc.useUtils();
   const supabase = useMemo(() => createClient(), []);
@@ -94,23 +97,23 @@ function CommentsPage() {
   return (
     <>
       <NextSeo
-        title="My Comments"
-        description="Your comments on pamphlets"
+        title={t("myComments.title")}
+        description={t("myComments.emptyDesc")}
         noindex
       />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <MessageCircle className="size-6 sm:size-8 text-blue-500" />
-          <h1 className="text-2xl sm:text-3xl font-bold">My Comments</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold">{t("myComments.title")}</h1>
         </div>
 
         {articleGroups.length === 0 ? (
           <div className="text-center py-16 bg-muted/30 rounded-xl">
             <MessageCircle className="size-16 mx-auto text-muted-foreground/50 mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No comments yet</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("myComments.empty")}</h2>
             <p className="text-muted-foreground mb-6">
-              Join the conversation by commenting on pamphlets you read.
+              {t("myComments.emptyDesc")}
             </p>
             <Link
               href="/"
@@ -224,3 +227,11 @@ function CommentsPage() {
 }
 
 export default withAuth(CommentsPage);
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
+}

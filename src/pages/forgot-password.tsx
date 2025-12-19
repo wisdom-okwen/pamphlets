@@ -2,6 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { NextSeo } from "next-seo";
 import { createClient } from "@/utils/supabase/clients/browser";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +18,7 @@ import {
 import { Mail, Loader2, ArrowLeft, Check } from "lucide-react";
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation("common");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +49,8 @@ export default function ForgotPasswordPage() {
     return (
       <>
         <NextSeo
-          title="Check your email"
-          description="Password reset link sent"
+          title={t("auth.checkEmail")}
+          description={t("auth.checkEmail")}
           noindex
         />
 
@@ -58,16 +61,16 @@ export default function ForgotPasswordPage() {
                 <Check className="size-6 text-primary" />
               </div>
               <CardTitle className="text-2xl font-bold">
-                Check your email
+                {t("auth.checkEmail")}
               </CardTitle>
               <CardDescription>
-                We sent a password reset link to <strong>{email}</strong>
+                {t("auth.resetLinkSent", "We sent a password reset link to")} <strong>{email}</strong>
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-4 text-center">
               <p className="text-sm text-muted-foreground">
-                Click the link in the email to reset your password.
+                {t("auth.clickResetLink", "Click the link in the email to reset your password.")}
               </p>
             </CardContent>
 
@@ -77,13 +80,13 @@ export default function ForgotPasswordPage() {
                 className="w-full"
                 onClick={() => setSuccess(false)}
               >
-                Try a different email
+                {t("auth.tryDifferentEmail", "Try a different email")}
               </Button>
               <Link
                 href="/login"
                 className="text-sm text-primary hover:underline"
               >
-                Back to login
+                {t("auth.backToLogin", "Back to login")}
               </Link>
             </CardFooter>
           </Card>
@@ -95,8 +98,8 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <NextSeo
-        title="Forgot Password"
-        description="Reset your Pamphlets password"
+        title={t("auth.forgotPassword")}
+        description={t("auth.forgotPasswordDesc", "Reset your Pamphlets password")}
         noindex
       />
 
@@ -104,10 +107,10 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold">
-              Forgot your password?
+              {t("auth.forgotPassword")}?
             </CardTitle>
             <CardDescription>
-              Enter your email and we&apos;ll send you a reset link
+              {t("auth.forgotPasswordDesc", "Enter your email and we'll send you a reset link")}
             </CardDescription>
           </CardHeader>
 
@@ -120,7 +123,7 @@ export default function ForgotPasswordPage() {
 
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.email")}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -140,10 +143,10 @@ export default function ForgotPasswordPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 size-4 animate-spin" />
-                    Sending...
+                    {t("auth.sending", "Sending...")}
                   </>
                 ) : (
-                  "Send reset link"
+                  t("auth.sendResetLink")
                 )}
               </Button>
             </form>
@@ -155,11 +158,19 @@ export default function ForgotPasswordPage() {
               className="flex items-center text-sm text-muted-foreground hover:text-primary"
             >
               <ArrowLeft className="mr-2 size-4" />
-              Back to login
+              {t("auth.backToLogin", "Back to login")}
             </Link>
           </CardFooter>
         </Card>
       </main>
     </>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+  };
 }
