@@ -137,10 +137,28 @@
     "empty": "Hakuna arifa bado",
     "emptyDesc": "Utaona arifa kuhusu shughuli kwenye maudhui yako hapa",
     "markAllRead": "Weka zote kama zimesomwa",
-    "likedYourComment": "amependa maoni yako",
-    "repliedToYour": "amejibu maoni yako",
-    "commentedOn": "ametoa maoni kwenye",
-    "newFollower": "ameanza kukufuata"
+    "likedYourComment": "alipenda maoni yako",
+    "repliedToYour": "alijibu maoni yako",
+    "commentedOn": "alitoa maoni kuhusu",
+    "newFollower": "alianza kukufuata",
+    "tabs": {
+      "all": "Zote",
+      "subscribe": "Jiandikishe"
+    },
+    "subscriptions": {
+      "title": "Usajili wa Arifa",
+      "newArticles": "Jiandikishe kwa Makala Mapya",
+      "newArticlesDesc": "Pokea arifa wakati makala mapya yanachapishwa.",
+      "subscribed": "Umejiandikisha",
+      "notSubscribed": "Hujajiandikisha",
+      "email": "Arifa za Barua pepe",
+      "emailDesc": "Pokea sasisho za barua pepe za arifa zako.",
+      "enabled": "Imewezeshwa",
+      "disabled": "Imezimwa"
+    },
+    "details": "Maelezo",
+    "viewArticle": "Tazama Makala",
+    "delete": "Futa"
   },
   "settings": {
     "pageTitle": "Mipangilio",

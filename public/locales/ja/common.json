@@ -140,7 +140,25 @@
     "likedYourComment": "があなたのコメントにいいねしました",
     "repliedToYour": "があなたのコメントに返信しました",
     "commentedOn": "がコメントしました",
-    "newFollower": "があなたをフォローし始めました"
+    "newFollower": "があなたをフォローし始めました",
+    "tabs": {
+      "all": "すべて",
+      "subscribe": "購読"
+    },
+    "subscriptions": {
+      "title": "通知購読",
+      "newArticles": "新着記事を購読",
+      "newArticlesDesc": "新しい記事が公開されたら通知を受け取る",
+      "subscribed": "購読中",
+      "notSubscribed": "未購読",
+      "email": "メール通知",
+      "emailDesc": "新着記事をメールで受け取る",
+      "enabled": "有効",
+      "disabled": "無効"
+    },
+    "details": "詳細",
+    "viewArticle": "記事を見る",
+    "delete": "削除"
   },
   "settings": {
     "pageTitle": "設定",

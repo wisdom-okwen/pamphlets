@@ -126,7 +126,7 @@ function NotificationsPage() {
             href={articleSlug}
             className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium transition-colors"
           >
-            View Article
+            {t("notifications.viewArticle")}
             <ExternalLink size={14} />
           </Link>
         )}
@@ -142,7 +142,7 @@ function NotificationsPage() {
             }
             disabled={deleteNotificationMutation.isPending}
           >
-            Delete
+            {t("notifications.delete")}
           </Button>
         </div>
       </div>
@@ -169,7 +169,7 @@ function NotificationsPage() {
                     : "bg-muted hover:bg-muted/80"
                 }`}
               >
-                All ({notifications.length})
+                {t("notifications.tabs.all")} ({notifications.length})
               </button>
               <button
                 onClick={() => setActiveTab("subscribe")}
@@ -179,7 +179,7 @@ function NotificationsPage() {
                     : "bg-muted hover:bg-muted/80"
                 }`}
               >
-                Subscribe
+                {t("notifications.tabs.subscribe")}
               </button>
             </div>
 
@@ -251,19 +251,19 @@ function NotificationsPage() {
           ) : (
             <div className="p-6 space-y-6">
               <div className="space-y-3">
-                <h3 className="font-semibold">Notification Subscriptions</h3>
+                <h3 className="font-semibold">{t("notifications.subscriptions.title")}</h3>
 
                 {/* Subscribe to New Articles */}
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
                       <Bell size={18} />
-                      Subscribe to New Articles
+                      {t("notifications.subscriptions.newArticles")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      Receive notifications when new articles are published.
+                      {t("notifications.subscriptions.newArticlesDesc")}
                     </p>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -275,8 +275,8 @@ function NotificationsPage() {
                       />
                       <span className="text-sm">
                         {preferences?.subscribeNewArticles
-                          ? "Subscribed"
-                          : "Not subscribed"}
+                          ? t("notifications.subscriptions.subscribed")
+                          : t("notifications.subscriptions.notSubscribed")}
                       </span>
                     </label>
                   </CardContent>
@@ -287,12 +287,12 @@ function NotificationsPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
                       <CheckCircle size={18} />
-                      Email Notifications
+                      {t("notifications.subscriptions.email")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <p className="text-sm text-muted-foreground">
-                      Receive email updates for your notifications.
+                      {t("notifications.subscriptions.emailDesc")}
                     </p>
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
@@ -311,8 +311,8 @@ function NotificationsPage() {
                       />
                       <span className="text-sm">
                         {preferences?.emailNotifications
-                          ? "Enabled"
-                          : "Disabled"}
+                          ? t("notifications.subscriptions.enabled")
+                          : t("notifications.subscriptions.disabled")}
                       </span>
                     </label>
                   </CardContent>
@@ -326,7 +326,7 @@ function NotificationsPage() {
         {selectedNotification && (
           <div className="w-96 border-l bg-muted/50 overflow-y-auto">
             <div className="sticky top-0 flex items-center justify-between p-4 border-b bg-background">
-              <h2 className="font-semibold">Details</h2>
+              <h2 className="font-semibold">{t("notifications.details")}</h2>
               <button
                 onClick={() => setSelectedNotification(null)}
                 className="p-1 rounded hover:bg-muted"

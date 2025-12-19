@@ -135,12 +135,30 @@
   "notifications": {
     "title": "通知",
     "empty": "暂无通知",
-    "emptyDesc": "您将在这里看到关于您内容的活动通知",
-    "markAllRead": "全部标为已读",
-    "likedYourComment": "赞了您的评论",
-    "repliedToYour": "回复了您的评论",
+    "emptyDesc": "您将在此看到有关您内容活动的通知",
+    "markAllRead": "全部标记为已读",
+    "likedYourComment": "赞了你的评论",
+    "repliedToYour": "回复了你的评论",
     "commentedOn": "评论了",
-    "newFollower": "开始关注您"
+    "newFollower": "开始关注你",
+    "tabs": {
+      "all": "全部",
+      "subscribe": "订阅"
+    },
+    "subscriptions": {
+      "title": "通知订阅",
+      "newArticles": "订阅新文章",
+      "newArticlesDesc": "当有新文章发布时接收通知。",
+      "subscribed": "已订阅",
+      "notSubscribed": "未订阅",
+      "email": "邮件通知",
+      "emailDesc": "通过邮件接收通知更新。",
+      "enabled": "已启用",
+      "disabled": "已禁用"
+    },
+    "details": "详情",
+    "viewArticle": "查看文章",
+    "delete": "删除"
   },
   "settings": {
     "pageTitle": "设置",

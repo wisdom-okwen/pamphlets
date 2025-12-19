@@ -134,13 +134,31 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "Pas encore de notifications",
-    "emptyDesc": "Vous verrez les notifications concernant l'activité sur votre contenu ici",
+    "empty": "Aucune notification",
+    "emptyDesc": "Vous verrez ici les notifications concernant l'activité sur votre contenu",
     "markAllRead": "Tout marquer comme lu",
     "likedYourComment": "a aimé votre commentaire",
     "repliedToYour": "a répondu à votre commentaire",
-    "commentedOn": "a commenté sur",
-    "newFollower": "a commencé à vous suivre"
+    "commentedOn": "a commenté",
+    "newFollower": "a commencé à vous suivre",
+    "tabs": {
+      "all": "Toutes",
+      "subscribe": "S'abonner"
+    },
+    "subscriptions": {
+      "title": "Abonnements aux Notifications",
+      "newArticles": "S'abonner aux Nouveaux Articles",
+      "newArticlesDesc": "Recevez des notifications lors de la publication de nouveaux articles.",
+      "subscribed": "Abonné",
+      "notSubscribed": "Non abonné",
+      "email": "Notifications par Email",
+      "emailDesc": "Recevez des mises à jour par email pour vos notifications.",
+      "enabled": "Activé",
+      "disabled": "Désactivé"
+    },
+    "details": "Détails",
+    "viewArticle": "Voir l'Article",
+    "delete": "Supprimer"
   },
   "settings": {
     "pageTitle": "Paramètres",

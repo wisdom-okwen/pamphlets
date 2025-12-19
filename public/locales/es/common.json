@@ -140,7 +140,25 @@
     "likedYourComment": "le gustó tu comentario",
     "repliedToYour": "respondió a tu comentario",
     "commentedOn": "comentó en",
-    "newFollower": "empezó a seguirte"
+    "newFollower": "empezó a seguirte",
+    "tabs": {
+      "all": "Todas",
+      "subscribe": "Suscribirse"
+    },
+    "subscriptions": {
+      "title": "Suscripciones de Notificaciones",
+      "newArticles": "Suscribirse a Nuevos Artículos",
+      "newArticlesDesc": "Recibe notificaciones cuando se publiquen nuevos artículos.",
+      "subscribed": "Suscrito",
+      "notSubscribed": "No suscrito",
+      "email": "Notificaciones por Correo",
+      "emailDesc": "Recibe actualizaciones por correo de tus notificaciones.",
+      "enabled": "Activado",
+      "disabled": "Desactivado"
+    },
+    "details": "Detalles",
+    "viewArticle": "Ver Artículo",
+    "delete": "Eliminar"
   },
   "settings": {
     "pageTitle": "Configuración",
