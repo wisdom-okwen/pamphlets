@@ -328,53 +328,53 @@ export default function Home() {
       </script>
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
-      <div className="sticky top-0 lg:top-[60px] z-40 bg-background px-4 border-b">
-        <div className="max-w-4xl mx-auto py-3 sm:py-4">
-          <div className="relative mb-2">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
+      <div className="sticky top-0 lg:top-[60px] z-40 bg-background/95 backdrop-blur-sm px-3 sm:px-4 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="max-w-4xl mx-auto py-2.5 sm:py-4">
+          <div className="relative mb-1 sm:mb-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={18} />
             <input
               type="text"
               placeholder="Search by title, tags, or content..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 sm:py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-base"
+              className="w-full pl-10 pr-10 py-2 sm:py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm sm:text-base"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors p-1 touch-manipulation"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             )}
           </div>
           {searchQuery && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
               {filteredArticles.length} {filteredArticles.length === 1 ? "result" : "results"} for &ldquo;{searchQuery}&rdquo;
             </p>
           )}
         </div>
       </div>
 
-      <main className="px-4 py-6 max-w-4xl mx-auto">
+      <main className="px-3 sm:px-4 py-4 sm:py-6 max-w-4xl mx-auto">
         {filteredArticles.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm sm:text-base">
               {searchQuery ? "No pamphlets match your search" : "No pamphlets yet"}
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {filteredArticles.map((article) => (
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group block border rounded-lg overflow-hidden bg-card shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200 relative"
+                className="group block border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200 relative"
               >
                 {/* Publish date - top right corner */}
                 {article.publishedAt && (
                   <div className="absolute top-2 right-2 z-10">
-                    <span className="bg-gray-500/100 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                    <span className="bg-black/60 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md backdrop-blur-sm">
                       {new Date(article.publishedAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -387,7 +387,7 @@ export default function Home() {
                 {/* Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row">
                   {/* Cover image */}
-                  <div className="w-full sm:w-36 md:w-44 h-48 sm:h-36 shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <div className="w-full sm:w-36 md:w-44 h-36 sm:h-36 shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                     {article.coverImageUrl ? (
                       <Image
                         src={article.coverImageUrl}
@@ -404,21 +404,21 @@ export default function Home() {
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
+                  <div className="flex-1 p-2.5 sm:p-4 flex flex-col justify-between min-w-0">
                     {/* Top: Title & excerpt */}
                     <div>
-                      <h2 className="font-semibold line-clamp-2 text-base leading-tight">
+                      <h2 className="font-semibold line-clamp-2 text-sm sm:text-base leading-tight text-zinc-900 dark:text-zinc-100">
                         {article.title}
                       </h2>
                       {article.excerpt && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1.5">
+                        <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mt-1 sm:mt-1.5">
                           {article.excerpt}
                         </p>
                       )}
                     </div>
 
                     {/* Bottom: Genre tag & actions */}
-                    <div className="flex items-center justify-between mt-3 gap-2">
+                    <div className="flex items-center justify-between mt-2 sm:mt-3 gap-2">
                       <div className="flex-1 min-w-0 overflow-hidden">
                         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
                           {(article.genres && article.genres.length > 0 ? article.genres : (article.genre ? [article.genre] : [])).map((g: { id: number; name: string; slug: string }) => (
@@ -430,79 +430,79 @@ export default function Home() {
                       </div>
 
                       {/* Right: Views, Likes & action buttons */}
-                      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground px-1 sm:px-2">
-                          <Eye size={12} />
+                      <div className="flex items-center gap-0.5 sm:gap-2 shrink-0">
+                        <div className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 px-1">
+                          <Eye size={11} className="sm:w-3 sm:h-3" />
                           <span>{article.viewCount}</span>
                         </div>
                         <button
                           onClick={(e) => handleLike(e, article.id)}
-                          className={`relative p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
-                            (optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : ""
+                          className={`relative p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
+                            (optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : "text-zinc-500 dark:text-zinc-400"
                           }`}
                           title="Like"
                         >
                           <Heart 
-                            size={16} 
-                            className={(optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : "text-muted-foreground hover:text-red-500"}
+                            size={14} 
+                            className={`sm:w-4 sm:h-4 ${(optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "text-red-500" : "text-zinc-500 dark:text-zinc-400 hover:text-red-500"}`}
                             fill={(optimisticLikes[article.id]?.liked ?? (article as ArticleWithCounts).userHasLiked) ? "currentColor" : "none"}
                           />
-                          <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-medium min-w-4 h-4 rounded-full flex items-center justify-center px-1">
+                          <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[14px] sm:min-w-4 h-[14px] sm:h-4 rounded-full flex items-center justify-center px-0.5">
                             {optimisticLikes[article.id]?.count ?? (article as ArticleWithCounts).likeCount ?? 0}
                           </span>
                         </button>
                         <button
                           onClick={(e) => handleBookmark(e, article.id)}
-                          className={`p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
-                            (optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : ""
+                          className={`p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
+                            (optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : "text-zinc-500 dark:text-zinc-400"
                           }`}
                           title="Bookmark"
                         >
                           <Bookmark 
-                            size={16} 
-                            className={(optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : "text-muted-foreground hover:text-yellow-500"}
+                            size={14} 
+                            className={`sm:w-4 sm:h-4 ${(optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "text-yellow-500" : "text-zinc-500 dark:text-zinc-400 hover:text-yellow-500"}`}
                             fill={(optimisticBookmarks[article.id] ?? bookmarkedIds?.includes(article.id)) ? "currentColor" : "none"}
                           />
                         </button>
                         <button
                           onClick={(e) => handleComment(e, article.id)}
-                          className="relative p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation"
+                          className="relative p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation text-zinc-500 dark:text-zinc-400"
                           title="Comments"
                         >
-                          <MessageCircle size={16} className="text-muted-foreground hover:text-blue-500" />
-                          <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[10px] font-medium min-w-4 h-4 rounded-full flex items-center justify-center px-1">
+                          <MessageCircle size={14} className="sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400 hover:text-blue-500" />
+                          <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[14px] sm:min-w-4 h-[14px] sm:h-4 rounded-full flex items-center justify-center px-0.5">
                             {(article as ArticleWithCounts).commentCount ?? 0}
                           </span>
                         </button>
                         <div className="relative" ref={shareMenuOpen === article.id ? shareMenuRef : null}>
                           <button
                             onClick={(e) => handleShareClick(e, article.id)}
-                            className={`p-2 sm:p-2 rounded-full border shadow-sm bg-background hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
-                              copiedArticleId === article.id ? "text-green-500" : ""
+                            className={`p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation ${
+                              copiedArticleId === article.id ? "text-green-500" : "text-zinc-500 dark:text-zinc-400"
                             }`}
                             title="Share"
                           >
                             {copiedArticleId === article.id ? (
-                              <Check size={16} className="text-green-500" />
+                              <Check size={14} className="sm:w-4 sm:h-4 text-green-500" />
                             ) : (
-                              <Share2 size={16} className="text-muted-foreground hover:text-green-500" />
+                              <Share2 size={14} className="sm:w-4 sm:h-4 text-zinc-500 dark:text-zinc-400 hover:text-green-500" />
                             )}
                           </button>
                           {shareMenuOpen === article.id && (
-                            <div className="absolute bottom-full right-0 mb-2 bg-background border rounded-lg shadow-lg py-1 min-w-[160px] z-50">
+                            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg py-1 min-w-[140px] sm:min-w-[160px] z-50">
                               <button
                                 onClick={(e) => handleCopyLink(e, { id: article.id, slug: article.slug })}
-                                className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition-colors touch-manipulation"
+                                className="w-full flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
                               >
-                                <Copy size={14} />
+                                <Copy size={12} className="sm:w-3.5 sm:h-3.5" />
                                 Copy link
                               </button>
                               {typeof navigator !== "undefined" && "share" in navigator && (
                                 <button
                                   onClick={(e) => handleNativeShare(e, { title: article.title, slug: article.slug })}
-                                  className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-muted transition-colors touch-manipulation"
+                                  className="w-full flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
                                 >
-                                  <Share2 size={14} />
+                                  <Share2 size={12} className="sm:w-3.5 sm:h-3.5" />
                                   Share...
                                 </button>
                               )}

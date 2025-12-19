@@ -18,10 +18,32 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (stored === "dark" || stored === "light") {
         return stored;
       }
+      // Respect system preference when no stored theme
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
     }
     return "light";
   });
   const [mounted, setMounted] = useState(() => typeof window !== "undefined");
+
+  // Listen for system theme changes (only if user hasn't set a preference)
+  useEffect(() => {
+    if (!mounted) return;
+    
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      // Only auto-switch if user hasn't explicitly set a theme
+      const stored = window.localStorage.getItem("theme");
+      if (!stored) {
+        setThemeState(e.matches ? "dark" : "light");
+      }
+    };
+    
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, [mounted]);
 
   useEffect(() => {
     if (!mounted) return;

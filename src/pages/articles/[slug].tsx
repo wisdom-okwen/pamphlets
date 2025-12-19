@@ -760,34 +760,44 @@ export default function ArticleModalPage() {
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 md:p-6"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
         onClick={close}
       >
         <div
-          className="relative flex flex-col items-center w-full max-w-[1100px]"
+          className="relative flex flex-col items-center w-full max-w-[1100px] max-h-[100dvh] sm:max-h-[95vh]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={close}
-            className="absolute -top-2 -right-2 md:-top-3 md:-right-3 z-30 p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
+            className="absolute top-0 right-0 sm:-top-2 sm:-right-2 z-30 p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
 
           {/* Mobile Layout - Single page view */}
-          <div className="md:hidden w-full">
-            <div className="bg-amber-50 dark:bg-zinc-900 rounded-lg shadow-2xl overflow-hidden">
+          <div className="lg:hidden w-full mt-8 sm:mt-0">
+            <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-2xl overflow-hidden">
               {/* Mobile content */}
-              <div className="p-4 min-h-[70vh] max-h-[75vh] overflow-y-auto">
+              <div className="p-3 sm:p-4 min-h-[50vh] max-h-[60vh] sm:max-h-[65vh] overflow-y-auto">
                 {spread === 0 ? (
                   // Cover page on mobile
                   <div className="flex flex-col h-full">
-                    <h1 className="text-xl font-bold mb-3 leading-tight">{article.title}</h1>
-                    {article.excerpt && (
-                      <p className="text-sm text-muted-foreground italic mb-3">{article.excerpt}</p>
+                    {/* Cover Image */}
+                    {article.coverImageUrl && (
+                      <div className="w-full h-36 sm:h-48 mb-3 sm:mb-4 rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800">
+                        <img
+                          src={article.coverImageUrl}
+                          alt={article.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                     )}
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <h1 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 leading-tight text-zinc-900 dark:text-zinc-100">{article.title}</h1>
+                    {article.excerpt && (
+                      <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 italic mb-2 sm:mb-3">{article.excerpt}</p>
+                    )}
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
                       {genres.map((g: GenreType) => (
                         <span
                           key={g.id}
@@ -797,7 +807,7 @@ export default function ArticleModalPage() {
                         </span>
                       ))}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-auto">
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 mt-auto pt-2">
                       By {typedArticle.author?.username ?? "Unknown"}
                     </div>
                   </div>
@@ -810,48 +820,48 @@ export default function ArticleModalPage() {
               </div>
               
               {/* Mobile page number */}
-              <div className="text-center text-xs text-muted-foreground py-2 border-t border-amber-200/50 dark:border-zinc-700/50">
+              <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 py-2 border-t border-zinc-200 dark:border-zinc-700">
                 {spread === 0 ? "Cover" : `Page ${spread} of ${textPages.length}`}
               </div>
             </div>
 
             {/* Mobile action buttons */}
-            <div className="flex justify-center gap-3 mt-4">
+            <div className="flex justify-center gap-2 sm:gap-3 mt-3 sm:mt-4">
               <button
                 onClick={handleLike}
-                className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : ""}`}
+                className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
-                <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
-                <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[10px] font-medium min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] rounded-full flex items-center justify-center px-1">
                   {likeCount}
                 </span>
               </button>
               <button
                 onClick={() => setShowComments(!showComments)}
-                className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : ""}`}
+                className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
-                <MessageCircle size={20} fill={showComments ? "currentColor" : "none"} />
-                <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[10px] font-medium min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                <MessageCircle size={18} fill={showComments ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] rounded-full flex items-center justify-center px-1">
                   {typedArticle.commentCount ?? 0}
                 </span>
               </button>
               <button
                 onClick={handleToggleBookmark}
-                className={`p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : ""}`}
+                className={`p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
-                <Bookmark size={20} fill={bookmarked ? "currentColor" : "none"} />
+                <Bookmark size={18} fill={bookmarked ? "currentColor" : "none"} />
               </button>
               <button
-                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation"
+                className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation text-zinc-600 dark:text-zinc-300"
               >
-                <Share2 size={20} />
+                <Share2 size={18} />
               </button>
             </div>
 
             {/* Mobile comments panel */}
             {showComments && (
-              <div className="mt-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-4 max-h-[40vh] flex flex-col">
-                <h3 className="text-sm font-semibold mb-3 shrink-0">Comments ({typedArticle.commentCount ?? 0})</h3>
+              <div className="mt-3 sm:mt-4 bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-3 sm:p-4 max-h-[35vh] sm:max-h-[40vh] flex flex-col">
+                <h3 className="text-sm font-semibold mb-2 sm:mb-3 shrink-0 text-zinc-900 dark:text-zinc-100">Comments ({typedArticle.commentCount ?? 0})</h3>
                 <div className="flex-1 overflow-y-auto space-y-3 mb-3 min-h-0">
                   {commentsLoading ? (
                     <div className="text-xs text-muted-foreground">Loading comments...</div>
@@ -930,17 +940,17 @@ export default function ArticleModalPage() {
             )}
 
             {/* Mobile Navigation */}
-            <div className="flex items-center justify-center gap-6 mt-4">
+            <div className="flex items-center justify-center gap-4 sm:gap-6 mt-3 sm:mt-4 pb-2">
               <button
                 onClick={() => {
                   if (spread > 0) setSpread(s => s - 1);
                 }}
                 disabled={spread === 0}
-                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation"
+                className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation text-zinc-700 dark:text-zinc-300"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={20} />
               </button>
-              <span className="text-sm text-white min-w-[80px] text-center">
+              <span className="text-xs sm:text-sm text-white min-w-[70px] sm:min-w-[80px] text-center">
                 {spread === 0 ? "Cover" : `${spread} / ${textPages.length}`}
               </span>
               <button
@@ -948,15 +958,15 @@ export default function ArticleModalPage() {
                   if (spread < textPages.length) setSpread(s => s + 1);
                 }}
                 disabled={spread >= textPages.length}
-                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation"
+                className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow disabled:opacity-40 touch-manipulation text-zinc-700 dark:text-zinc-300"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={20} />
               </button>
             </div>
           </div>
 
           {/* Desktop Layout - Book spread view */}
-          <div className="hidden md:flex flex-col items-center">
+          <div className="hidden lg:flex flex-col items-center">
             <div className="flex">
           {/* Book container with flip effect */}
           <div className="relative flex rounded-lg shadow-2xl" style={{ perspective: "2000px" }}>
@@ -968,8 +978,18 @@ export default function ArticleModalPage() {
               <div className="absolute inset-0 p-6 lg:p-8 flex flex-col">
               {spread === 0 ? (
                 // Cover page
-                <div className="flex flex-col flex-1 min-h-0 justify-between">
-                  <div>
+                <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+                  {/* Cover Image */}
+                  {article.coverImageUrl && (
+                    <div className="w-full h-48 lg:h-56 mb-4 rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-800 shrink-0">
+                      <img
+                        src={article.coverImageUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1">
                     <h1 className="text-2xl font-bold mb-4 leading-tight">{article.title}</h1>
                     {article.excerpt && (
                       <p className="text-sm text-muted-foreground italic mb-4">{article.excerpt}</p>
@@ -985,7 +1005,7 @@ export default function ArticleModalPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-xs text-muted-foreground shrink-0">
                     By {typedArticle.author?.username ?? "Unknown"}
                   </div>
                 </div>
@@ -1202,7 +1222,7 @@ export default function ArticleModalPage() {
             </div>
 
         {/* Navigation - Desktop only */}
-        <div className="hidden md:flex items-center gap-6 mt-4">
+        <div className="hidden lg:flex items-center gap-6 mt-4">
           <button
             onClick={prev}
             disabled={spread === 0}
