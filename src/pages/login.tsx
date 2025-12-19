@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Lock, Loader2, Heart, Users, Sparkles, Sun, Moon } from "lucide-react";
+import { Mail, Lock, Loader2, Heart, Users, Sparkles, Sun, Moon, Info, X } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,16 +155,28 @@ export default function LoginPage() {
 
         {/* Right Side - Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 sm:px-6 py-8 min-h-screen relative">
-          {/* Theme Toggle */}
-          {mounted && (
-            <button
-              onClick={toggle}
-              aria-label="toggle-theme"
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors z-10"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
-          )}
+          {/* Top buttons - About (mobile only) and Theme Toggle */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            {mounted && (
+              <>
+                <button
+                  onClick={() => setShowAbout(true)}
+                  aria-label="About Pamphlets"
+                  className="lg:hidden p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5 text-sm text-muted-foreground"
+                >
+                  <Info size={18} />
+                  <span>About</span>
+                </button>
+                <button
+                  onClick={toggle}
+                  aria-label="toggle-theme"
+                  className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+              </>
+            )}
+          </div>
           <Card className="w-full max-w-md border-0 shadow-none lg:shadow-lg lg:border">
             <CardHeader className="space-y-1 text-center px-4 sm:px-6">
               {/* Mobile Logo */}
@@ -288,6 +301,87 @@ export default function LoginPage() {
             </CardFooter>
           </Card>
         </div>
+
+        {/* Mobile About Modal */}
+        {showAbout && (
+          <div className="lg:hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setShowAbout(false)}
+            />
+            
+            {/* Modal */}
+            <div className="relative w-full sm:max-w-md bg-zinc-900 text-white rounded-t-2xl sm:rounded-2xl p-6 pb-8 sm:m-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+              {/* Close button */}
+              <button
+                onClick={() => setShowAbout(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-white/10 transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <img
+                  src="/pamphlets.svg"
+                  alt="Pamphlets Logo"
+                  className="size-10"
+                />
+                <span className="text-2xl font-bold">Pamphlets</span>
+              </div>
+              <p className="text-white/80 text-sm mb-6">Read and share personal writings on anything</p>
+
+              {/* Content */}
+              <h2 className="text-xl font-bold mb-3">
+                Your thoughts.<br />Your stories.
+              </h2>
+              <p className="text-white/80 text-sm mb-6">
+                A platform for reading and posting personal writeups, free writings, and thoughts on anything that matters to you.
+              </p>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-white/10 rounded-lg">
+                    <Sparkles className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Free Expression</h3>
+                    <p className="text-white/60 text-xs">Write about anything - no topic restrictions</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-white/10 rounded-lg">
+                    <Heart className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Personal Writings</h3>
+                    <p className="text-white/60 text-xs">Share your thoughts, stories, and ideas</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-white/10 rounded-lg">
+                    <Users className="size-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Community</h3>
+                    <p className="text-white/60 text-xs">Connect with others who love to read and write</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quote */}
+              <div className="border-t border-white/10 pt-4">
+                <p className="text-white/50 text-xs italic">
+                  &quot;There is no greater agony than bearing an untold story inside you.&quot;
+                </p>
+                <p className="text-white/30 text-xs mt-1">— Maya Angelou</p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
