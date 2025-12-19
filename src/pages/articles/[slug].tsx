@@ -47,6 +47,7 @@ interface ArticleWithCounts {
   userHasLiked?: boolean;
   likeCount?: number;
   commentCount?: number;
+  status: string;
 }
 
 /**
@@ -71,37 +72,131 @@ function renderMarkdown(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
 
-  // Split text into lines first to handle headers properly
-  const lines = text.split(/\n/);
-  let currentParagraph: string[] = [];
+  // Split into blocks (paragraphs, lists, code blocks, etc.)
+  const blocks = text.split(/\n\n+/);
+  
+  for (const block of blocks) {
+    const trimmedBlock = block.trim();
+    if (!trimmedBlock) continue;
 
-  const flushParagraph = () => {
-    if (currentParagraph.length > 0) {
-      const paragraphText = currentParagraph.join(' ').trim();
-      if (paragraphText) {
-        parts.push(
-          <p key={key++} className="mb-3">
-            {renderInlineMarkdown(paragraphText)}
-          </p>
-        );
-      }
-      currentParagraph = [];
-    }
-  };
-
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-    
-    // Empty line = end of paragraph
-    if (!trimmedLine) {
-      flushParagraph();
+    // Code block: ```language\ncode\n```
+    const codeBlockMatch = trimmedBlock.match(/^```(\w+)?\n([\s\S]*?)\n```$/);
+    if (codeBlockMatch) {
+      const language = codeBlockMatch[1] || '';
+      const code = codeBlockMatch[2];
+      parts.push(
+        <pre key={key++} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-4 text-sm">
+          <code className={`language-${language}`}>{code}</code>
+        </pre>
+      );
       continue;
     }
 
-    // Check for headers: # Header, ## Header, etc.
-    const headerMatch = trimmedLine.match(/^(#{1,6})\s*(.+)$/);
+    // Blockquote: > text
+    if (trimmedBlock.startsWith('> ')) {
+      const quoteText = trimmedBlock.replace(/^>\s?/gm, '').trim();
+      parts.push(
+        <blockquote key={key++} className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic my-4 text-gray-700 dark:text-gray-300">
+          {renderInlineMarkdown(quoteText)}
+        </blockquote>
+      );
+      continue;
+    }
+
+    // Horizontal rule: --- or *** or ___
+    if (/^[-*_]{3,}$/.test(trimmedBlock)) {
+      parts.push(<hr key={key++} className="my-6 border-gray-300 dark:border-gray-600" />);
+      continue;
+    }
+
+    // Table detection
+    const lines = trimmedBlock.split('\n');
+    const tableLines = lines.filter(line => line.trim());
+    if (tableLines.length >= 2) {
+      const isTable = tableLines.every(line => line.includes('|'));
+      if (isTable) {
+        const tableRows = tableLines.map(line => 
+          line.split('|').map(cell => cell.trim()).filter(cell => cell !== '')
+        );
+        
+        // Check if second row is separator row
+        if (tableRows.length >= 2 && tableRows[1].every(cell => /^:?-+:?$/.test(cell))) {
+          const headers = tableRows[0];
+          const alignments = tableRows[1].map(cell => {
+            if (cell.startsWith(':') && cell.endsWith(':')) return 'center';
+            if (cell.endsWith(':')) return 'right';
+            return 'left';
+          });
+          const dataRows = tableRows.slice(2);
+          
+          parts.push(
+            <table key={key++} className="min-w-full border-collapse border border-gray-300 dark:border-gray-600 my-4">
+              <thead>
+                <tr>
+                  {headers.map((header, idx) => (
+                    <th key={idx} className="border border-gray-300 dark:border-gray-600 px-4 py-2 bg-gray-50 dark:bg-gray-800 font-semibold">
+                      {renderInlineMarkdown(header)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {dataRows.map((row, rowIdx) => (
+                  <tr key={rowIdx}>
+                    {row.map((cell, cellIdx) => {
+                      const alignClass = alignments[cellIdx] === 'center' ? 'text-center' : 
+                                        alignments[cellIdx] === 'right' ? 'text-right' : 'text-left';
+                      return (
+                        <td key={cellIdx} className={`border border-gray-300 dark:border-gray-600 px-4 py-2 ${alignClass}`}>
+                          {renderInlineMarkdown(cell)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          );
+          continue;
+        }
+      }
+    }
+
+    // Task list detection
+    const isTaskList = lines.every(line => /^\s*[-*]\s+\[[ x]\]\s/.test(line.trim()));
+    if (isTaskList) {
+      const taskItems = lines.map(line => {
+        const match = line.trim().match(/^[-*]\s+\[([ x])\]\s(.+)$/);
+        if (match) {
+          return { checked: match[1] === 'x', text: match[2] };
+        }
+        return { checked: false, text: line.trim() };
+      });
+      
+      parts.push(
+        <ul key={key++} className="my-4 space-y-2">
+          {taskItems.map((item, idx) => (
+            <li key={idx} className="flex items-center space-x-2">
+              <input 
+                type="checkbox" 
+                checked={item.checked} 
+                readOnly 
+                className="rounded border-gray-300 dark:border-gray-600" 
+              />
+              <span className={item.checked ? 'line-through text-gray-500' : ''}>
+                {renderInlineMarkdown(item.text)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Headers: # ## ### etc.
+    const firstLine = lines[0];
+    const headerMatch = firstLine.match(/^(#{1,6})\s*(.+)$/);
     if (headerMatch) {
-      flushParagraph();
       const level = headerMatch[1].length;
       const headerText = headerMatch[2].trim();
       const headerClasses: Record<number, string> = {
@@ -120,10 +215,9 @@ function renderMarkdown(text: string): React.ReactNode {
       continue;
     }
 
-    // Check for YouTube URL on its own line
-    const youtubeMatch = trimmedLine.match(/^(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)[\w-]+)$/);
+    // YouTube URL on its own line
+    const youtubeMatch = firstLine.match(/^(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)[\w-]+)$/);
     if (youtubeMatch) {
-      flushParagraph();
       const videoId = getYouTubeVideoId(youtubeMatch[1]);
       if (videoId) {
         parts.push(
@@ -145,10 +239,9 @@ function renderMarkdown(text: string): React.ReactNode {
       }
     }
 
-    // Check for @[youtube](url) syntax
-    const youtubeEmbedMatch = trimmedLine.match(/^@\[youtube\]\(([^)]+)\)$/);
+    // @[youtube](url) syntax
+    const youtubeEmbedMatch = firstLine.match(/^@\[youtube\]\(([^)]+)\)$/);
     if (youtubeEmbedMatch) {
-      flushParagraph();
       const videoId = getYouTubeVideoId(youtubeEmbedMatch[1]);
       if (videoId) {
         parts.push(
@@ -170,40 +263,67 @@ function renderMarkdown(text: string): React.ReactNode {
       }
     }
 
-    // Check for image: ![alt](url)
-    const imageMatch = trimmedLine.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-    if (imageMatch) {
-      flushParagraph();
+    // Table detection
+    const isTable = lines.length >= 2 && 
+      lines.every(line => /^\s*\|.*\|\s*$/.test(line)) && 
+      /^\s*\|[\s\-\|:]+\|\s*$/.test(lines[1]);
+    
+    if (isTable) {
+      const tableRows = lines.map(line => 
+        line.split('|').slice(1, -1).map(cell => cell.trim())
+      );
+      const headers = tableRows[0];
+      const bodyRows = tableRows.slice(2); // Skip header and separator
+      
       parts.push(
-        <div key={key++} className="my-3">
-          <img
-            src={imageMatch[2]}
-            alt={imageMatch[1]}
-            className="max-w-full h-auto rounded shadow-sm"
-            style={{ maxHeight: "200px", objectFit: "contain" }}
-          />
+        <div key={key++} className="my-4 overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-600">
+            <thead>
+              <tr className="bg-gray-50 dark:bg-gray-800">
+                {headers.map((header, idx) => (
+                  <th key={idx} className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left font-semibold">
+                    {renderInlineMarkdown(header)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((row, rowIdx) => (
+                <tr key={rowIdx} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  {row.map((cell, cellIdx) => (
+                    <td key={cellIdx} className="border border-gray-300 dark:border-gray-600 px-4 py-2">
+                      {renderInlineMarkdown(cell)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       );
       continue;
     }
 
-    currentParagraph.push(trimmedLine);
+    // Regular paragraph
+    parts.push(
+      <p key={key++} className="mb-3">
+        {renderInlineMarkdown(trimmedBlock)}
+      </p>
+    );
   }
-
-  flushParagraph();
 
   return <>{parts}</>;
 }
 
 /**
- * Handle inline markdown: **bold**, *italic*, [links](url), inline images
+ * Handle inline markdown: ~~strikethrough~~, `code`, **bold**, *italic*, [links](url), inline images
  */
 function renderInlineMarkdown(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
 
-  // Regex to find inline elements: **bold**, *italic*, [link](url), ![img](url)
-  const inlineRegex = /(\*\*(.+?)\*\*)|(\*(.+?)\*)|(\[([^\]]+)\]\(([^)]+)\))|(!\[([^\]]*)\]\(([^)]+)\))/g;
+  // Regex to find inline elements: ~~strikethrough~~, `code`, **bold**, *italic*, [link](url), ![img](url)
+  const inlineRegex = /(~~([^~]+)~~)|(`([^`]+)`)|(\*\*(.+?)\*\*)|(\*(.+?)\*)|(\[([^\]]+)\]\(([^)]+)\))|(!\[([^\]]*)\]\(([^)]+)\))/g;
   
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -215,22 +335,28 @@ function renderInlineMarkdown(text: string): React.ReactNode {
     }
 
     if (match[1]) {
-      // Bold: **text**
-      parts.push(<strong key={key++}>{match[2]}</strong>);
+      // Strikethrough: ~~text~~
+      parts.push(<del key={key++} className="line-through">{match[2]}</del>);
     } else if (match[3]) {
-      // Italic: *text*
-      parts.push(<em key={key++}>{match[4]}</em>);
+      // Inline code: `code`
+      parts.push(<code key={key++} className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono">{match[4]}</code>);
     } else if (match[5]) {
+      // Bold: **text**
+      parts.push(<strong key={key++}>{match[6]}</strong>);
+    } else if (match[7]) {
+      // Italic: *text*
+      parts.push(<em key={key++}>{match[8]}</em>);
+    } else if (match[9]) {
       // Link: [text](url)
       parts.push(
-        <a key={key++} href={match[7]} className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">
-          {match[6]}
+        <a key={key++} href={match[11]} className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">
+          {match[10]}
         </a>
       );
-    } else if (match[8]) {
+    } else if (match[12]) {
       // Inline image: ![alt](url)
       parts.push(
-        <img key={key++} src={match[10]} alt={match[9]} className="inline-block max-h-24 rounded" />
+        <img key={key++} src={match[14]} alt={match[13]} className="inline-block max-h-24 rounded" />
       );
     }
 
@@ -247,14 +373,14 @@ function renderInlineMarkdown(text: string): React.ReactNode {
 
 /**
  * Split text into pages, breaking at whitespace to avoid cutting words.
- * Preserves markdown images ![alt](url) and links [text](url) by not splitting them.
+ * Preserves markdown images, links, and code blocks by not splitting them.
  */
 function chunkText(text: string, charsPerPage = 1200): string[] {
   const pages: string[] = [];
   let remaining = text;
   
-  // Regex to match markdown images and links: ![...](...) or [...](...) 
-  const markdownPattern = /!?\[[^\]]*\]\([^)]*\)/g;
+  // Regex to match markdown images, links, code blocks, and multi-line tables
+  const markdownPattern = /(!?\[[^\]]*\]\([^)]*\))|(`{3}[\s\S]*?`{3})|((?:^\s*\|.*\|\s*$\n?)+)/gm;
   
   while (remaining.length > 0) {
     if (remaining.length <= charsPerPage) {
@@ -265,7 +391,7 @@ function chunkText(text: string, charsPerPage = 1200): string[] {
     // Find a good break point
     let end = charsPerPage;
     
-    // Check if we're in the middle of a markdown image/link
+    // Check if we're in the middle of a markdown pattern (images, links, code blocks)
     // Find all markdown patterns in the chunk we're about to cut
     const chunkToCheck = remaining.slice(0, end + 200);
     let match;
@@ -604,6 +730,15 @@ export default function ArticleModalPage() {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
         <div className="text-white">Article not found</div>
+      </div>
+    );
+  }
+
+  // Check if article is archived or not published
+  if (article.status !== "published") {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+        <div className="text-white">Article no longer available</div>
       </div>
     );
   }

@@ -90,16 +90,14 @@ export default withAuth(function AdminPage() {
     data: adminArticlesData,
   } = trpc.articles.adminGetAll.useQuery(
     { limit: 200, status: viewStatus === "all" ? undefined : viewStatus },
-    { enabled: activeView === "articles" && isAdmin }
+    { enabled: activeView === "articles" && isAdmin, refetchOnWindowFocus: false, staleTime: Infinity }
   );
   const [articlesList, setArticlesList] = useState<AdminArticle[]>([]);
   const deleteArticle = trpc.articles.delete.useMutation({
     onMutate: async ({ id }) => {
       setArticlesList((prev) => prev.filter((a) => a.id !== id));
     },
-    onSuccess() {
-      trpcCtx.articles.getAll.invalidate();
-    },
+    onSuccess() {},
     onError: (err) => {
       trpcCtx.articles.getAll.invalidate();
       alert("Failed to delete article: " + err.message);

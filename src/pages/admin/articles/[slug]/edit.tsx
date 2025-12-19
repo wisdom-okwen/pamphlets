@@ -166,7 +166,7 @@ function EditArticlePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="genre" className="text-base font-medium">Genres</Label>
+                    <Label className="text-base font-medium">Genres</Label>
                     <div className="flex gap-2 overflow-x-auto max-w-full py-1">
                       {genresLoading ? (
                         <div className="text-sm text-muted-foreground">Loading genres...</div>

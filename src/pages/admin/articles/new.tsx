@@ -172,7 +172,7 @@ function NewArticlePage() {
 
             {/* Genre (multi-select chips) */}
             <div className="space-y-2">
-              <Label htmlFor="genre" className="text-base font-medium">
+              <Label className="text-base font-medium">
                 Genres
               </Label>
 
