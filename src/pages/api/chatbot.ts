@@ -66,11 +66,21 @@ export default async function handler(
         }
 
         // Validate history if provided
-        const conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+        const conversationHistory: Array<{
+            role: "user" | "assistant";
+            content: string;
+        }> = [];
         if (Array.isArray(history)) {
             for (const msg of history) {
-                if (msg && typeof msg.content === 'string' && (msg.role === 'user' || msg.role === 'assistant')) {
-                    conversationHistory.push({ role: msg.role, content: msg.content });
+                if (
+                    msg &&
+                    typeof msg.content === "string" &&
+                    (msg.role === "user" || msg.role === "assistant")
+                ) {
+                    conversationHistory.push({
+                        role: msg.role,
+                        content: msg.content,
+                    });
                 }
             }
         }
@@ -170,14 +180,15 @@ Instructions:
 - If a user says "no" or declines something, acknowledge it naturally (e.g., "No problem! Let me know if you need anything else.") rather than repeating your introduction`;
 
         // Build messages array with history
-        const apiMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
-            { role: "system", content: systemPrompt },
-        ];
+        const apiMessages: Array<{
+            role: "system" | "user" | "assistant";
+            content: string;
+        }> = [{ role: "system", content: systemPrompt }];
 
         // Add conversation history (excluding the current message which is added separately)
         // Skip the last message if it matches the current user message (to avoid duplication)
         for (const msg of conversationHistory) {
-            if (msg.content !== message || msg.role !== 'user') {
+            if (msg.content !== message || msg.role !== "user") {
                 apiMessages.push({ role: msg.role, content: msg.content });
             }
         }
