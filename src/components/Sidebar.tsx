@@ -30,7 +30,7 @@ const protectedNavItems = [
   { href: "/bookmarks", label: "My Bookmarks", icon: Bookmark, action: "view your bookmarks" },
   { href: "/comments", label: "My Comments", icon: MessageCircle, action: "view your comments" },
   { href: "/settings", label: "Settings", icon: Settings, action: "access settings" },
-  { href: "/assistant", label: "AI Assistant", icon: Bot, action: "use the AI assistant" },
+  { href: "#chatbot", label: "AI Assistant", icon: Bot, action: "use the AI assistant", isChatbot: true },
 ];
 
 const adminItems = [
@@ -81,13 +81,17 @@ export function Sidebar() {
     window.location.href = "/";
   };
 
-  const handleProtectedClick = (e: React.MouseEvent, item: { href: string; action: string }) => {
+  const handleProtectedClick = (e: React.MouseEvent, item: { href: string; action: string; isChatbot?: boolean }) => {
     if (!user) {
       e.preventDefault();
       setIsOpen(false);
       openModal(item.action);
     } else {
       setIsOpen(false);
+      if (item.isChatbot) {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('openChatbot'));
+      }
     }
   };
 

@@ -74,6 +74,19 @@ export const articlesRouter = createTRPCRouter({
                 nextCursor = (cursor ?? 0) + limit;
             }
 
+            // Get total count of published articles
+            const totalCountResult = await ctx.db
+                .select({ count: sql<number>`count(*)` })
+                .from(articles)
+                .where(
+                    and(
+                        eq(articles.status, "published"),
+                        genreId ? eq(articles.genreId, genreId) : undefined
+                    )
+                );
+
+            const totalCount = totalCountResult[0]?.count ?? 0;
+
             const mapped = items.map((it) => {
                 const likeReactions = (it.reactions || []).filter(
                     (r: ReactionType) => r.type === "like"
@@ -95,6 +108,7 @@ export const articlesRouter = createTRPCRouter({
             return {
                 items: mapped,
                 nextCursor,
+                totalCount,
             };
         }),
 

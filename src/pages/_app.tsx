@@ -9,6 +9,7 @@ import { NavBarProvider, useNavBarActions } from "@/contexts/NavBarContext";
 import { AuthGuard } from "@/components/AuthGuard";
 import NavBar from "@/components/NavBar";
 import { Sidebar } from "@/components/Sidebar";
+import { Chatbot } from "@/components/Chatbot";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -36,7 +37,6 @@ const getPageTitle = (pathname: string): string => {
     "/bookmarks": "My Bookmarks",
     "/comments": "My Comments",
     "/settings": "Settings",
-    "/assistant": "AI Assistant",
     "/admin": "Admin",
     "/admin/articles/new": "New Article",
   };
@@ -63,6 +63,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
         {!hasOwnHeader && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} actions={actions} />}
         <Component {...pageProps} />
       </div>
+
+      <Chatbot />
     </>
   );
 }

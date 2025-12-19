@@ -1,6 +1,11 @@
 import { GetServerSideProps } from "next";
 
-function generateSiteMap(articles: any[]) {
+interface SitemapArticle {
+  slug: string;
+  updatedAt: string | Date;
+}
+
+function generateSiteMap(articles: SitemapArticle[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
      <url>
@@ -22,7 +27,7 @@ function generateSiteMap(articles: any[]) {
        <priority>0.8</priority>
      </url>
      ${articles
-       .map(({ slug, updatedAt }: any) => {
+       .map(({ slug, updatedAt }: SitemapArticle) => {
          return `
        <url>
            <loc>${`https://pamflets.vercel.app/articles/${slug}`}</loc>

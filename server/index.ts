@@ -7,6 +7,7 @@ import { bookmarksRouter } from "./routers/bookmarks";
 import { usersRouter } from "./routers/users";
 import { adminStatsRouter } from "./routers/adminStats";
 import { notificationsRouter } from "./routers/notifications";
+import { chatbotRouter } from "./routers/chatbot";
 
 /**
  * Main app router - combines all routers
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
     users: usersRouter,
     adminStats: adminStatsRouter,
     notifications: notificationsRouter,
+    chatbot: chatbotRouter,
 });
 
 // Export type for client

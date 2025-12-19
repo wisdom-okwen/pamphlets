@@ -12,17 +12,16 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
-
-  // Read from localStorage only after mount to avoid hydration mismatch
-  useEffect(() => {
-    const stored = window.localStorage.getItem("theme") as Theme | null;
-    if (stored === "dark" || stored === "light") {
-      setThemeState(stored);
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("theme") as Theme | null;
+      if (stored === "dark" || stored === "light") {
+        return stored;
+      }
     }
-    setMounted(true);
-  }, []);
+    return "light";
+  });
+  const [mounted, setMounted] = useState(() => typeof window !== "undefined");
 
   useEffect(() => {
     if (!mounted) return;
