@@ -203,7 +203,7 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Right Side - Signup Form */}
+        {/* Right Side - Signup */}
         <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 sm:px-6 py-8 min-h-screen overflow-y-auto relative">
           {/* Theme Toggle */}
           {mounted && (
