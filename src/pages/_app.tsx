@@ -72,7 +72,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
 function App(props: AppProps) {
   return (
-    <div className={`${sourceSerif.variable} ${inter.variable}`}>
+    <div className={`${sourceSerif.variable} ${inter.variable} min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100`}>
       <AuthProvider>
         <ThemeProvider>
           <NavBarProvider>
