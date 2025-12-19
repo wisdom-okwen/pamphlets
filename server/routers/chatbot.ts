@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { articles, reactions, comments, bookmarks, users, chatMessages } from "@/db/schema";
+import {
+    articles,
+    reactions,
+    comments,
+    bookmarks,
+    users,
+    chatMessages,
+} from "@/db/schema";
 import { eq, desc, sql, and, SQL } from "drizzle-orm";
 
 export const chatbotRouter = createTRPCRouter({
@@ -60,10 +67,16 @@ export const chatbotRouter = createTRPCRouter({
             orderBy: [desc(comments.createdAt)],
         });
 
-        const commentsWithReactions = userComments.map(comment => {
-            const likeCount = comment.reactions.filter(r => r.type === 'like').length;
-            const loveCount = comment.reactions.filter(r => r.type === 'love').length;
-            const supportCount = comment.reactions.filter(r => r.type === 'support').length;
+        const commentsWithReactions = userComments.map((comment) => {
+            const likeCount = comment.reactions.filter(
+                (r) => r.type === "like"
+            ).length;
+            const loveCount = comment.reactions.filter(
+                (r) => r.type === "love"
+            ).length;
+            const supportCount = comment.reactions.filter(
+                (r) => r.type === "support"
+            ).length;
 
             return {
                 id: comment.id,
@@ -88,15 +101,24 @@ export const chatbotRouter = createTRPCRouter({
             },
             interactions: {
                 likedArticles: userReactions
-                    .filter(r => r.type === 'like' && r.article)
-                    .map(r => r.article!),
-                bookmarkedArticles: userBookmarks.map(b => b.article),
+                    .filter((r) => r.type === "like" && r.article)
+                    .map((r) => r.article!),
+                bookmarkedArticles: userBookmarks.map((b) => b.article),
                 comments: commentsWithReactions,
             },
         };
     }),
 
     getArticleStats: protectedProcedure.query(async ({ ctx }) => {
+        const userId = ctx.subject!.id;
+
+        // Check if user is admin
+        const currentUser = await ctx.db.query.users.findFirst({
+            where: eq(users.id, userId),
+            columns: { role: true },
+        });
+        const isAdmin = currentUser?.role === "admin";
+
         const mostRecent = await ctx.db.query.articles.findFirst({
             where: eq(articles.status, "published"),
             orderBy: [desc(articles.publishedAt)],
@@ -116,7 +138,10 @@ export const chatbotRouter = createTRPCRouter({
             },
         });
 
-        const totalCount = await ctx.db.$count(articles, eq(articles.status, "published"));
+        const totalCount = await ctx.db.$count(
+            articles,
+            eq(articles.status, "published")
+        );
 
         const mostLiked = await ctx.db
             .select({
@@ -128,10 +153,13 @@ export const chatbotRouter = createTRPCRouter({
                 likeCount: sql<number>`count(${reactions.id})`,
             })
             .from(articles)
-            .leftJoin(reactions, and(
-                eq(reactions.articleId, articles.id),
-                eq(reactions.type, 'like')
-            ))
+            .leftJoin(
+                reactions,
+                and(
+                    eq(reactions.articleId, articles.id),
+                    eq(reactions.type, "like")
+                )
+            )
             .where(eq(articles.status, "published"))
             .groupBy(articles.id)
             .orderBy(desc(sql`count(${reactions.id})`))
@@ -186,7 +214,7 @@ export const chatbotRouter = createTRPCRouter({
             limit: 50, // Limit to recent articles for summary
         });
 
-        const summaries = articleSummaries.map(article => ({
+        const summaries = articleSummaries.map((article) => ({
             id: article.id,
             title: article.title,
             slug: article.slug,
@@ -194,16 +222,26 @@ export const chatbotRouter = createTRPCRouter({
             publishedAt: article.publishedAt,
             author: article.author?.username,
             viewCount: article.viewCount,
-            likeCount: article.reactions.filter(r => r.type === 'like').length,
+            likeCount: article.reactions.filter((r) => r.type === "like")
+                .length,
             commentCount: article.comments.length,
         }));
 
+        // Get user count for admins
+        let totalUsers = null;
+        if (isAdmin) {
+            totalUsers = await ctx.db.$count(users);
+        }
+
         return {
-            mostRecent: mostRecent ? {
-                ...mostRecent,
-                author: mostRecent.author?.username,
-            } : null,
+            mostRecent: mostRecent
+                ? {
+                      ...mostRecent,
+                      author: mostRecent.author?.username,
+                  }
+                : null,
             totalCount,
+            totalUsers,
             mostLiked: mostLiked[0] || null,
             mostBookmarked: mostBookmarked[0] || null,
             articleSummaries: summaries,
@@ -212,10 +250,12 @@ export const chatbotRouter = createTRPCRouter({
 
     // Search articles by natural language query (for chatbot)
     searchArticles: protectedProcedure
-        .input(z.object({
-            query: z.string().min(1),
-            limit: z.number().min(1).max(20).default(5),
-        }))
+        .input(
+            z.object({
+                query: z.string().min(1),
+                limit: z.number().min(1).max(20).default(5),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const { query, limit } = input;
 
@@ -223,7 +263,9 @@ export const chatbotRouter = createTRPCRouter({
             const searchResults = await ctx.db.query.articles.findMany({
                 where: and(
                     eq(articles.status, "published"),
-                    sql`${articles.title} ILIKE ${`%${query}%`} OR ${articles.excerpt} ILIKE ${`%${query}%`}`
+                    sql`${articles.title} ILIKE ${`%${query}%`} OR ${
+                        articles.excerpt
+                    } ILIKE ${`%${query}%`}`
                 ),
                 columns: {
                     id: true,
@@ -243,42 +285,52 @@ export const chatbotRouter = createTRPCRouter({
                 limit,
             });
 
-            return searchResults.map(article => ({
+            return searchResults.map((article) => ({
                 ...article,
                 author: article.author?.username,
             }));
         }),
 
     saveChatMessage: protectedProcedure
-        .input(z.object({
-            role: z.enum(["user", "assistant"]),
-            content: z.string().min(1),
-            sessionId: z.string().optional(),
-        }))
+        .input(
+            z.object({
+                role: z.enum(["user", "assistant"]),
+                content: z.string().min(1),
+                sessionId: z.string().optional(),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const userId = ctx.subject!.id;
 
-            const [newMessage] = await ctx.db.insert(chatMessages).values({
-                userId,
-                role: input.role,
-                content: input.content,
-                sessionId: input.sessionId,
-            }).returning();
+            const [newMessage] = await ctx.db
+                .insert(chatMessages)
+                .values({
+                    userId,
+                    role: input.role,
+                    content: input.content,
+                    sessionId: input.sessionId,
+                })
+                .returning();
 
             return newMessage;
         }),
 
     getChatHistory: protectedProcedure
-        .input(z.object({
-            limit: z.number().min(1).max(100).default(50),
-            sessionId: z.string().optional(),
-        }))
+        .input(
+            z.object({
+                limit: z.number().min(1).max(100).default(50),
+                sessionId: z.string().optional(),
+            })
+        )
         .query(async ({ ctx, input }) => {
             const userId = ctx.subject!.id;
 
             const messages = await ctx.db.query.chatMessages.findMany({
                 where: input.sessionId
-                    ? and(eq(chatMessages.userId, userId), eq(chatMessages.sessionId, input.sessionId))
+                    ? and(
+                          eq(chatMessages.userId, userId),
+                          eq(chatMessages.sessionId, input.sessionId)
+                      )
                     : eq(chatMessages.userId, userId),
                 orderBy: [desc(chatMessages.createdAt)],
                 limit: input.limit,
@@ -288,24 +340,34 @@ export const chatbotRouter = createTRPCRouter({
         }),
 
     deleteChatHistory: protectedProcedure
-        .input(z.object({
-            sessionId: z.string().optional(),
-            beforeDate: z.date().optional(),
-        }))
+        .input(
+            z.object({
+                sessionId: z.string().optional(),
+                beforeDate: z.date().optional(),
+            })
+        )
         .mutation(async ({ ctx, input }) => {
             const userId = ctx.subject!.id;
 
-            const conditions: SQL<unknown>[] = [eq(chatMessages.userId, userId)];
+            const conditions: SQL<unknown>[] = [
+                eq(chatMessages.userId, userId),
+            ];
 
             if (input.sessionId) {
-                conditions.push(sql`${chatMessages.sessionId} = ${input.sessionId}`);
+                conditions.push(
+                    sql`${chatMessages.sessionId} = ${input.sessionId}`
+                );
             }
 
             if (input.beforeDate) {
-                conditions.push(sql`${chatMessages.createdAt} < ${input.beforeDate}`);
+                conditions.push(
+                    sql`${chatMessages.createdAt} < ${input.beforeDate}`
+                );
             }
 
-            const result = await ctx.db.delete(chatMessages).where(and(...conditions));
+            const result = await ctx.db
+                .delete(chatMessages)
+                .where(and(...conditions));
 
             return { deletedCount: result.rowCount };
         }),

@@ -106,6 +106,8 @@ export default async function handler(
             apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY,
         });
 
+        const isAdmin = context?.user?.role === 'admin';
+        
         const systemPrompt = `You are a helpful AI assistant for "Pamphlets" - a platform for reading and sharing personal writings and free writeups about anything.
 
 STRICT SCOPE LIMITATION:
@@ -114,6 +116,7 @@ You MUST ONLY answer questions related to:
 2. The user's activity on the platform (their likes, bookmarks, comments)
 3. Finding or discovering articles/pamphlets on the platform
 4. General questions about what kinds of content exist on the platform
+${isAdmin ? `5. Platform administration questions (user counts, article statistics, platform health) - ADMIN ONLY` : ''}
 
 You MUST REFUSE to answer:
 - General knowledge questions (history, science, math, geography, etc.)
@@ -131,6 +134,13 @@ Platform Overview:
 - Authors can publish pamphlets on diverse topics
 - The platform supports markdown formatting
 
+${isAdmin ? `ADMIN PRIVILEGES:
+This user is an ADMIN. They have access to:
+- View total user counts and platform statistics
+- Ask about platform health and metrics
+- Get information about all articles and users on the platform
+When they ask admin-related questions (like "how many users are there"), provide the information from the stats below.
+` : ''}
 User Context:
 ${
     context
@@ -165,7 +175,8 @@ ${
     stats
         ? `
 Total pamphlets: ${stats.totalCount}
-Most recent pamphlet: ${stats.items?.[0]?.title || "None"}
+${stats.totalUsers ? `Total users: ${stats.totalUsers}` : ''}
+Most recent pamphlet: ${stats.items?.[0]?.title || stats.mostRecent?.title || "None"}
 `
         : "No statistics available"
 }

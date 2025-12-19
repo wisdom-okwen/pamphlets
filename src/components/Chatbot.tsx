@@ -114,20 +114,22 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
     }
   }, [isOpen, user, refetchHistory]);
 
-  const { data: rawArticleStats } = trpc.articles.getAll.useQuery(
-    { limit: 1 },
-    { enabled: isOpen }
+  const { data: rawArticleStats } = trpc.chatbot.getArticleStats.useQuery(
+    undefined,
+    { enabled: !!user && isOpen }
   );
 
   const articleStats = rawArticleStats
     ? {
-        items: rawArticleStats.items.map((item) => ({
-          id: item.id,
-          title: item.title,
-          publishedAt: item.publishedAt,
-          excerpt: item.excerpt ?? undefined,
-        })),
+        items: rawArticleStats.mostRecent ? [{
+          id: rawArticleStats.mostRecent.id,
+          title: rawArticleStats.mostRecent.title,
+          publishedAt: rawArticleStats.mostRecent.publishedAt,
+          excerpt: rawArticleStats.mostRecent.excerpt ?? undefined,
+        }] : [],
         totalCount: rawArticleStats.totalCount,
+        totalUsers: rawArticleStats.totalUsers,
+        mostRecent: rawArticleStats.mostRecent,
       }
     : undefined;
 
@@ -157,6 +159,13 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
       excerpt?: string;
     }>;
     totalCount: number;
+    totalUsers?: number | null;
+    mostRecent?: {
+      id: number;
+      title: string;
+      publishedAt: Date | null;
+      excerpt: string | null;
+    } | null;
   }
 
   const generateResponse = async (
