@@ -52,6 +52,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   const hasOwnHeader = pagesWithOwnHeader.includes(router.pathname);
 
   const showSidebar = !isAuthPage;
+  const showNavBar = !isAuthPage && !hasOwnHeader;
 
   return (
     <>
@@ -60,7 +61,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
       {showSidebar && <Sidebar />}
 
       <div className={showSidebar ? "lg:pl-64" : ""}>
-        {!hasOwnHeader && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} actions={actions} />}
+        {showNavBar && <NavBar title={getPageTitle(router.pathname)} hideAuth={showSidebar} actions={actions} />}
         <Component {...pageProps} />
       </div>
 

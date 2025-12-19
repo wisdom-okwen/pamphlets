@@ -14,12 +14,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Mail, Lock, Loader2, Heart, Users, Sparkles } from "lucide-react";
+import { Mail, Lock, Loader2, Heart, Users, Sparkles, Sun, Moon } from "lucide-react";
 import { GoogleIcon } from "@/components/icons/GoogleIcon";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+  const { theme, toggle, mounted } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +81,7 @@ export default function LoginPage() {
 
       <main className="flex min-h-screen">
         {/* Left Side - About Section */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-primary/80 text-white p-12 flex-col justify-between relative overflow-hidden">
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 text-white p-12 flex-col justify-between relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 border border-white/20 rounded-full" />
@@ -88,9 +90,14 @@ export default function LoginPage() {
             <div className="absolute bottom-40 right-10 w-20 h-20 border border-white/20 rounded-full" />
           </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl font-bold">Pamphlets</span>
+          <div className="relative z-20">
+            <div className="flex items-center gap-4 mb-2">
+              <img
+                src="/pamphlets.svg"
+                alt="Pamphlets Logo"
+                className="size-12"
+              />
+              <span className="text-4xl font-bold">Pamphlets</span>
             </div>
             <p className="text-white/80 text-lg">Read and share personal writings on anything</p>
           </div>
@@ -146,7 +153,17 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 py-8">
+        <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 py-8 relative">
+          {/* Theme Toggle */}
+          {mounted && (
+            <button
+              onClick={toggle}
+              aria-label="toggle-theme"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+          )}
           <Card className="w-full max-w-md border-0 shadow-none lg:shadow-lg lg:border">
             <CardHeader className="space-y-1 text-center">
               {/* Mobile Logo */}
