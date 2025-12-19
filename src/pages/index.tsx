@@ -21,6 +21,7 @@ interface ArticleWithCounts {
   userHasLiked?: boolean;
   likeCount?: number;
   commentCount?: number;
+  publishedAt?: Date | null;
 }
 
 export default function Home() {
@@ -368,8 +369,21 @@ export default function Home() {
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group block border rounded-lg overflow-hidden bg-card shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200"
+                className="group block border rounded-lg overflow-hidden bg-card shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200 relative"
               >
+                {/* Publish date - top right corner */}
+                {article.publishedAt && (
+                  <div className="absolute top-2 right-2 z-10">
+                    <span className="bg-gray-500/100 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                      {new Date(article.publishedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                )}
+
                 {/* Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row">
                   {/* Cover image */}
