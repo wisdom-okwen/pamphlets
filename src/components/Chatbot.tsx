@@ -157,8 +157,19 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
     totalCount: number;
   }
 
-  const generateResponse = async (userMessage: string, context: ChatbotData | undefined, stats: ArticleStats | undefined) => {
+  const generateResponse = async (
+    userMessage: string, 
+    context: ChatbotData | undefined, 
+    stats: ArticleStats | undefined,
+    chatHistory: Message[]
+  ) => {
     try {
+      // Prepare conversation history for the API (last 10 messages for context)
+      const recentHistory = chatHistory.slice(-10).map(msg => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+
       const response = await fetch('/api/chatbot', {
         method: 'POST',
         headers: {
@@ -168,6 +179,7 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
           message: userMessage,
           context,
           stats,
+          history: recentHistory,
         }),
       });
 
@@ -206,7 +218,8 @@ export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
         content: userMessageContent,
       });
 
-      const response = await generateResponse(userMessageContent, userContext, articleStats);
+      // Pass current messages (before adding the new user message) as history
+      const response = await generateResponse(userMessageContent, userContext, articleStats, [...messages, userMessage]);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

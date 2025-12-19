@@ -707,6 +707,45 @@ export default function ArticleModalPage() {
     }, 300);
   }, [isFlipping, spread]);
 
+  // Share functionality
+  const handleShare = async () => {
+    if (!article) return;
+    
+    const shareUrl = `${window.location.origin}/articles/${article.slug}`;
+    const shareData = {
+      title: article.title,
+      text: article.excerpt || `Check out "${article.title}" on Pamphlets`,
+      url: shareUrl,
+    };
+
+    // Try native share API first (works on mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err) {
+        // User cancelled or error - fall through to clipboard
+        if ((err as Error).name === 'AbortError') return;
+      }
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      // Could add a toast notification here
+      alert('Link copied to clipboard!');
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareUrl;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Link copied to clipboard!');
+    }
+  };
+
   // Keyboard navigation
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -760,7 +799,7 @@ export default function ArticleModalPage() {
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4"
+        className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-2 sm:p-4"
         onClick={close}
       >
         <div
@@ -770,7 +809,7 @@ export default function ArticleModalPage() {
           {/* Close button */}
           <button
             onClick={close}
-            className="absolute top-0 right-0 sm:-top-2 sm:-right-2 z-30 p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
+            className="absolute top-0 right-0 sm:-top-2 sm:-right-2 z-[80] p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
           >
             <X size={18} />
           </button>
@@ -852,6 +891,7 @@ export default function ArticleModalPage() {
                 <Bookmark size={18} fill={bookmarked ? "currentColor" : "none"} />
               </button>
               <button
+                onClick={handleShare}
                 className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation text-zinc-600 dark:text-zinc-300"
               >
                 <Share2 size={18} />
@@ -1122,6 +1162,7 @@ export default function ArticleModalPage() {
                 <Bookmark size={22} fill={bookmarked ? "currentColor" : "none"} />
               </button>
               <button
+                onClick={handleShare}
                 className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200"
               >
                 <Share2 size={22} />

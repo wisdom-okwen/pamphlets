@@ -59,10 +59,20 @@ export default async function handler(
     }
 
     try {
-        const { message, context, stats } = req.body;
+        const { message, context, stats, history } = req.body;
 
         if (!message || typeof message !== "string") {
             return res.status(400).json({ error: "Message is required" });
+        }
+
+        // Validate history if provided
+        const conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+        if (Array.isArray(history)) {
+            for (const msg of history) {
+                if (msg && typeof msg.content === 'string' && (msg.role === 'user' || msg.role === 'assistant')) {
+                    conversationHistory.push({ role: msg.role, content: msg.content });
+                }
+            }
         }
 
         // Check if API key is configured
@@ -155,14 +165,29 @@ Instructions:
 - Answer questions about the user's interactions (liked pamphlets, bookmarks, comments)
 - Explain platform features
 - Keep responses concise and friendly
-- ALWAYS stay within the platform scope - refuse off-topic questions politely`;
+- ALWAYS stay within the platform scope - refuse off-topic questions politely
+- Be conversational and remember what the user said earlier in the conversation
+- If a user says "no" or declines something, acknowledge it naturally (e.g., "No problem! Let me know if you need anything else.") rather than repeating your introduction`;
+
+        // Build messages array with history
+        const apiMessages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+            { role: "system", content: systemPrompt },
+        ];
+
+        // Add conversation history (excluding the current message which is added separately)
+        // Skip the last message if it matches the current user message (to avoid duplication)
+        for (const msg of conversationHistory) {
+            if (msg.content !== message || msg.role !== 'user') {
+                apiMessages.push({ role: msg.role, content: msg.content });
+            }
+        }
+
+        // Add the current user message
+        apiMessages.push({ role: "user", content: message });
 
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: message },
-            ],
+            messages: apiMessages,
             max_tokens: 500,
             temperature: 0.7,
         });
