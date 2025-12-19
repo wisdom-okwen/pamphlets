@@ -232,6 +232,18 @@ export const reactions = pgTable("reactions", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ============ CHAT MESSAGES TABLE ============
+export const chatMessages = pgTable("chat_messages", {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 20 }).notNull(),
+    content: text("content").notNull(),
+    sessionId: varchar("session_id", { length: 100 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ============ RELATIONS ============
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -239,6 +251,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     comments: many(comments),
     bookmarks: many(bookmarks),
     reactions: many(reactions),
+    chatMessages: many(chatMessages),
     preferences: one(userPreferences),
     notifications: many(notifications),
     sentNotifications: many(notifications, { relationName: "fromUser" }),
@@ -333,6 +346,13 @@ export const reactionsRelations = relations(reactions, ({ one }) => ({
     }),
 }));
 
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+    user: one(users, {
+        fields: [chatMessages.userId],
+        references: [users.id],
+    }),
+}));
+
 // ============ TYPE EXPORTS ============
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -351,6 +371,9 @@ export type NewArticle = typeof articles.$inferInsert;
 
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
+
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type NewChatMessage = typeof chatMessages.$inferInsert;
 
 export type Bookmark = typeof bookmarks.$inferSelect;
 export type NewBookmark = typeof bookmarks.$inferInsert;

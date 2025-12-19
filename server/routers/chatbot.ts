@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { articles, reactions, comments, bookmarks, users } from "@/db/schema";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { articles, reactions, comments, bookmarks, users, chatMessages } from "@/db/schema";
+import { eq, desc, sql, and, SQL } from "drizzle-orm";
 
 export const chatbotRouter = createTRPCRouter({
     getUserContext: protectedProcedure.query(async ({ ctx }) => {
@@ -247,5 +247,66 @@ export const chatbotRouter = createTRPCRouter({
                 ...article,
                 author: article.author?.username,
             }));
+        }),
+
+    saveChatMessage: protectedProcedure
+        .input(z.object({
+            role: z.enum(["user", "assistant"]),
+            content: z.string().min(1),
+            sessionId: z.string().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const userId = ctx.subject!.id;
+
+            const [newMessage] = await ctx.db.insert(chatMessages).values({
+                userId,
+                role: input.role,
+                content: input.content,
+                sessionId: input.sessionId,
+            }).returning();
+
+            return newMessage;
+        }),
+
+    getChatHistory: protectedProcedure
+        .input(z.object({
+            limit: z.number().min(1).max(100).default(50),
+            sessionId: z.string().optional(),
+        }))
+        .query(async ({ ctx, input }) => {
+            const userId = ctx.subject!.id;
+
+            const messages = await ctx.db.query.chatMessages.findMany({
+                where: input.sessionId
+                    ? and(eq(chatMessages.userId, userId), eq(chatMessages.sessionId, input.sessionId))
+                    : eq(chatMessages.userId, userId),
+                orderBy: [desc(chatMessages.createdAt)],
+                limit: input.limit,
+            });
+
+            return messages.reverse();
+        }),
+
+    deleteChatHistory: protectedProcedure
+        .input(z.object({
+            sessionId: z.string().optional(),
+            beforeDate: z.date().optional(),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const userId = ctx.subject!.id;
+
+            const conditions: SQL<unknown>[] = [eq(chatMessages.userId, userId)];
+
+            if (input.sessionId) {
+                conditions.push(sql`${chatMessages.sessionId} = ${input.sessionId}`);
+            }
+
+            if (input.beforeDate) {
+                conditions.push(sql`${chatMessages.createdAt} < ${input.beforeDate}`);
+            }
+
+            const result = await ctx.db.delete(chatMessages).where(and(...conditions));
+
+            return { deletedCount: result.rowCount };
         }),
 });
