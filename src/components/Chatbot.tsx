@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/contexts/AuthContext";
-import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -57,18 +57,60 @@ interface ChatbotProps {
   mode?: 'floating';
 }
 
-export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
+export function Chatbot({ mode: _mode = 'floating' }: ChatbotProps = {}) {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const utils = trpc.useUtils();
 
   // Fetch user context data
   const { data: userContext } = trpc.chatbot.getUserContext.useQuery(undefined, {
     enabled: !!user && isOpen,
   });
+
+  const { data: chatHistory, refetch: refetchHistory } = trpc.chatbot.getChatHistory.useQuery(
+    { limit: 50 },
+    {
+      enabled: !!user && isOpen,
+      staleTime: 0,
+    }
+  );
+
+  const saveChatMessage = trpc.chatbot.saveChatMessage.useMutation();
+
+  const deleteChatHistory = trpc.chatbot.deleteChatHistory.useMutation({
+    onSuccess: () => {
+      setMessages([]);
+      utils.chatbot.getChatHistory.invalidate();
+    },
+  });
+
+  // Load chat history when it's fetched
+  useEffect(() => {
+    if (chatHistory && chatHistory.length > 0 && messages.length === 0) {
+      setIsLoadingHistory(true);
+      const loadedMessages: Message[] = chatHistory.map((msg) => ({
+        id: msg.id.toString(),
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+        timestamp: new Date(msg.createdAt),
+      }));
+      setMessages(loadedMessages);
+      setIsLoadingHistory(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatHistory]);
+
+  // Refetch history when chat opens
+  useEffect(() => {
+    if (isOpen && user) {
+      refetchHistory();
+    }
+  }, [isOpen, user, refetchHistory]);
 
   const { data: rawArticleStats } = trpc.articles.getAll.useQuery(
     { limit: 1 },
@@ -145,10 +187,11 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    const userMessageContent = input.trim();
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: userMessageContent,
       timestamp: new Date(),
     };
 
@@ -157,7 +200,13 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
     setIsLoading(true);
 
     try {
-      const response = await generateResponse(input, userContext, articleStats);
+      // Save user message to database
+      await saveChatMessage.mutateAsync({
+        role: 'user',
+        content: userMessageContent,
+      });
+
+      const response = await generateResponse(userMessageContent, userContext, articleStats);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -165,6 +214,12 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Save assistant message to database
+      await saveChatMessage.mutateAsync({
+        role: 'assistant',
+        content: response,
+      });
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -175,6 +230,12 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleClearHistory = () => {
+    if (confirm("Are you sure you want to clear your chat history?")) {
+      deleteChatHistory.mutate({});
     }
   };
 
@@ -207,22 +268,42 @@ export function Chatbot({ mode = 'floating' }: ChatbotProps = {}) {
               <Bot size={20} className="text-blue-600" />
               <span className="font-medium text-sm">Pamphlets Assistant</span>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-              <X size={18} />
-            </button>
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <button
+                  onClick={handleClearHistory}
+                  className="text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400 p-1"
+                  title="Clear chat history"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1"
+              >
+                <X size={18} />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {messages.length === 0 && (
+            {isLoadingHistory ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
+                <div className="flex justify-center space-x-1 mb-2">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                </div>
+                <p>Loading chat history...</p>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
                 <Bot size={32} className="mx-auto mb-2 opacity-50" />
                 <p>Hi! I&apos;m your personalized AI assistant for <strong>Pamphlets</strong> - a platform dedicated to personal development, wellbeing, and positive behavioral change. I can help you find and learn about articles, and answer questions about your interactions across the platform!</p>
               </div>
-            )}
+            ) : null}
             {messages.map((message) => (
               <div
                 key={message.id}
