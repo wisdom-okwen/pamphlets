@@ -8,6 +8,7 @@ interface AuthGuardProps {
 
 // Routes that don't require authentication
 const publicRoutes = [
+  "/",
   "/login",
   "/signup",
   "/forgot-password",
@@ -29,7 +30,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
       router.replace(`/login?redirect=${encodeURIComponent(router.asPath)}`);
     }
 
-    if (user && isPublicRoute && router.pathname !== "/signout" && router.pathname !== "/callback") {
+    // Redirect logged-in users away from auth pages (but not from homepage)
+    if (user && isPublicRoute && router.pathname !== "/signout" && router.pathname !== "/callback" && router.pathname !== "/") {
       router.replace("/");
     }
   }, [user, isLoading, isPublicRoute, router]);
