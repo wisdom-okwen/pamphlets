@@ -77,7 +77,7 @@ export default function LoginPage() {
       <NextSeo
         title="Login"
         description="Sign in to your Pamphlets account"
-        noindex
+       
       />
 
       <main className="flex min-h-screen">

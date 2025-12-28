@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
         <NextSeo
           title="Password Reset"
           description="Your password has been reset"
-          noindex
+         
         />
 
         <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
@@ -118,7 +118,7 @@ export default function ResetPasswordPage() {
       <NextSeo
         title="Reset Password"
         description="Set your new password"
-        noindex
+       
       />
 
       <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">

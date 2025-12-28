@@ -562,7 +562,7 @@ function SettingsPage() {
 
   return (
     <>
-      <NextSeo title="Settings" description="Manage your account settings" noindex />
+      <NextSeo title="Settings" description="Manage your account settings" />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-5xl">
         <div className="flex items-center gap-3 mb-6 sm:mb-8">

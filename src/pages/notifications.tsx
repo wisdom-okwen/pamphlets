@@ -151,7 +151,7 @@ function NotificationsPage() {
       <NextSeo
         title="Notifications"
         description="Manage your notifications"
-        noindex
+       
       />
 
       <main className="flex h-[calc(100vh-60px)]">

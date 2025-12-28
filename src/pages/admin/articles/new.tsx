@@ -139,7 +139,7 @@ function NewArticlePage() {
       <NextSeo
         title="New Pamphlet"
         description="Create a new pamphlet"
-        noindex
+       
       />
 
       <div className="min-h-screen bg-background">

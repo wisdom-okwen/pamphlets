@@ -128,7 +128,7 @@ export default function SignupPage() {
       <NextSeo
         title="Sign Up"
         description="Create your Pamphlets account"
-        noindex
+       
       />
 
       <main className="flex min-h-screen">

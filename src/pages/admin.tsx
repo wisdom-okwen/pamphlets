@@ -248,7 +248,7 @@ export default withAuth(function AdminPage() {
 
   return (
     <>
-      <NextSeo title="Admin" description="Admin dashboard" noindex />
+      <NextSeo title="Admin" description="Admin dashboard" />
 
       <main className="min-h-screen bg-background px-4 py-6 max-w-6xl mx-auto">
         <div className="mb-6">

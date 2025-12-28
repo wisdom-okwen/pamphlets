@@ -4,4 +4,4 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://pamphlets.vercel.app/sitemap.xml
+Sitemap: https://pamflets.vercel.app/sitemap.xml
