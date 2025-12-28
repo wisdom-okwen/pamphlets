@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
         <NextSeo
           title="Check your email"
           description="Password reset link sent"
-          noindex
+         
         />
 
         <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
       <NextSeo
         title="Forgot Password"
         description="Reset your Pamphlets password"
-        noindex
+       
       />
 
       <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">

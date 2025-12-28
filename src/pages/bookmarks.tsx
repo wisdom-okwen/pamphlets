@@ -48,7 +48,7 @@ function BookmarksPage() {
       <NextSeo
         title="My Bookmarks"
         description="Your saved pamphlets"
-        noindex
+       
       />
 
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
