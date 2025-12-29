@@ -800,16 +800,21 @@ export default function ArticleModalPage() {
       
       <div
         className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-2 sm:p-4"
-        onClick={close}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            close();
+          }
+        }}
       >
         <div
           className="relative flex flex-col items-center w-full max-w-[1100px] max-h-[100dvh] sm:max-h-[95vh]"
-          onClick={(e) => e.stopPropagation()}
         >
-          {/* Close button */}
           <button
-            onClick={close}
-            className="absolute top-0 right-0 sm:-top-2 sm:-right-2 z-[80] p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+            }}
+            className="lg:hidden absolute top-0 right-0 sm:-top-2 sm:-right-2 z-[80] p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
           >
             <X size={18} />
           </button>
@@ -867,7 +872,10 @@ export default function ArticleModalPage() {
             {/* Mobile action buttons */}
             <div className="flex justify-center gap-2 sm:gap-3 mt-3 sm:mt-4">
               <button
-                onClick={handleLike}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike();
+                }}
                 className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
                 <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
@@ -876,7 +884,10 @@ export default function ArticleModalPage() {
                 </span>
               </button>
               <button
-                onClick={() => setShowComments(!showComments)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowComments(!showComments);
+                }}
                 className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
                 <MessageCircle size={18} fill={showComments ? "currentColor" : "none"} />
@@ -885,13 +896,19 @@ export default function ArticleModalPage() {
                 </span>
               </button>
               <button
-                onClick={handleToggleBookmark}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleBookmark();
+                }}
                 className={`p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : "text-zinc-600 dark:text-zinc-300"}`}
               >
                 <Bookmark size={18} fill={bookmarked ? "currentColor" : "none"} />
               </button>
               <button
-                onClick={handleShare}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShare();
+                }}
                 className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation text-zinc-600 dark:text-zinc-300"
               >
                 <Share2 size={18} />
@@ -1138,7 +1155,19 @@ export default function ArticleModalPage() {
               showComments ? "flex-row mb-3 shrink-0" : "flex-col justify-center h-full"
             }`}>
               <button
-                onClick={handleLike}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  close();
+                }}
+                className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 text-zinc-600 dark:text-zinc-300"
+              >
+                <X size={22} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike();
+                }}
                 className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 ${isLiked ? "text-red-500" : ""}`}
               >
                 <Heart size={22} fill={isLiked ? "currentColor" : "none"} />
@@ -1147,7 +1176,10 @@ export default function ArticleModalPage() {
                 </span>
               </button>
               <button
-                onClick={() => setShowComments(!showComments)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowComments(!showComments);
+                }}
                 className={`relative p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 ${showComments ? "text-blue-500" : ""}`}
               >
                 <MessageCircle size={22} fill={showComments ? "currentColor" : "none"} />
@@ -1156,13 +1188,19 @@ export default function ArticleModalPage() {
                 </span>
               </button>
               <button
-                onClick={handleToggleBookmark}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleBookmark();
+                }}
                 className={`p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 ${bookmarked ? "text-yellow-500" : ""}`}
               >
                 <Bookmark size={22} fill={bookmarked ? "currentColor" : "none"} />
               </button>
               <button
-                onClick={handleShare}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShare();
+                }}
                 className="p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200"
               >
                 <Share2 size={22} />
