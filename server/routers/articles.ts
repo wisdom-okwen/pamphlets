@@ -595,4 +595,77 @@ export const articlesRouter = createTRPCRouter({
             });
             return { liked: !!existingLike };
         }),
+
+    // Get current user's articles (for authors)
+    getMyArticles: protectedProcedure
+        .input(
+            z.object({
+                limit: z.number().min(1).max(100).default(50),
+                status: z.enum(["all", "draft", "published", "archived"]).default("all"),
+            })
+        )
+        .query(async ({ ctx, input }) => {
+            const { limit, status } = input;
+            const userId = ctx.subject.id;
+
+            const items = await ctx.db.query.articles.findMany({
+                where: and(
+                    eq(articles.authorId, userId),
+                    status !== "all" ? eq(articles.status, status) : undefined
+                ),
+                orderBy: [desc(articles.updatedAt)],
+                limit,
+                with: {
+                    genre: true,
+                    articleGenres: { with: { genre: true } },
+                    reactions: true,
+                    comments: true,
+                },
+            });
+
+            // Calculate statistics for each article
+            const mapped = items.map((it) => {
+                const likeReactions = (it.reactions || []).filter(
+                    (r: ReactionType) => r.type === "like"
+                );
+                return {
+                    id: it.id,
+                    title: it.title,
+                    slug: it.slug,
+                    excerpt: it.excerpt,
+                    coverImageUrl: it.coverImageUrl,
+                    status: it.status,
+                    viewCount: it.viewCount,
+                    likeCount: likeReactions.length,
+                    commentCount: (it.comments || []).length,
+                    publishedAt: it.publishedAt,
+                    createdAt: it.createdAt,
+                    updatedAt: it.updatedAt,
+                    genres: (it.articleGenres || []).map(
+                        (ag: ArticleGenreType) => ag.genre
+                    ),
+                };
+            });
+
+            // Calculate totals for statistics overview
+            const totalViews = mapped.reduce((sum, a) => sum + a.viewCount, 0);
+            const totalLikes = mapped.reduce((sum, a) => sum + a.likeCount, 0);
+            const totalComments = mapped.reduce((sum, a) => sum + a.commentCount, 0);
+            const publishedCount = mapped.filter((a) => a.status === "published").length;
+            const draftCount = mapped.filter((a) => a.status === "draft").length;
+            const archivedCount = mapped.filter((a) => a.status === "archived").length;
+
+            return {
+                items: mapped,
+                stats: {
+                    totalArticles: mapped.length,
+                    publishedCount,
+                    draftCount,
+                    archivedCount,
+                    totalViews,
+                    totalLikes,
+                    totalComments,
+                },
+            };
+        }),
 });

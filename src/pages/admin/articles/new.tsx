@@ -416,4 +416,4 @@ function NewArticlePage() {
   );
 }
 
-export default withAuth(NewArticlePage, { requireAdmin: true });
+export default withAuth(NewArticlePage, { requireAuthor: true });
