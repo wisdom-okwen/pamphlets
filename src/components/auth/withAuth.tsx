@@ -11,13 +11,17 @@ export function withAuth<P extends object>(
   options?: {
     redirectTo?: string;
     requireAdmin?: boolean;
+    requireAuthor?: boolean;
   }
 ) {
-  const { redirectTo = "/login", requireAdmin = false } = options || {};
+  const { redirectTo = "/login", requireAdmin = false, requireAuthor = false } = options || {};
 
   return function WithAuthComponent(props: P) {
-    const { user, isLoading, isRoleLoading, isAdmin } = useAuth();
+    const { user, isLoading, isRoleLoading, isAdmin, role } = useAuth();
     const router = useRouter();
+
+    const isAuthorOrAdmin = role === "author" || role === "admin";
+    const needsRoleCheck = requireAdmin || requireAuthor;
 
     useEffect(() => {
       if (!isLoading && !user) {
@@ -33,8 +37,15 @@ export function withAuth<P extends object>(
       }
     }, [user, isLoading, isRoleLoading, isAdmin, router]);
 
+    // Redirect non-authors/non-admins if author is required
+    useEffect(() => {
+      if (!isLoading && !isRoleLoading && user && requireAuthor && !isAuthorOrAdmin) {
+        router.push("/");
+      }
+    }, [user, isLoading, isRoleLoading, isAuthorOrAdmin, router]);
+
     // Show loading state while checking auth or role
-    if (isLoading || (requireAdmin && isRoleLoading)) {
+    if (isLoading || (needsRoleCheck && isRoleLoading)) {
       return (
         <main className="flex min-h-screen items-center justify-center bg-background">
           <Loader2 className="size-8 animate-spin text-primary" />
@@ -60,7 +71,15 @@ export function withAuth<P extends object>(
       );
     }
 
-    // User is authenticated (and admin if required), render the wrapped component
+    // Don't render if author required but user is not author or admin
+    if (requireAuthor && !isAuthorOrAdmin) {
+      return (
+        <main className="flex min-h-screen items-center justify-center bg-background">
+          <Loader2 className="size-8 animate-spin text-primary" />
+        </main>
+      );
+    }
+
     return <WrappedComponent {...props} />;
   };
 }

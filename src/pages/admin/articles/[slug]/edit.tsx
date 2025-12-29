@@ -350,4 +350,4 @@ function EditArticlePage() {
   );
 }
 
-export default withAuth(EditArticlePage, { requireAdmin: true });
+export default withAuth(EditArticlePage, { requireAuthor: true });

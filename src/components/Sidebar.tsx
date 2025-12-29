@@ -13,6 +13,7 @@ import {
   LogOut,
   LogIn,
   User,
+  PenTool,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AuthModal, useAuthModal } from "@/components/AuthModal";
@@ -35,6 +36,10 @@ const protectedNavItems = [
 
 const adminItems = [
   { href: "/admin", label: "Admin", icon: Shield },
+];
+
+const authorItems = [
+  { href: "/author", label: "Author", icon: PenTool },
 ];
 
 export function Sidebar() {
@@ -162,6 +167,35 @@ export function Sidebar() {
               </span>
             </div>
             {adminItems.map((item) => {
+              const isActive = router.pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              );
+            })}
+          </>
+        )}
+
+        {/* Author section - show for authors (non-admins) */}
+        {role === "author" && !isAdmin && (
+          <>
+            <div className="pt-4 pb-2">
+              <span className="px-3 text-xs font-semibold uppercase text-muted-foreground">
+                Author
+              </span>
+            </div>
+            {authorItems.map((item) => {
               const isActive = router.pathname.startsWith(item.href);
               return (
                 <Link
