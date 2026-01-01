@@ -678,7 +678,14 @@ export default function ArticleModalPage() {
   const [spread, setSpread] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [flipDirection, setFlipDirection] = useState<"forward" | "backward">("forward");
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(() => {
+    // Initialize from query param if available (client-side only)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("comments") === "true";
+    }
+    return false;
+  });
   const [commentText, setCommentText] = useState("");
   const [postingComment, setPostingComment] = useState(false);
 
