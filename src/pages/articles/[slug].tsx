@@ -193,6 +193,90 @@ function renderMarkdown(text: string): React.ReactNode {
       continue;
     }
 
+    // Ordered list detection (1. 2. 3. etc)
+    const isOrderedList = lines.every(line => /^\s*\d+\.\s+/.test(line));
+    if (isOrderedList && lines.length > 0) {
+      const listItems = lines.map(line => {
+        const match = line.match(/^\s*\d+\.\s+(.+)$/);
+        return match ? match[1] : line.trim();
+      });
+      
+      parts.push(
+        <ol key={key++} className="my-4 ml-6 space-y-1 list-decimal">
+          {listItems.map((item, idx) => (
+            <li key={idx} className="pl-1">
+              {renderInlineMarkdown(item)}
+            </li>
+          ))}
+        </ol>
+      );
+      continue;
+    }
+
+    // Unordered list detection (- or * without checkbox)
+    const isUnorderedList = lines.every(line => /^\s*[-*]\s+(?!\[[ x]\])/.test(line));
+    if (isUnorderedList && lines.length > 0) {
+      const listItems = lines.map(line => {
+        const match = line.match(/^\s*[-*]\s+(.+)$/);
+        return match ? match[1] : line.trim();
+      });
+      
+      parts.push(
+        <ul key={key++} className="my-4 ml-6 space-y-1 list-disc">
+          {listItems.map((item, idx) => (
+            <li key={idx} className="pl-1">
+              {renderInlineMarkdown(item)}
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Block image with optional caption: ![alt](url) followed by _caption_ or *caption*
+    const blockImageMatch = trimmedBlock.match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\s*\n\s*)?(?:[_*](.+?)[_*])?$/);
+    if (blockImageMatch) {
+      const alt = blockImageMatch[1];
+      const src = blockImageMatch[2];
+      const caption = blockImageMatch[3];
+      
+      parts.push(
+        <figure key={key++} className="my-4">
+          <img 
+            src={src} 
+            alt={alt} 
+            className="w-full max-w-md mx-auto rounded-lg shadow-sm" 
+            loading="lazy"
+          />
+          {caption && (
+            <figcaption className="text-center text-sm text-gray-500 dark:text-gray-400 italic mt-2">
+              {caption}
+            </figcaption>
+          )}
+        </figure>
+      );
+      continue;
+    }
+
+    // Standalone block image (no caption)
+    const standaloneImageMatch = trimmedBlock.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+    if (standaloneImageMatch) {
+      const alt = standaloneImageMatch[1];
+      const src = standaloneImageMatch[2];
+      
+      parts.push(
+        <figure key={key++} className="my-4">
+          <img 
+            src={src} 
+            alt={alt} 
+            className="w-full max-w-md mx-auto rounded-lg shadow-sm" 
+            loading="lazy"
+          />
+        </figure>
+      );
+      continue;
+    }
+
     // Headers: # ## ### etc.
     const firstLine = lines[0];
     const headerMatch = firstLine.match(/^(#{1,6})\s*(.+)$/);
@@ -316,14 +400,15 @@ function renderMarkdown(text: string): React.ReactNode {
 }
 
 /**
- * Handle inline markdown: ~~strikethrough~~, `code`, **bold**, *italic*, [links](url), inline images
+ * Handle inline markdown: ~~strikethrough~~, `code`, **bold**, __bold__, *italic*, _italic_, [links](url), inline images
  */
 function renderInlineMarkdown(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
 
-  // Regex to find inline elements: ~~strikethrough~~, `code`, **bold**, *italic*, [link](url), ![img](url)
-  const inlineRegex = /(~~([^~]+)~~)|(`([^`]+)`)|(\*\*(.+?)\*\*)|(\*(.+?)\*)|(\[([^\]]+)\]\(([^)]+)\))|(!\[([^\]]*)\]\(([^)]+)\))/g;
+  // Regex to find inline elements: ~~strikethrough~~, `code`, **bold**, __bold__, *italic*, _italic_, [link](url), ![img](url)
+  // Order matters: check longer patterns first (** before *, __ before _)
+  const inlineRegex = /(~~([^~]+)~~)|(`([^`]+)`)|(\*\*(.+?)\*\*)|(__(.+?)__)|(?<!\w)_([^_]+?)_(?!\w)|(\*([^*]+?)\*)|(\[([^\]]+)\]\(([^)]+)\))|(!\[([^\]]*)\]\(([^)]+)\))/g;
   
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -344,19 +429,25 @@ function renderInlineMarkdown(text: string): React.ReactNode {
       // Bold: **text**
       parts.push(<strong key={key++}>{match[6]}</strong>);
     } else if (match[7]) {
-      // Italic: *text*
-      parts.push(<em key={key++}>{match[8]}</em>);
+      // Bold: __text__
+      parts.push(<strong key={key++}>{match[8]}</strong>);
     } else if (match[9]) {
+      // Italic: _text_ (underscore)
+      parts.push(<em key={key++}>{match[9]}</em>);
+    } else if (match[10]) {
+      // Italic: *text* (asterisk)
+      parts.push(<em key={key++}>{match[11]}</em>);
+    } else if (match[12]) {
       // Link: [text](url)
       parts.push(
-        <a key={key++} href={match[11]} className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">
-          {match[10]}
+        <a key={key++} href={match[14]} className="text-blue-600 dark:text-blue-400 underline" target="_blank" rel="noopener noreferrer">
+          {match[13]}
         </a>
       );
-    } else if (match[12]) {
+    } else if (match[15]) {
       // Inline image: ![alt](url)
       parts.push(
-        <img key={key++} src={match[14]} alt={match[13]} className="inline-block max-h-24 rounded" />
+        <img key={key++} src={match[17]} alt={match[16]} className="inline-block max-h-24 rounded" />
       );
     }
 
