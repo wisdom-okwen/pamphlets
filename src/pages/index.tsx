@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { NextSeo, ArticleJsonLd } from "next-seo";
 import { Bookmark, MessageCircle, Share2, Eye, Heart, Search, X, Copy, Check } from "lucide-react";
 import { getGenreColor } from "@/models/genreColors";
@@ -25,11 +26,12 @@ interface ArticleWithCounts {
 }
 
 export default function Home() {
+  const router = useRouter();
   const { user } = useAuth();
   const { isOpen, action, openModal, closeModal } = useAuthModal();
   const [searchQuery, setSearchQuery] = useState("");
   const utils = trpc.useUtils();
-  const supabase = useMemo(() => createClient(), []);
+  const supabase = useMemo(() => createClient(), []); 
   
   const { data, isLoading, error } = trpc.articles.getAll.useQuery({
     limit: 20,
@@ -190,13 +192,14 @@ export default function Home() {
     toggleBookmarkMutation.mutate({ articleId });
   };
 
-  const handleComment = (e: React.MouseEvent, articleId: number) => {
+  const handleComment = (e: React.MouseEvent, articleId: number, articleSlug: string) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
       openModal("view and add comments");
       return;
     }
+    router.push(`/articles/${articleSlug}?comments=true`);
   };
 
   const [shareMenuOpen, setShareMenuOpen] = useState<number | null>(null);
@@ -465,7 +468,7 @@ export default function Home() {
                           />
                         </button>
                         <button
-                          onClick={(e) => handleComment(e, article.id)}
+                          onClick={(e) => handleComment(e, article.id, article.slug)}
                           className="relative p-1.5 sm:p-2 rounded-full border border-zinc-200 dark:border-zinc-700 shadow-sm bg-white dark:bg-zinc-800 hover:shadow-md hover:-translate-y-0.5 transition-transform duration-150 touch-manipulation text-zinc-500 dark:text-zinc-400"
                           title="Comments"
                         >
