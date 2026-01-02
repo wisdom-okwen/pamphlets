@@ -559,7 +559,6 @@ export default function ArticleModalPage() {
         "postgres_changes",
         { event: "*", schema: "public", table: "reactions", filter: `article_id=eq.${article.id}` },
         () => {
-          // Invalidate and refetch article to get updated like count
           utils.articles.getBySlug.invalidate({ slug });
         }
       )
@@ -580,7 +579,6 @@ export default function ArticleModalPage() {
         "postgres_changes",
         { event: "*", schema: "public", table: "comments", filter: `article_id=eq.${article.id}` },
         () => {
-          // Refetch comments when they change
           utils.comments.getByArticle.invalidate({ articleId: article.id });
         }
       )
@@ -601,10 +599,8 @@ export default function ArticleModalPage() {
         "postgres_changes",
         { event: "*", schema: "public", table: "reactions" },
         (payload) => {
-          // Check if the reaction is on a comment (comment_id is not null)
           const data = payload.new as { comment_id?: number } | null;
           if (data?.comment_id) {
-            // Refetch comments to get updated reaction counts
             utils.comments.getByArticle.invalidate({ articleId: article.id });
           }
         }
@@ -621,7 +617,6 @@ export default function ArticleModalPage() {
 
   const toggleLikeMutation = trpc.articles.toggleLike.useMutation({
     onSuccess: (data) => {
-      // Update with server confirmed liked state, keep the count
       setOptimisticLike((prev) => {
         if (!prev) return prev;
         return {
@@ -631,7 +626,6 @@ export default function ArticleModalPage() {
       });
     },
     onError: () => {
-      // Revert on error
       setOptimisticLike(null);
     },
   });

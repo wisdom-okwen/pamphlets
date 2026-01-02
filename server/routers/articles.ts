@@ -12,6 +12,7 @@ import {
     userPreferences,
     notifications,
     users,
+    articleViews,
 } from "@/db/schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { generateSlug, generateUniqueSlug } from "@/lib/slug";
@@ -160,11 +161,31 @@ export const articlesRouter = createTRPCRouter({
                 return null;
             }
 
-            // Increment view count
-            await ctx.db
-                .update(articles)
-                .set({ viewCount: article.viewCount + 1 })
-                .where(eq(articles.id, article.id));
+            // Track unique views for logged-in users only
+            const userId = ctx.subject?.id || null;
+            
+            if (userId) {
+                const existingView = await ctx.db.query.articleViews.findFirst({
+                    where: and(
+                        eq(articleViews.articleId, article.id),
+                        eq(articleViews.userId, userId)
+                    ),
+                });
+                
+                // If no existing view, create one and increment the view count
+                if (!existingView) {
+                    await ctx.db.insert(articleViews).values({
+                        articleId: article.id,
+                        userId: userId,
+                    });
+                    
+                    // Increment view count only for new unique views
+                    await ctx.db
+                        .update(articles)
+                        .set({ viewCount: article.viewCount + 1 })
+                        .where(eq(articles.id, article.id));
+                }
+            }
 
             const likeReactions = (article.reactions || []).filter(
                 (r: ReactionType) => r.type === "like"
