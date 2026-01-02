@@ -244,6 +244,20 @@ export const chatMessages = pgTable("chat_messages", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// ============ ARTICLE VIEWS TABLE (for unique view tracking) ============
+export const articleViews = pgTable("article_views", {
+    id: serial("id").primaryKey(),
+    articleId: integer("article_id")
+        .notNull()
+        .references(() => articles.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+}, (table) => ({
+    articleUserIdx: uniqueIndex("article_user_view_idx").on(table.articleId, table.userId),
+}));
+
 // ============ RELATIONS ============
 
 export const usersRelations = relations(users, ({ many, one }) => ({
@@ -302,6 +316,7 @@ export const articlesRelations = relations(articles, ({ one, many }) => ({
     reactions: many(reactions),
     tags: many(articleTags),
     articleGenres: many(articleGenres),
+    views: many(articleViews),
 }));
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -353,6 +368,17 @@ export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
     }),
 }));
 
+export const articleViewsRelations = relations(articleViews, ({ one }) => ({
+    article: one(articles, {
+        fields: [articleViews.articleId],
+        references: [articles.id],
+    }),
+    user: one(users, {
+        fields: [articleViews.userId],
+        references: [users.id],
+    }),
+}));
+
 // ============ TYPE EXPORTS ============
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -380,3 +406,6 @@ export type NewBookmark = typeof bookmarks.$inferInsert;
 
 export type Reaction = typeof reactions.$inferSelect;
 export type NewReaction = typeof reactions.$inferInsert;
+
+export type ArticleView = typeof articleViews.$inferSelect;
+export type NewArticleView = typeof articleViews.$inferInsert;
