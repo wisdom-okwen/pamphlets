@@ -82,32 +82,37 @@
 
 /* Dark theme variables - class-based (controlled by ThemeContext) */
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --background: #0a0c14;
+  --foreground: #e8eaf0;
+  --card: #12162a;
+  --card-foreground: #f8fafc;
+  --popover: #12162a;
+  --popover-foreground: #f8fafc;
+  --primary: #f8fafc;
+  --primary-foreground: #12162a;
+  --secondary: #1e2340;
+  --secondary-foreground: #f8fafc;
+  --muted: #1e2340;
+  --muted-foreground: #9ca3b8;
+  --accent: #1e2340;
+  --accent-foreground: #f8fafc;
   --destructive: #7f1d1d;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #d4d4d8;
-  --sidebar: #0a0a0a;
-  --sidebar-foreground: #fafafa;
-  --sidebar-primary: #fafafa;
-  --sidebar-primary-foreground: #18181b;
-  --sidebar-accent: #27272a;
-  --sidebar-accent-foreground: #fafafa;
-  --sidebar-border: #27272a;
-  --sidebar-ring: #d4d4d8;
+  --border: #1e2340;
+  --input: #1e2340;
+  --ring: #c8cdd8;
+  --sidebar: #0a0c14;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #f8fafc;
+  --sidebar-primary-foreground: #12162a;
+  --sidebar-accent: #1e2340;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #1e2340;
+  --sidebar-ring: #c8cdd8;
+  
+  /* Dark blue tinted zinc overrides */
+  --zinc-700: #2d3352;
+  --zinc-800: #1e2340;
+  --zinc-900: #12162a;
 }
 
 body {
@@ -118,6 +123,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
+
+/* Override zinc colors in dark mode with blue-tinted variants */
+.dark .dark\:bg-zinc-700 { background-color: #2d3352 !important; }
+.dark .dark\:bg-zinc-800 { background-color: #1e2340 !important; }
+.dark .dark\:bg-zinc-900 { background-color: #12162a !important; }
+.dark .dark\:bg-black { background-color: #0a0c14 !important; }
+.dark .dark\:bg-zinc-800\/40 { background-color: rgba(30, 35, 64, 0.4) !important; }
+.dark .dark\:border-zinc-700 { border-color: #2d3352 !important; }
+.dark .dark\:border-zinc-800 { border-color: #1e2340 !important; }
 
 html.scrollbar-gutter-stable {
   scrollbar-gutter: stable;
