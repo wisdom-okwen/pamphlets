@@ -72,8 +72,48 @@ function renderMarkdown(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let key = 0;
 
+  // Pre-process: merge consecutive list items separated by blank lines
+  // This handles cases like "1. Item\n\n2. Item\n\n   - nested\n\n3. Item"
+  const preprocessText = (input: string): string => {
+    const blocks = input.split(/\n\n+/);
+    const mergedBlocks: string[] = [];
+    let currentListBlock: string[] = [];
+    
+    const isListLine = (line: string) => /^\s*(\d+\.|-|\*)\s+/.test(line);
+    const isBlockAList = (block: string) => {
+      const lines = block.split('\n').filter(l => l.trim());
+      return lines.length > 0 && lines.every(l => isListLine(l));
+    };
+    
+    for (const block of blocks) {
+      const trimmedBlock = block.trim();
+      if (!trimmedBlock) continue;
+      
+      if (isBlockAList(trimmedBlock)) {
+        // This block is entirely list items - add to current list
+        currentListBlock.push(trimmedBlock);
+      } else {
+        // Not a list block - flush any accumulated list and add this block
+        if (currentListBlock.length > 0) {
+          mergedBlocks.push(currentListBlock.join('\n'));
+          currentListBlock = [];
+        }
+        mergedBlocks.push(trimmedBlock);
+      }
+    }
+    
+    // Don't forget to flush any remaining list items
+    if (currentListBlock.length > 0) {
+      mergedBlocks.push(currentListBlock.join('\n'));
+    }
+    
+    return mergedBlocks.join('\n\n');
+  };
+
+  const processedText = preprocessText(text);
+
   // Split into blocks (paragraphs, lists, code blocks, etc.)
-  const blocks = text.split(/\n\n+/);
+  const blocks = processedText.split(/\n\n+/);
   
   for (const block of blocks) {
     const trimmedBlock = block.trim();
@@ -193,43 +233,126 @@ function renderMarkdown(text: string): React.ReactNode {
       continue;
     }
 
-    // Ordered list detection (1. 2. 3. etc)
+    // Mixed list detection - supports ordered lists with nested unordered items
+    const isMixedList = lines.some(line => /^\s*\d+\.\s+/.test(line)) && 
+                        lines.every(line => /^\s*(\d+\.|-|\*)\s+/.test(line));
+    
+    // Ordered list detection (1. 2. 3. etc) - with nested list support
     const isOrderedList = lines.every(line => /^\s*\d+\.\s+/.test(line));
-    if (isOrderedList && lines.length > 0) {
-      const listItems = lines.map(line => {
-        const match = line.match(/^\s*\d+\.\s+(.+)$/);
-        return match ? match[1] : line.trim();
-      });
-      
-      parts.push(
-        <ol key={key++} className="my-4 ml-6 space-y-1 list-decimal">
-          {listItems.map((item, idx) => (
-            <li key={idx} className="pl-1">
-              {renderInlineMarkdown(item)}
+    
+    if ((isOrderedList || isMixedList) && lines.length > 0) {
+      const renderMixedList = (items: string[], startIdx: number = 0, baseIndent: number = 0, listType: 'ol' | 'ul' = 'ol'): { element: React.ReactNode; endIdx: number } => {
+        const listItems: React.ReactNode[] = [];
+        let i = startIdx;
+        
+        while (i < items.length) {
+          const line = items[i];
+          const orderedMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
+          const unorderedMatch = line.match(/^(\s*)[-*]\s+(.+)$/);
+          const match = orderedMatch || unorderedMatch;
+          
+          if (!match) { i++; continue; }
+          
+          const currentIndent = match[1].length;
+          const content = match[2];
+          const isOrdered = !!orderedMatch;
+          
+          if (currentIndent < baseIndent) break;
+          
+          if (currentIndent > baseIndent) {
+            // This is a nested item, determine its type
+            const nestedType = isOrdered ? 'ol' : 'ul';
+            const nested = renderMixedList(items, i, currentIndent, nestedType);
+            if (listItems.length > 0) {
+              // Append nested list to last item
+              const lastItem = listItems.pop();
+              listItems.push(
+                <li key={i} className="pl-1">
+                  {lastItem}
+                  {nested.element}
+                </li>
+              );
+            }
+            i = nested.endIdx;
+            continue;
+          }
+          
+          listItems.push(
+            <li key={i} className="pl-1">
+              {renderInlineMarkdown(content)}
             </li>
-          ))}
-        </ol>
-      );
+          );
+          i++;
+        }
+        
+        const ListTag = listType;
+        const listClass = listType === 'ol' ? "ml-6 space-y-1 list-decimal" : "ml-6 space-y-1 list-disc";
+        
+        return {
+          element: <ListTag className={listClass}>{listItems}</ListTag>,
+          endIdx: i
+        };
+      };
+      
+      // Determine if top level starts with ordered or unordered
+      const firstLine = lines[0];
+      const topLevelType = /^\s*\d+\.\s+/.test(firstLine) ? 'ol' : 'ul';
+      
+      const result = renderMixedList(lines, 0, 0, topLevelType);
+      parts.push(<div key={key++} className="my-4">{result.element}</div>);
       continue;
     }
 
-    // Unordered list detection (- or * without checkbox)
+    // Unordered list detection (- or * without checkbox) - with nested list support
     const isUnorderedList = lines.every(line => /^\s*[-*]\s+(?!\[[ x]\])/.test(line));
     if (isUnorderedList && lines.length > 0) {
-      const listItems = lines.map(line => {
-        const match = line.match(/^\s*[-*]\s+(.+)$/);
-        return match ? match[1] : line.trim();
-      });
-      
-      parts.push(
-        <ul key={key++} className="my-4 ml-6 space-y-1 list-disc">
-          {listItems.map((item, idx) => (
-            <li key={idx} className="pl-1">
-              {renderInlineMarkdown(item)}
+      const renderNestedUnorderedList = (items: string[], startIdx: number = 0, baseIndent: number = 0): { element: React.ReactNode; endIdx: number } => {
+        const listItems: React.ReactNode[] = [];
+        let i = startIdx;
+        
+        while (i < items.length) {
+          const line = items[i];
+          const indentMatch = line.match(/^(\s*)[-*]\s+(.+)$/);
+          if (!indentMatch) { i++; continue; }
+          
+          const currentIndent = indentMatch[1].length;
+          const content = indentMatch[2];
+          
+          if (currentIndent < baseIndent) break;
+          
+          if (currentIndent > baseIndent) {
+            // This is a nested item, recurse
+            const nested = renderNestedUnorderedList(items, i, currentIndent);
+            if (listItems.length > 0) {
+              // Append nested list to last item
+              const lastItem = listItems.pop();
+              listItems.push(
+                <li key={i} className="pl-1">
+                  {lastItem}
+                  {nested.element}
+                </li>
+              );
+            }
+            i = nested.endIdx;
+            continue;
+          }
+          
+          listItems.push(
+            <li key={i} className="pl-1">
+              {renderInlineMarkdown(content)}
             </li>
-          ))}
-        </ul>
-      );
+          );
+          i++;
+        }
+        
+        return {
+          element: <ul className="ml-6 space-y-1 list-disc">{listItems}</ul>,
+          endIdx: i
+        };
+      };
+      
+      const result = renderNestedUnorderedList(lines, 0, 0);
+      parts.push(<div key={key++} className="my-4">{result.element}</div>);
       continue;
     }
 
