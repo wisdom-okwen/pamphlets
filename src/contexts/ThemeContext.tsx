@@ -1,50 +1,60 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useSyncExternalStore, useCallback } from "react";
 
 type Theme = "light" | "dark";
+type ThemePreference = "light" | "dark" | "system";
 
 interface ThemeContextType {
   theme: Theme;
+  themePreference: ThemePreference;
   toggle: () => void;
-  setTheme: (t: Theme) => void;
+  setTheme: (t: ThemePreference) => void;
   mounted: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const stored = window.localStorage.getItem("theme") as Theme | null;
-      if (stored === "dark" || stored === "light") {
-        return stored;
-      }
-      // Respect system preference when no stored theme
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-      }
-    }
-    return "light";
-  });
-  const [mounted, setMounted] = useState(() => typeof window !== "undefined");
-
-  // Listen for system theme changes (only if user hasn't set a preference)
-  useEffect(() => {
-    if (!mounted) return;
-    
+// Use useSyncExternalStore for reliable system theme detection
+function useSystemTheme(): Theme {
+  const subscribe = useCallback((callback: () => void) => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only auto-switch if user hasn't explicitly set a theme
-      const stored = window.localStorage.getItem("theme");
-      if (!stored) {
-        setThemeState(e.matches ? "dark" : "light");
-      }
-    };
-    
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [mounted]);
+    mediaQuery.addEventListener("change", callback);
+    return () => mediaQuery.removeEventListener("change", callback);
+  }, []);
+  
+  const getSnapshot = useCallback(() => {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }, []);
+  
+  const getServerSnapshot = useCallback(() => "light" as Theme, []);
+  
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
 
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const systemTheme = useSystemTheme();
+  
+  // Track the user's preference (light, dark, or system)
+  // Initialize with a function to read from localStorage (only runs on client)
+  const [themePreference, setThemePreference] = useState<ThemePreference>(() => {
+    if (typeof window === "undefined") return "system";
+    const stored = window.localStorage.getItem("theme") as ThemePreference | null;
+    if (stored === "dark" || stored === "light" || stored === "system") {
+      return stored;
+    }
+    return "system";
+  });
+  
+  const [mounted, setMounted] = useState(false);
+  
+  // Set mounted after first render
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // Compute the actual theme based on preference
+  const theme: Theme = themePreference === "system" ? systemTheme : themePreference;
+
+  // Apply dark class to document
   useEffect(() => {
     if (!mounted) return;
     const root = document.documentElement;
@@ -53,14 +63,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } else {
       root.classList.remove("dark");
     }
-    window.localStorage.setItem("theme", theme);
   }, [theme, mounted]);
 
-  const toggle = () => setThemeState((t) => (t === "dark" ? "light" : "dark"));
-  const setTheme = (t: Theme) => setThemeState(t);
+  const toggle = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setThemePreference(newTheme);
+    window.localStorage.setItem("theme", newTheme);
+  };
+  
+  const setThemeFunc = (t: ThemePreference) => {
+    setThemePreference(t);
+    window.localStorage.setItem("theme", t);
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggle, setTheme, mounted }}>
+    <ThemeContext.Provider value={{ theme, themePreference, toggle, setTheme: setThemeFunc, mounted }}>
       {children}
     </ThemeContext.Provider>
   );
