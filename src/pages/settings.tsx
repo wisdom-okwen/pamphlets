@@ -153,6 +153,29 @@ function SettingsPage() {
     },
   });
 
+  const deleteAccountMutation = trpc.users.deleteMyAccount.useMutation({
+    onSuccess: async () => {
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    },
+    onError: (err) => {
+      setError(err.message);
+    },
+  });
+
+  const handleDeleteAccount = () => {
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.")) {
+      return;
+    }
+    
+    const confirmText = prompt("Type 'DELETE' to confirm account deletion:");
+    if (confirmText !== "DELETE") {
+      return;
+    }
+    
+    deleteAccountMutation.mutate();
+  };
+
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -547,8 +570,20 @@ function SettingsPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Once you delete your account, there is no going back. Please be certain.
                 </p>
-                <Button variant="destructive" size="sm">
-                  Delete Account
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={handleDeleteAccount}
+                  disabled={deleteAccountMutation.isPending}
+                >
+                  {deleteAccountMutation.isPending ? (
+                    <>
+                      <Loader2 className="size-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete Account"
+                  )}
                 </Button>
               </div>
             </div>
