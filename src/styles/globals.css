@@ -3,38 +3,38 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #faf9f7;
-  --foreground: #1a1a1a;
+  --background: #f0f8ff;
+  --foreground: #1a2a3a;
   --radius: 0.625rem;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
-  --primary: #1a1a1a;
-  --primary-foreground: #faf9f7;
-  --secondary: #f5f3f0;
-  --secondary-foreground: #1a1a1a;
-  --muted: #f5f3f0;
-  --muted-foreground: #6b6b6b;
-  --accent: #f5f3f0;
-  --accent-foreground: #1a1a1a;
+  --card: #e6f4ff;
+  --card-foreground: #1a2a3a;
+  --popover: #e6f4ff;
+  --popover-foreground: #1a2a3a;
+  --primary: #1a2a3a;
+  --primary-foreground: #f0f8ff;
+  --secondary: #d6eeff;
+  --secondary-foreground: #1a2a3a;
+  --muted: #d6eeff;
+  --muted-foreground: #4a6070;
+  --accent: #d6eeff;
+  --accent-foreground: #1a2a3a;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #e8e6e3;
-  --input: #e8e6e3;
-  --ring: #b0aea8;
+  --border: #b8daf0;
+  --input: #b8daf0;
+  --ring: #70b0d8;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: #faf9f7;
-  --sidebar-foreground: #1a1a1a;
-  --sidebar-primary: #1a1a1a;
-  --sidebar-primary-foreground: #faf9f7;
-  --sidebar-accent: #f0eeeb;
-  --sidebar-accent-foreground: #1a1a1a;
-  --sidebar-border: #e8e6e3;
-  --sidebar-ring: #b0aea8;
+  --sidebar: #e0f2ff;
+  --sidebar-foreground: #1a2a3a;
+  --sidebar-primary: #1a2a3a;
+  --sidebar-primary-foreground: #f0f8ff;
+  --sidebar-accent: #d0ebff;
+  --sidebar-accent-foreground: #1a2a3a;
+  --sidebar-border: #b8daf0;
+  --sidebar-ring: #70b0d8;
 }
 
 @theme inline {
@@ -124,16 +124,57 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Override light mode colors with vibrant sky blue variants */
+.bg-white { background-color: #e6f4ff !important; }
+.bg-white\/95 { background-color: rgba(230, 244, 255, 0.95) !important; }
+.bg-white\/90 { background-color: rgba(230, 244, 255, 0.90) !important; }
+.bg-white\/80 { background-color: rgba(230, 244, 255, 0.80) !important; }
+.bg-white\/10 { background-color: rgba(230, 244, 255, 0.10) !important; }
+.bg-zinc-50 { background-color: #e0f2ff !important; }
+.bg-zinc-100 { background-color: #d0ebff !important; }
+.bg-zinc-200 { background-color: #b8daf0 !important; }
+.bg-gray-50 { background-color: #e0f2ff !important; }
+.bg-gray-100 { background-color: #d0ebff !important; }
+.bg-gray-200 { background-color: #b8daf0 !important; }
+.bg-slate-50 { background-color: #e0f2ff !important; }
+.bg-slate-100 { background-color: #d0ebff !important; }
+.bg-slate-200 { background-color: #b8daf0 !important; }
+.border-zinc-200 { border-color: #b8daf0 !important; }
+.border-zinc-300 { border-color: #90c8e8 !important; }
+.border-gray-200 { border-color: #b8daf0 !important; }
+.border-gray-300 { border-color: #90c8e8 !important; }
+.hover\:bg-zinc-100:hover { background-color: #d0ebff !important; }
+.hover\:bg-gray-100:hover { background-color: #d0ebff !important; }
+
+/* Override gradient colors for about panels (signup/login) */
+.from-zinc-900 { --tw-gradient-from: #12162a !important; }
+.via-zinc-800 { --tw-gradient-via: #1e2340 !important; }
+.to-zinc-900 { --tw-gradient-to: #12162a !important; }
+.bg-zinc-900 { background-color: #12162a !important; }
+.bg-zinc-800 { background-color: #1e2340 !important; }
+
 /* Override zinc colors in dark mode with blue-tinted variants */
+.dark .bg-white { background-color: #1e2340 !important; }
+.dark .bg-white\/95 { background-color: rgba(30, 35, 64, 0.95) !important; }
+.dark .bg-white\/90 { background-color: rgba(30, 35, 64, 0.90) !important; }
+.dark .bg-white\/80 { background-color: rgba(30, 35, 64, 0.80) !important; }
+.dark .bg-white\/10 { background-color: rgba(30, 35, 64, 0.10) !important; }
 .dark .dark\:bg-zinc-700 { background-color: #2d3352 !important; }
 .dark .dark\:bg-zinc-800 { background-color: #1e2340 !important; }
 .dark .dark\:bg-zinc-900 { background-color: #12162a !important; }
 .dark .dark\:bg-zinc-950 { background-color: #0a0c14 !important; }
+.dark .dark\:bg-zinc-950\/95 { background-color: rgba(10, 12, 20, 0.95) !important; }
 .dark .dark\:bg-black { background-color: #0a0c14 !important; }
 .dark .dark\:bg-zinc-800\/40 { background-color: rgba(30, 35, 64, 0.4) !important; }
+.dark .dark\:bg-slate-800\/40 { background-color: rgba(30, 35, 64, 0.4) !important; }
 .dark .dark\:border-zinc-700 { border-color: #2d3352 !important; }
 .dark .dark\:border-zinc-800 { border-color: #1e2340 !important; }
 .dark .dark\:hover\:bg-zinc-800:hover { background-color: #1e2340 !important; }
+
+/* Dark mode gradient overrides for about panels */
+.dark .dark\:from-zinc-950 { --tw-gradient-from: #0a0c14 !important; }
+.dark .dark\:via-zinc-900 { --tw-gradient-via: #12162a !important; }
+.dark .dark\:to-zinc-950 { --tw-gradient-to: #0a0c14 !important; }
 
 html.scrollbar-gutter-stable {
   scrollbar-gutter: stable;
