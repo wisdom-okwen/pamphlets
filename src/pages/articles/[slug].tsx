@@ -586,53 +586,91 @@ function renderInlineMarkdown(text: string): React.ReactNode {
 }
 
 /**
- * Split text into pages, breaking at whitespace to avoid cutting words.
- * Preserves markdown images, links, and code blocks by not splitting them.
+ * Split text into pages, breaking at paragraph boundaries when possible.
+ * Preserves markdown images, links, and code blocks by not splitting them mid-element.
  */
 function chunkText(text: string, charsPerPage = 1200): string[] {
   const pages: string[] = [];
+  
+  // Split by double newlines to get paragraphs/blocks
+  const blocks = text.split(/\n\n+/);
+  let currentPage = "";
+  
+  for (const block of blocks) {
+    const trimmedBlock = block.trim();
+    if (!trimmedBlock) continue;
+    
+    // Check if adding this block would exceed the limit
+    const potentialPage = currentPage ? currentPage + "\n\n" + trimmedBlock : trimmedBlock;
+    
+    if (potentialPage.length <= charsPerPage) {
+      // Block fits, add it to current page
+      currentPage = potentialPage;
+    } else if (currentPage) {
+      // Block doesn't fit and we have content - save current page and start new one
+      pages.push(currentPage);
+      
+      // If the block itself is too long, we need to split it
+      if (trimmedBlock.length > charsPerPage) {
+        // Split long block by sentences or at word boundaries
+        const splitBlock = splitLongBlock(trimmedBlock, charsPerPage);
+        for (let i = 0; i < splitBlock.length - 1; i++) {
+          pages.push(splitBlock[i]);
+        }
+        currentPage = splitBlock[splitBlock.length - 1] || "";
+      } else {
+        currentPage = trimmedBlock;
+      }
+    } else {
+      // Current page is empty but block is too long - split it
+      const splitBlock = splitLongBlock(trimmedBlock, charsPerPage);
+      for (let i = 0; i < splitBlock.length - 1; i++) {
+        pages.push(splitBlock[i]);
+      }
+      currentPage = splitBlock[splitBlock.length - 1] || "";
+    }
+  }
+  
+  // Don't forget the last page
+  if (currentPage) {
+    pages.push(currentPage);
+  }
+  
+  return pages.length > 0 ? pages : [""];
+}
+
+/**
+ * Split a long block of text into smaller chunks, preferring sentence boundaries.
+ */
+function splitLongBlock(text: string, maxLength: number): string[] {
+  const chunks: string[] = [];
   let remaining = text;
   
-  // Regex to match markdown images, links, code blocks, and multi-line tables
-  const markdownPattern = /(!?\[[^\]]*\]\([^)]*\))|(`{3}[\s\S]*?`{3})|((?:^\s*\|.*\|\s*$\n?)+)/gm;
-  
-  while (remaining.length > 0) {
-    if (remaining.length <= charsPerPage) {
-      pages.push(remaining);
-      break;
-    }
+  while (remaining.length > maxLength) {
+    let end = maxLength;
     
-    // Find a good break point
-    let end = charsPerPage;
-    
-    // Check if we're in the middle of a markdown pattern (images, links, code blocks)
-    // Find all markdown patterns in the chunk we're about to cut
-    const chunkToCheck = remaining.slice(0, end + 200);
-    let match;
-    markdownPattern.lastIndex = 0;
-    
-    while ((match = markdownPattern.exec(chunkToCheck)) !== null) {
-      const matchStart = match.index;
-      const matchEnd = match.index + match[0].length;
-      
-      // If our cut point is in the middle of a markdown pattern
-      if (matchStart < end && matchEnd > end) {
-        // Move the cut point to before the pattern starts
-        end = matchStart;
-        break;
+    // Try to find a sentence boundary (. ! ?) followed by space
+    const sentenceEnd = remaining.slice(0, maxLength).search(/[.!?]\s+(?=[A-Z])/);
+    if (sentenceEnd > maxLength * 0.5) {
+      // Found a good sentence break in the latter half
+      end = sentenceEnd + 2; // Include the punctuation and space
+    } else {
+      // Fall back to word boundary
+      while (end > 0 && remaining[end] !== " " && remaining[end] !== "\n") {
+        end--;
       }
+      if (end === 0) end = maxLength; // No space found, hard cut
     }
     
-    // Now find last space/newline within the adjusted limit
-    while (end > 0 && remaining[end] !== " " && remaining[end] !== "\n") {
-      end--;
-    }
-    if (end === 0) end = charsPerPage;
-    
-    pages.push(remaining.slice(0, end));
-    remaining = remaining.slice(end).trimStart();
+    chunks.push(remaining.slice(0, end).trim());
+    remaining = remaining.slice(end).trim();
   }
-  return pages;
+  
+  if (remaining) {
+    chunks.push(remaining);
+  }
+  
+  return chunks;
 }
 
 /**
