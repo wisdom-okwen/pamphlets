@@ -72,8 +72,12 @@ export const userPreferences = pgTable("user_preferences", {
         .references(() => users.id, { onDelete: "cascade" })
         .unique(),
     emailNotifications: boolean("email_notifications").default(true).notNull(),
-    subscribeNewArticles: boolean("subscribe_new_articles").default(true).notNull(),
-    subscribeReactionNotifications: boolean("subscribe_reaction_notifications").default(true).notNull(),
+    subscribeNewArticles: boolean("subscribe_new_articles")
+        .default(true)
+        .notNull(),
+    subscribeReactionNotifications: boolean("subscribe_reaction_notifications")
+        .default(true)
+        .notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -87,9 +91,15 @@ export const notifications = pgTable("notifications", {
     type: notificationTypeEnum("type").notNull(),
     title: varchar("title", { length: 255 }).notNull(),
     message: text("message").notNull(),
-    articleId: integer("article_id").references(() => articles.id, { onDelete: "cascade" }),
-    commentId: integer("comment_id").references(() => comments.id, { onDelete: "cascade" }),
-    fromUserId: uuid("from_user_id").references(() => users.id, { onDelete: "set null" }),
+    articleId: integer("article_id").references(() => articles.id, {
+        onDelete: "cascade",
+    }),
+    commentId: integer("comment_id").references(() => comments.id, {
+        onDelete: "cascade",
+    }),
+    fromUserId: uuid("from_user_id").references(() => users.id, {
+        onDelete: "set null",
+    }),
     isRead: boolean("is_read").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -165,29 +175,40 @@ export const articleGenresRelations = relations(articleGenres, ({ one }) => ({
 }));
 
 // ============ TAGS TABLE ============
-export const tags = pgTable("tags", {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 100 }).notNull(),
-    slug: varchar("slug", { length: 100 }).notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => ({
-    tagNameIdx: uniqueIndex("tag_name_idx").on(table.name),
-    tagSlugIdx: uniqueIndex("tag_slug_idx").on(table.slug),
-}));
+export const tags = pgTable(
+    "tags",
+    {
+        id: serial("id").primaryKey(),
+        name: varchar("name", { length: 100 }).notNull(),
+        slug: varchar("slug", { length: 100 }).notNull().unique(),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        tagNameIdx: uniqueIndex("tag_name_idx").on(table.name),
+        tagSlugIdx: uniqueIndex("tag_slug_idx").on(table.slug),
+    })
+);
 
 // ============ ARTICLE_TAGS JOIN TABLE ============
-export const articleTags = pgTable("article_tags", {
-    id: serial("id").primaryKey(),
-    articleId: integer("article_id")
-        .notNull()
-        .references(() => articles.id, { onDelete: "cascade" }),
-    tagId: integer("tag_id")
-        .notNull()
-        .references(() => tags.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => ({
-    articleTagIdx: uniqueIndex("article_tag_idx").on(table.articleId, table.tagId),
-}));
+export const articleTags = pgTable(
+    "article_tags",
+    {
+        id: serial("id").primaryKey(),
+        articleId: integer("article_id")
+            .notNull()
+            .references(() => articles.id, { onDelete: "cascade" }),
+        tagId: integer("tag_id")
+            .notNull()
+            .references(() => tags.id, { onDelete: "cascade" }),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        articleTagIdx: uniqueIndex("article_tag_idx").on(
+            table.articleId,
+            table.tagId
+        ),
+    })
+);
 
 // ============ COMMENTS TABLE ============
 export const comments = pgTable("comments", {
@@ -245,18 +266,25 @@ export const chatMessages = pgTable("chat_messages", {
 });
 
 // ============ ARTICLE VIEWS TABLE (for unique view tracking) ============
-export const articleViews = pgTable("article_views", {
-    id: serial("id").primaryKey(),
-    articleId: integer("article_id")
-        .notNull()
-        .references(() => articles.id, { onDelete: "cascade" }),
-    userId: uuid("user_id")
-        .notNull()
-        .references(() => users.id, { onDelete: "cascade" }),
-    viewedAt: timestamp("viewed_at").defaultNow().notNull(),
-}, (table) => ({
-    articleUserIdx: uniqueIndex("article_user_view_idx").on(table.articleId, table.userId),
-}));
+export const articleViews = pgTable(
+    "article_views",
+    {
+        id: serial("id").primaryKey(),
+        articleId: integer("article_id")
+            .notNull()
+            .references(() => articles.id, { onDelete: "cascade" }),
+        userId: uuid("user_id")
+            .notNull()
+            .references(() => users.id, { onDelete: "cascade" }),
+        viewedAt: timestamp("viewed_at").defaultNow().notNull(),
+    },
+    (table) => ({
+        articleUserIdx: uniqueIndex("article_user_view_idx").on(
+            table.articleId,
+            table.userId
+        ),
+    })
+);
 
 // ============ RELATIONS ============
 
@@ -271,12 +299,15 @@ export const usersRelations = relations(users, ({ many, one }) => ({
     sentNotifications: many(notifications, { relationName: "fromUser" }),
 }));
 
-export const userPreferencesRelations = relations(userPreferences, ({ one }) => ({
-    user: one(users, {
-        fields: [userPreferences.userId],
-        references: [users.id],
-    }),
-}));
+export const userPreferencesRelations = relations(
+    userPreferences,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [userPreferences.userId],
+            references: [users.id],
+        }),
+    })
+);
 
 export const notificationsRelations = relations(notifications, ({ one }) => ({
     user: one(users, {
