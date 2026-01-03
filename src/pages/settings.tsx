@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ const LANGUAGES = [
 
 function SettingsPage() {
   const { user } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { themePreference, setTheme } = useTheme();
   const utils = trpc.useUtils();
   const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -392,9 +393,20 @@ function SettingsPage() {
               <Label>Theme</Label>
               <div className="grid grid-cols-3 gap-3">
                 <button
+                  onClick={() => setTheme("system")}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
+                    themePreference === "system"
+                      ? "border-primary bg-primary/5"
+                      : "border-muted hover:border-muted-foreground/50"
+                  }`}
+                >
+                  <Monitor className="size-6" />
+                  <span className="text-sm font-medium">System</span>
+                </button>
+                <button
                   onClick={() => setTheme("light")}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
-                    theme === "light"
+                    themePreference === "light"
                       ? "border-primary bg-primary/5"
                       : "border-muted hover:border-muted-foreground/50"
                   }`}
@@ -405,7 +417,7 @@ function SettingsPage() {
                 <button
                   onClick={() => setTheme("dark")}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors ${
-                    theme === "dark"
+                    themePreference === "dark"
                       ? "border-primary bg-primary/5"
                       : "border-muted hover:border-muted-foreground/50"
                   }`}
