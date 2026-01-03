@@ -163,7 +163,7 @@ export const articlesRouter = createTRPCRouter({
 
             // Track unique views for logged-in users only
             const userId = ctx.subject?.id || null;
-            
+
             if (userId) {
                 const existingView = await ctx.db.query.articleViews.findFirst({
                     where: and(
@@ -171,14 +171,14 @@ export const articlesRouter = createTRPCRouter({
                         eq(articleViews.userId, userId)
                     ),
                 });
-                
+
                 // If no existing view, create one and increment the view count
                 if (!existingView) {
                     await ctx.db.insert(articleViews).values({
                         articleId: article.id,
                         userId: userId,
                     });
-                    
+
                     // Increment view count only for new unique views
                     await ctx.db
                         .update(articles)
@@ -405,16 +405,21 @@ export const articlesRouter = createTRPCRouter({
                 // set primary genre to first
                 const primary = genreIds[0];
 
+                // Only set publishedAt if publishing for the first time
+                const shouldSetPublishedAt =
+                    data.status === "published" &&
+                    existingArticle?.status !== "published" &&
+                    !existingArticle?.publishedAt;
+
                 await ctx.db
                     .update(articles)
                     .set({
                         ...data,
                         genreId: primary,
                         updatedAt: new Date(),
-                        publishedAt:
-                            data.status === "published"
-                                ? new Date()
-                                : undefined,
+                        publishedAt: shouldSetPublishedAt
+                            ? new Date()
+                            : undefined,
                     })
                     .where(eq(articles.id, id));
 
@@ -435,13 +440,18 @@ export const articlesRouter = createTRPCRouter({
                 }
             }
 
+            // Only set publishedAt if publishing for the first time
+            const shouldSetPublishedAt =
+                data.status === "published" &&
+                existingArticle?.status !== "published" &&
+                !existingArticle?.publishedAt;
+
             const [article] = await ctx.db
                 .update(articles)
                 .set({
                     ...data,
                     updatedAt: new Date(),
-                    publishedAt:
-                        data.status === "published" ? new Date() : undefined,
+                    publishedAt: shouldSetPublishedAt ? new Date() : undefined,
                 })
                 .where(eq(articles.id, id))
                 .returning();
@@ -622,7 +632,9 @@ export const articlesRouter = createTRPCRouter({
         .input(
             z.object({
                 limit: z.number().min(1).max(100).default(50),
-                status: z.enum(["all", "draft", "published", "archived"]).default("all"),
+                status: z
+                    .enum(["all", "draft", "published", "archived"])
+                    .default("all"),
             })
         )
         .query(async ({ ctx, input }) => {
@@ -671,10 +683,19 @@ export const articlesRouter = createTRPCRouter({
             // Calculate totals for statistics overview
             const totalViews = mapped.reduce((sum, a) => sum + a.viewCount, 0);
             const totalLikes = mapped.reduce((sum, a) => sum + a.likeCount, 0);
-            const totalComments = mapped.reduce((sum, a) => sum + a.commentCount, 0);
-            const publishedCount = mapped.filter((a) => a.status === "published").length;
-            const draftCount = mapped.filter((a) => a.status === "draft").length;
-            const archivedCount = mapped.filter((a) => a.status === "archived").length;
+            const totalComments = mapped.reduce(
+                (sum, a) => sum + a.commentCount,
+                0
+            );
+            const publishedCount = mapped.filter(
+                (a) => a.status === "published"
+            ).length;
+            const draftCount = mapped.filter(
+                (a) => a.status === "draft"
+            ).length;
+            const archivedCount = mapped.filter(
+                (a) => a.status === "archived"
+            ).length;
 
             return {
                 items: mapped,
