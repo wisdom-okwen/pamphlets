@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, adminProcedure, protectedProcedure } from "../trpc";
-import { users } from "../db/schema";
-import { eq, asc } from "drizzle-orm";
+import { users, articles, comments } from "../db/schema";
+import { eq, asc, and } from "drizzle-orm";
 import { createAdminClient } from "@/utils/supabase/clients/api";
+
+const DELETED_USER_ID = "00000000-0000-0000-0000-000000000000";
 
 export const usersRouter = createTRPCRouter({
     /**
@@ -104,17 +106,76 @@ export const usersRouter = createTRPCRouter({
     delete: adminProcedure
         .input(z.object({ id: z.string().uuid() }))
         .mutation(async ({ ctx, input }) => {
-            // Delete from database first
+            // Reassign published articles to the "deleted user" account
+            await ctx.db
+                .update(articles)
+                .set({ authorId: DELETED_USER_ID })
+                .where(
+                    and(
+                        eq(articles.authorId, input.id),
+                        eq(articles.status, "published")
+                    )
+                );
+
+            // Reassign comments to the "deleted user" account
+            await ctx.db
+                .update(comments)
+                .set({ userId: DELETED_USER_ID })
+                .where(eq(comments.userId, input.id));
+
+            // Delete from database (this will cascade delete drafts, bookmarks, reactions, etc.)
             await ctx.db.delete(users).where(eq(users.id, input.id));
-            
+
             // Also delete from Supabase Auth
             const supabaseAdmin = createAdminClient();
-            const { error } = await supabaseAdmin.auth.admin.deleteUser(input.id);
-            
+            const { error } = await supabaseAdmin.auth.admin.deleteUser(
+                input.id
+            );
+
             if (error) {
-                console.error("Failed to delete user from Supabase Auth:", error);
+                console.error(
+                    "Failed to delete user from Supabase Auth:",
+                    error
+                );
             }
-            
+
             return { success: true };
         }),
+
+    /**
+     * Delete current user's own account
+     */
+    deleteMyAccount: protectedProcedure.mutation(async ({ ctx }) => {
+        const userId = ctx.subject.id;
+
+        // Reassign published articles to the "deleted user" account
+        await ctx.db
+            .update(articles)
+            .set({ authorId: DELETED_USER_ID })
+            .where(
+                and(
+                    eq(articles.authorId, userId),
+                    eq(articles.status, "published")
+                )
+            );
+
+        // Reassign comments to the "deleted user" account
+        await ctx.db
+            .update(comments)
+            .set({ userId: DELETED_USER_ID })
+            .where(eq(comments.userId, userId));
+
+        // Delete from database (this will cascade delete drafts, bookmarks, reactions, etc.)
+        await ctx.db.delete(users).where(eq(users.id, userId));
+
+        // Also delete from Supabase Auth
+        const supabaseAdmin = createAdminClient();
+        const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+        if (error) {
+            console.error("Failed to delete user from Supabase Auth:", error);
+        }
+
+        return { success: true };
+    }),
 });
