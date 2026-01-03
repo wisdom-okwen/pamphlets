@@ -1062,18 +1062,67 @@ export default function ArticleModalPage() {
         <div
           className="relative flex flex-col items-center w-full max-w-[1100px] max-h-[100dvh] sm:max-h-[95vh]"
         >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              close();
-            }}
-            className="lg:hidden absolute top-0 right-0 sm:-top-2 sm:-right-2 z-[80] p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
-          >
-            <X size={18} />
-          </button>
+          {/* Mobile top bar with close and action buttons */}
+          <div className="lg:hidden absolute top-0 left-0 right-0 z-[80] flex items-center justify-end px-2 py-1">
+            {/* Action buttons and close button on the right */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike();
+                }}
+                className={`relative p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : "text-zinc-600 dark:text-zinc-300"}`}
+              >
+                <Heart size={16} fill={isLiked ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[8px] font-medium min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5">
+                  {likeCount}
+                </span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowComments(!showComments);
+                }}
+                className={`relative p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : "text-zinc-600 dark:text-zinc-300"}`}
+              >
+                <MessageCircle size={16} fill={showComments ? "currentColor" : "none"} />
+                <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[8px] font-medium min-w-[14px] h-[14px] rounded-full flex items-center justify-center px-0.5">
+                  {typedArticle.commentCount ?? 0}
+                </span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleToggleBookmark();
+                }}
+                className={`p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : "text-zinc-600 dark:text-zinc-300"}`}
+              >
+                <Bookmark size={16} fill={bookmarked ? "currentColor" : "none"} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShare();
+                }}
+                className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation text-zinc-600 dark:text-zinc-300"
+              >
+                <Share2 size={16} />
+              </button>
+              {/* Close button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  close();
+                }}
+                className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
 
           {/* Mobile Layout - Single page view */}
-          <div className="lg:hidden w-full mt-8 sm:mt-0">
+          <div className="lg:hidden w-full mt-12 sm:mt-10">
             <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-2xl overflow-hidden">
               {/* Mobile content */}
               <div className="p-3 sm:p-4 min-h-[50vh] max-h-[60vh] sm:max-h-[65vh] overflow-y-auto">
@@ -1120,52 +1169,6 @@ export default function ArticleModalPage() {
               <div className="text-center text-xs text-zinc-500 dark:text-zinc-400 py-2 border-t border-zinc-200 dark:border-zinc-700">
                 {spread === 0 ? "Cover" : `Page ${spread} of ${textPages.length}`}
               </div>
-            </div>
-
-            {/* Mobile action buttons */}
-            <div className="flex justify-center gap-2 sm:gap-3 mt-3 sm:mt-4">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleLike();
-                }}
-                className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${isLiked ? "text-red-500" : "text-zinc-600 dark:text-zinc-300"}`}
-              >
-                <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
-                <span className="absolute -top-1 -right-1 z-10 bg-red-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] rounded-full flex items-center justify-center px-1">
-                  {likeCount}
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowComments(!showComments);
-                }}
-                className={`relative p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${showComments ? "text-blue-500" : "text-zinc-600 dark:text-zinc-300"}`}
-              >
-                <MessageCircle size={18} fill={showComments ? "currentColor" : "none"} />
-                <span className="absolute -top-1 -right-1 z-10 bg-blue-500 text-white text-[9px] sm:text-[10px] font-medium min-w-[16px] sm:min-w-[18px] h-[16px] sm:h-[18px] rounded-full flex items-center justify-center px-1">
-                  {typedArticle.commentCount ?? 0}
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleBookmark();
-                }}
-                className={`p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation ${bookmarked ? "text-yellow-500" : "text-zinc-600 dark:text-zinc-300"}`}
-              >
-                <Bookmark size={18} fill={bookmarked ? "currentColor" : "none"} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleShare();
-                }}
-                className="p-2.5 sm:p-3 rounded-full bg-white dark:bg-zinc-800 shadow hover:scale-110 transition-all duration-200 touch-manipulation text-zinc-600 dark:text-zinc-300"
-              >
-                <Share2 size={18} />
-              </button>
             </div>
 
             {/* Mobile comments panel */}
