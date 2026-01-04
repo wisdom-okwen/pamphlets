@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MarkdownEditor } from "@/components/editor/MarkdownEditor";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Save, Send, Upload, Link as LinkIcon, X } from "lucide-react";
+import { Loader2, Save, Send, Upload, Link as LinkIcon, X, Plus, Check, Search } from "lucide-react";
 import { useNavBarActions } from "@/contexts/NavBarContext";
 
 function NewArticlePage() {
@@ -26,9 +26,32 @@ function NewArticlePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState("");
+  const [isCreatingTag, setIsCreatingTag] = useState(false);
+  const [tagSearch, setTagSearch] = useState("");
 
-  // Fetch genres for the dropdown
+  const utils = trpc.useUtils();
   const { data: genres, isLoading: genresLoading } = trpc.genres.getAll.useQuery();
+
+  // Create genre mutation
+  const createGenre = trpc.genres.createByAuthor.useMutation({
+    onSuccess: (genre) => {
+      setGenreIds((prev) => [...prev, genre.id.toString()]);
+      setNewTagName("");
+      setIsCreatingTag(false);
+      utils.genres.getAll.invalidate();
+    },
+    onError: (err) => {
+      setError(err.message);
+      setIsCreatingTag(false);
+    },
+  });
+
+  const handleCreateTag = () => {
+    if (!newTagName.trim()) return;
+    setIsCreatingTag(true);
+    createGenre.mutate({ name: newTagName.trim() });
+  };
 
   // Create article mutation
   const createArticle = trpc.articles.create.useMutation({
@@ -173,44 +196,123 @@ function NewArticlePage() {
             {/* Genre (multi-select chips) */}
             <div className="space-y-2">
               <Label className="text-base font-medium">
-                Genres
+                Tags
               </Label>
 
-              <div className="relative">
-                <div className="flex flex-wrap gap-2">
-                  {genresLoading ? (
-                    <div className="text-sm text-muted-foreground">Loading genres...</div>
-                  ) : genres && genres.length > 0 ? (
-                    genres.map((genre) => {
-                      const gid = genre.id.toString();
-                      const selected = genreIds.includes(gid);
-                      return (
-                        <button
+              {/* Selected tags */}
+              {genreIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 pb-2">
+                  {genres?.filter(g => genreIds.includes(g.id.toString())).map((genre) => (
+                    <span
+                      key={genre.id}
+                      className="inline-flex items-center gap-1 rounded-full bg-primary text-primary-foreground px-3 py-1 text-sm"
+                    >
+                      {genre.name}
+                      <button
                         type="button"
-                        key={genre.id}
-                        onClick={() =>
-                          setGenreIds((prev) =>
-                            prev.includes(gid)
-                              ? prev.filter((p) => p !== gid)
-                              : [...prev, gid]
-                          )
-                        }
-                          className={`rounded-full px-3 py-1 text-sm transition-colors focus:outline-none ${
-                            selected
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted/10 text-muted-foreground"
-                          }`}
+                        onClick={() => setGenreIds((prev) => prev.filter((p) => p !== genre.id.toString()))}
+                        className="hover:bg-primary-foreground/20 rounded-full p-0.5 transition-colors"
                       >
-                        {genre.name}
+                        <X size={14} />
                       </button>
-                    );
-                  })
-                ) : (
-                  <div className="text-sm text-muted-foreground">No genres available</div>
-                )}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Scrollable tag list */}
+              <div className="relative border border-border rounded-lg">
+                {/* Search input */}
+                <div className="p-2 border-b border-border">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                    <Input
+                      type="text"
+                      placeholder="Search tags..."
+                      value={tagSearch}
+                      onChange={(e) => setTagSearch(e.target.value)}
+                      className="pl-8 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="max-h-40 overflow-y-auto p-2 scrollbar-hide">
+                  {genresLoading ? (
+                    <div className="text-sm text-muted-foreground p-2">Loading tags...</div>
+                  ) : genres && genres.length > 0 ? (
+                    <div className="space-y-1">
+                      {genres
+                        .filter((genre) => 
+                          genre.name.toLowerCase().includes(tagSearch.toLowerCase())
+                        )
+                        .map((genre) => {
+                        const gid = genre.id.toString();
+                        const selected = genreIds.includes(gid);
+                        return (
+                          <button
+                            type="button"
+                            key={genre.id}
+                            onClick={() =>
+                              setGenreIds((prev) =>
+                                prev.includes(gid)
+                                  ? prev.filter((p) => p !== gid)
+                                  : [...prev, gid]
+                              )
+                            }
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
+                              selected
+                                ? "bg-primary/10 text-primary"
+                                : "hover:bg-muted text-foreground"
+                            }`}
+                          >
+                            <span>{genre.name}</span>
+                            {selected && <Check size={16} className="text-primary" />}
+                          </button>
+                        );
+                      })}
+                      {genres.filter((genre) => 
+                        genre.name.toLowerCase().includes(tagSearch.toLowerCase())
+                      ).length === 0 && (
+                        <div className="text-sm text-muted-foreground p-2">No tags match "{tagSearch}"</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground p-2">No tags available</div>
+                  )}
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Select one or more genres</p>
+
+              {/* Create new tag */}
+              <div className="flex gap-2 mt-2">
+                <Input
+                  type="text"
+                  placeholder="Create new tag..."
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleCreateTag();
+                    }
+                  }}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCreateTag}
+                  disabled={!newTagName.trim() || isCreatingTag}
+                  className="shrink-0"
+                >
+                  {isCreatingTag ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Plus size={16} />
+                  )}
+                  <span className="ml-1">Add</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Select one or more tags, or create your own</p>
             </div>
 
             {/* Synopsis */}
