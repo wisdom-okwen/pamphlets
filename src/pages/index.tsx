@@ -372,7 +372,7 @@ export default function Home() {
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group block border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-zinc-900 shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200 relative"
+                className="group block border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 shadow-md hover:shadow-xl hover:-translate-y-1 transform transition-all duration-200 relative"
               >
                 {/* Publish date - top right corner */}
                 {article.publishedAt && (
@@ -390,7 +390,7 @@ export default function Home() {
                 {/* Mobile: Stack vertically, Desktop: Horizontal */}
                 <div className="flex flex-col sm:flex-row">
                   {/* Cover image */}
-                  <div className="w-full sm:w-36 md:w-44 h-36 sm:h-36 shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                  <div className="w-full sm:w-36 md:w-44 h-36 sm:h-36 shrink-0 bg-zinc-100 dark:bg-zinc-800 overflow-hidden sm:rounded-l-lg rounded-t-lg sm:rounded-t-none">
                     {article.coverImageUrl ? (
                       <Image
                         src={article.coverImageUrl}
@@ -492,7 +492,7 @@ export default function Home() {
                             )}
                           </button>
                           {shareMenuOpen === article.id && (
-                            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg py-1 min-w-[140px] sm:min-w-[160px] z-50">
+                            <div className="absolute bottom-full right-0 mb-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg py-1 min-w-[140px] sm:min-w-[160px] z-[100]">
                               <button
                                 onClick={(e) => handleCopyLink(e, { id: article.id, slug: article.slug })}
                                 className="w-full flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors touch-manipulation"
