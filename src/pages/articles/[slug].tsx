@@ -1052,13 +1052,12 @@ export default function ArticleModalPage() {
       <AuthModal isOpen={isOpen} onClose={closeModal} action={action} />
       
       <div
-        className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-2 sm:p-4"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            close();
-          }
-        }}
+        className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-4"
       >
+        <div 
+          className="absolute inset-0 bg-black/80 touch-manipulation"
+          onClick={close}
+        />
         <div
           className="relative flex flex-col items-center w-full max-w-[1100px] max-h-[100dvh] sm:max-h-[95vh]"
         >
@@ -1114,9 +1113,9 @@ export default function ArticleModalPage() {
                   e.stopPropagation();
                   close();
                 }}
-                className="p-2 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
+                className="p-2.5 rounded-full bg-white dark:bg-zinc-800 shadow-lg touch-manipulation"
               >
-                <X size={18} />
+                <X size={20} />
               </button>
             </div>
           </div>

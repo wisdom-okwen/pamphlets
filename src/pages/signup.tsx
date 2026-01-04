@@ -36,7 +36,6 @@ export default function SignupPage() {
     setIsLoading(true);
     setError(null);
 
-    // Validate passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       setIsLoading(false);
@@ -79,7 +78,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Create user record in public.users table
       const { error: profileError } = await supabase
         .from("users")
         .upsert(
@@ -94,10 +92,8 @@ export default function SignupPage() {
 
       if (profileError) {
         console.error("Error creating user profile:", profileError);
-        // Don't block signup if profile creation fails
       }
 
-      // Redirect to home page after successful signup
       window.location.href = "/";
     } catch {
       setError("An error occurred during signup. Please try again.");
@@ -132,9 +128,7 @@ export default function SignupPage() {
       />
 
       <main className="flex min-h-screen">
-        {/* Left Side - About Section */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 text-white p-12 flex-col justify-between relative overflow-hidden">
-          {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-10 left-10 w-32 h-32 border border-white/20 rounded-full" />
             <div className="absolute top-40 right-20 w-24 h-24 border border-white/20 rounded-full" />
@@ -204,9 +198,7 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Right Side - Signup */}
         <div className="w-full lg:w-1/2 flex items-center justify-center bg-background px-4 sm:px-6 py-8 min-h-screen overflow-y-auto relative">
-          {/* Top buttons - About (mobile only) and Theme Toggle */}
           <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
             {mounted && (
               <>
@@ -455,7 +447,6 @@ export default function SignupPage() {
         {/* Mobile About Modal */}
         {showAbout && (
           <div className="lg:hidden fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            {/* Backdrop */}
             <div 
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setShowAbout(false)}
@@ -463,15 +454,13 @@ export default function SignupPage() {
             
             {/* Modal */}
             <div className="relative w-full sm:max-w-md bg-zinc-900 text-white rounded-t-2xl sm:rounded-2xl p-6 pb-8 sm:m-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
-              {/* Close button */}
               <button
                 onClick={() => setShowAbout(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                className="absolute top-4 right-4 p-2.5 rounded-full hover:bg-white/10 transition-colors touch-manipulation"
               >
                 <X size={20} />
               </button>
 
-              {/* Header */}
               <div className="flex items-center gap-3 mb-4">
                 <img
                   src="/pamphlets.svg"
@@ -482,7 +471,6 @@ export default function SignupPage() {
               </div>
               <p className="text-white/80 text-sm mb-6">Read and share personal writings on anything</p>
 
-              {/* Content */}
               <h2 className="text-xl font-bold mb-3">
                 Start writing.<br />Share your voice.
               </h2>

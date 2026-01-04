@@ -24,9 +24,9 @@ export function AuthModal({ isOpen, onClose, action }: AuthModalProps) {
       <div className="relative bg-white dark:bg-zinc-900 rounded-xl shadow-xl p-6 m-4 max-w-sm w-full">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          className="absolute top-4 right-4 p-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 touch-manipulation"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         <div className="text-center">
