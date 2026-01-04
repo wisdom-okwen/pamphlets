@@ -164,7 +164,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-2">
         {/* Public nav items (Home) */}
         {publicNavItems.map((item) => {
           const isActive = router.pathname === item.href;
@@ -173,10 +173,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors border ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
               }`}
             >
               <item.icon size={20} />
@@ -193,10 +193,10 @@ export function Sidebar() {
               key={item.href}
               href={user ? item.href : "#"}
               onClick={(e) => handleProtectedClick(e, item)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors border ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
               }`}
             >
               <item.icon size={20} />
@@ -220,10 +220,10 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors border ${
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <item.icon size={20} />
@@ -249,10 +249,10 @@ export function Sidebar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors border ${
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   <item.icon size={20} />
