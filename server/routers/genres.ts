@@ -1,7 +1,16 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure, adminProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure, adminProcedure, authorProcedure } from "../trpc";
 import { genres } from "@/db/schema";
 import { eq } from "drizzle-orm";
+
+function createSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
 
 export const genresRouter = createTRPCRouter({
     // Get all genres
@@ -43,6 +52,35 @@ export const genresRouter = createTRPCRouter({
             const [genre] = await ctx.db
                 .insert(genres)
                 .values(input)
+                .returning();
+            return genre;
+        }),
+
+    // Create genre by author (auto-generates slug)
+    createByAuthor: authorProcedure
+        .input(
+            z.object({
+                name: z.string().min(1).max(100),
+            })
+        )
+        .mutation(async ({ ctx, input }) => {
+            const slug = createSlug(input.name);
+            
+            // Check if genre with this slug already exists
+            const existing = await ctx.db.query.genres.findFirst({
+                where: eq(genres.slug, slug),
+            });
+            
+            if (existing) {
+                return existing;
+            }
+            
+            const [genre] = await ctx.db
+                .insert(genres)
+                .values({
+                    name: input.name.trim(),
+                    slug,
+                })
                 .returning();
             return genre;
         }),

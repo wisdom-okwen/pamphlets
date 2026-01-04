@@ -176,3 +176,27 @@ export const adminProcedure = t.procedure
             },
         });
     });
+
+/**
+ * Author (author or admin role required) procedure
+ *
+ * Author API routes that require the user to have author or admin role.
+ */
+export const authorProcedure = t.procedure
+    .use(timingMiddleware)
+    .use(({ ctx, next }) => {
+        if (!ctx.subject) {
+            throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
+        if (ctx.subject.role !== "author" && ctx.subject.role !== "admin") {
+            throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Author access required",
+            });
+        }
+        return next({
+            ctx: {
+                subject: ctx.subject,
+            },
+        });
+    });
