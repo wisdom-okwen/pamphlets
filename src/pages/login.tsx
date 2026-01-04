@@ -316,7 +316,7 @@ export default function LoginPage() {
               {/* Close button */}
               <button
                 onClick={() => setShowAbout(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                className="absolute top-4 right-4 p-2.5 rounded-full hover:bg-white/10 transition-colors touch-manipulation"
               >
                 <X size={20} />
               </button>

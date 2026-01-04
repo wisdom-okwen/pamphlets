@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {
@@ -49,6 +49,53 @@ export function Sidebar() {
   const { isOpen: isAuthModalOpen, action, openModal, closeModal } = useAuthModal();
   const supabase = useMemo(() => createClient(), []);
   const utils = trpc.useUtils();
+  
+  // Swipe gesture handling
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchEndX - touchStartX.current;
+    const deltaY = touchEndY - touchStartY.current;
+    
+    const minSwipeDistance = 50;
+    const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+    const screenWidth = window.innerWidth;
+    
+    if (isHorizontalSwipe && Math.abs(deltaX) > minSwipeDistance) {
+      // Swipe left from right edge to open (only when starting from right 50px of screen)
+      if (deltaX < 0 && touchStartX.current > screenWidth - 50 && !isOpen) {
+        setIsOpen(true);
+      }
+      // Swipe right to close
+      if (deltaX > 0 && isOpen) {
+        setIsOpen(false);
+      }
+    }
+    
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, [isOpen]);
+
+  // Add swipe gesture listeners
+  useEffect(() => {
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
+    document.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchEnd]);
 
   // Fetch user profile from database
   const { data: profile } = trpc.users.getMyProfile.useQuery(undefined, {
@@ -285,11 +332,11 @@ export function Sidebar() {
       
       {/* Mobile hamburger button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm touch-manipulation"
-        aria-label="Open menu"
+        aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        <Menu size={20} />
+        {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Desktop sidebar */}
