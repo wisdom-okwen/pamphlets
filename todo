@@ -6,7 +6,7 @@
 * Request to become author + admin page to approve/reject author request
 * Messaging Admins
 * Following/Followers impl
-* 
+* Make chatbot more contextual with info on pamphlets statistics and detailed information
 
 ### Bugs
 * Pamphlet link in email subscriptions is invalid
