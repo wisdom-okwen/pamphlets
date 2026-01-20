@@ -1,0 +1,22 @@
+# Bugs To Fix & Features To Implement
+
+### Features
+* Implement localization
+* Deleting/editing a comment
+* Request to become author + admin page to approve/reject author request
+* Messaging Admins
+* Following/Followers impl
+* 
+
+### Bugs
+* Pamphlet link in email subscriptions is invalid
+
+
+
+    #### Mobile
+    * The theme switcher button is hidden behind the menu icon in mobile screen
+    * Navigation buttons (Next/Prev. on pamphlet details is hidden in mobile when comments window is open)
+
+
+    #### Large Screens
+
