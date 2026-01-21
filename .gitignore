@@ -48,7 +48,7 @@ next-env.d.ts
 .env.production.local
 
 # todo comments
-todo
+# todo
 
 # Migrations
 /drizzle

@@ -333,7 +333,7 @@ export function Sidebar() {
       {/* Mobile hamburger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-3 right-4 z-[60] p-2.5 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm touch-manipulation"
+        className="lg:hidden fixed top-3 right-2 z-[60] p-2.5 rounded-lg bg-white dark:bg-zinc-900 border dark:border-zinc-800 shadow-sm touch-manipulation"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
