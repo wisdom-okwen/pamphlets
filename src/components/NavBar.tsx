@@ -68,7 +68,7 @@ export default function NavBar({
   return (
     <>
       <header className="w-full sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm">
-        <div className="w-full px-4 sm:px-6 lg:px-8 pr-16 lg:pr-8 h-15 flex items-center">
+        <div className="w-full px-4 sm:px-6 lg:px-8 pr-14 sm:pr-6 lg:pr-8 h-15 flex items-center">
         {/* Left: Logo / Back button */}
         <div className="flex items-center gap-2 w-1/3">
           {backHref ? (
